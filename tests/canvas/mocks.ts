@@ -16,7 +16,11 @@ export interface MockCanvasContext {
 }
 
 /**
- * Creates a mock 2D canvas context with jest-like spies
+ * Create a mock 2D canvas context with jest-style spy functions for common drawing methods.
+ *
+ * The returned object provides spy functions for methods used in tests and initializes `fillStyle` to an empty string.
+ *
+ * @returns A `MockCanvasContext` whose drawing methods are jest-style spies and whose `fillStyle` is `""`.
  */
 export function createMockCanvasContext(): MockCanvasContext {
 	return {
@@ -31,8 +35,11 @@ export function createMockCanvasContext(): MockCanvasContext {
 }
 
 /**
- * Sets up canvas prototype mocks for testing
- * Call in beforeEach to ensure clean state
+ * Install test-friendly mocks on HTMLCanvasElement prototypes.
+ *
+ * Mocks:
+ * - `toBlob(callback, type, quality)` — invokes `callback` with a `Blob` whose data is `"mock-canvas-data"` and whose MIME type is `type` or `"image/png"`.
+ * - `toDataURL(type, quality)` — returns a data URL of the form `data:<type or "image/png">;base64,mockbase64data`.
  */
 export function setupCanvasMocks(): void {
 	// Mock toBlob
@@ -55,8 +62,9 @@ export function setupCanvasMocks(): void {
 }
 
 /**
- * Restores original canvas methods
- * Call in afterEach if needed
+ * Restore original HTMLCanvasElement methods that may have been overridden for tests.
+ *
+ * This is safe to call from test teardown; in environments where originals are not present (for example, happy-dom) the function may be a no-op.
  */
 export function restoreCanvasMocks(): void {
 	// In happy-dom these may not have original implementations
@@ -64,7 +72,9 @@ export function restoreCanvasMocks(): void {
 }
 
 /**
- * Creates a canvas element with a mock context
+ * Create an HTMLCanvasElement whose "2d" context is replaced with a mock context.
+ *
+ * @returns An object containing the created `canvas` and the mock `MockCanvasContext` that will be returned when calling `canvas.getContext("2d")`
  */
 export function createMockCanvas(
 	width = 200,

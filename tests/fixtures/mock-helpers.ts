@@ -3,7 +3,11 @@
  */
 
 /**
- * Creates a mock HTMLImageElement with specified dimensions
+ * Create an HTMLImageElement whose naturalWidth and naturalHeight match the given dimensions.
+ *
+ * @param width - Desired natural width in pixels (default: 400)
+ * @param height - Desired natural height in pixels (default: 300)
+ * @returns The created HTMLImageElement with `naturalWidth` equal to `width` and `naturalHeight` equal to `height`
  */
 export function createMockImage(width = 400, height = 300): HTMLImageElement {
 	const img = document.createElement("img");
@@ -16,7 +20,11 @@ export function createMockImage(width = 400, height = 300): HTMLImageElement {
 }
 
 /**
- * Creates a PointerEvent for testing drag interactions
+ * Create a PointerEvent configured for simulating pointer-based drag interactions in tests.
+ *
+ * @param type - The event type (e.g., "pointerdown", "pointermove", "pointerup").
+ * @param options - Partial PointerEventInit values that override the following defaults: bubbles = true, cancelable = true, clientX = 100, clientY = 100, button = 0, pointerId = 1, pointerType = "mouse".
+ * @returns The constructed PointerEvent with the merged defaults and provided overrides.
  */
 export function createPointerEvent(
 	type: string,
@@ -35,7 +43,11 @@ export function createPointerEvent(
 }
 
 /**
- * Creates a WheelEvent for testing zoom interactions
+ * Create a WheelEvent representing a wheel gesture used for zoom interactions.
+ *
+ * @param deltaY - Vertical scroll delta; positive values indicate movement away from the user.
+ * @param options - Partial WheelEventInit to override the default event properties.
+ * @returns A WheelEvent with `deltaY` set to the provided value, `bubbles` true, `cancelable` true, `deltaMode` 0, and any provided `options` applied on top of these defaults.
  */
 export function createWheelEvent(
 	deltaY: number,
@@ -51,7 +63,11 @@ export function createWheelEvent(
 }
 
 /**
- * Creates a TouchEvent for testing pinch zoom
+ * Creates a TouchEvent with synthetic touch points for testing gestures such as pinch/zoom.
+ *
+ * @param type - The touch event type (e.g., `"touchstart"`, `"touchmove"`, `"touchend"`).
+ * @param touches - Array of touch coordinates; each entry provides `clientX` and `clientY` for a touch point.
+ * @returns A TouchEvent whose `touches` list contains one touch per input coordinate. Each synthetic touch has an incremental `identifier`, `target` set to `document.body`, matching `clientX`/`clientY`/`pageX`/`pageY`/`screenX`/`screenY`, and default `radiusX`/`radiusY` of `1`, `rotationAngle` of `0`, and `force` of `1`. The event is created with `bubbles: true` and `cancelable: true`.
  */
 export function createTouchEvent(
 	type: string,
@@ -80,7 +96,15 @@ export function createTouchEvent(
 }
 
 /**
- * Simulates a drag operation on an element
+ * Simulates a user drag on an element between two client coordinates.
+ *
+ * Dispatches pointerdown at the start coordinates, pointermove to the end coordinates, and pointerup at the end coordinates.
+ *
+ * @param element - The element that will receive the pointer events
+ * @param startX - Starting client X coordinate in pixels
+ * @param startY - Starting client Y coordinate in pixels
+ * @param endX - Ending client X coordinate in pixels
+ * @param endY - Ending client Y coordinate in pixels
  */
 export async function simulateDrag(
 	element: HTMLElement,
@@ -101,14 +125,19 @@ export async function simulateDrag(
 }
 
 /**
- * Waits for the next animation frame
+ * Waits until the next animation frame.
+ *
+ * @returns Resolves with no value after the next animation frame.
  */
 export function nextFrame(): Promise<void> {
 	return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }
 
 /**
- * Waits for a specified number of milliseconds
+ * Pause execution for a given duration.
+ *
+ * @param ms - Delay duration in milliseconds
+ * @returns `undefined` after the specified delay
  */
 export function wait(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
