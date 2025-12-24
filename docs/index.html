@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Croppie - Modern Image Cropper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../dist/croppie.css">
+  <style>
+    :root {
+      --bg: #050505;
+      --text: #fafafa;
+      --text-muted: #737373;
+      --accent: #818cf8;
+      --accent-dim: rgba(129, 140, 248, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', 'Courier New', Consolas, monospace;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grid pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 800px;
+      padding: 3rem 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 4rem;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .tagline::after {
+      content: '▋';
+      color: var(--accent);
+      animation: blink 1s step-end infinite;
+      margin-left: 0.25em;
+    }
+
+    .badges {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 9999px;
+      color: var(--text-muted);
+    }
+
+    .badge.highlight {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* Demo section */
+    .demo-section {
+      margin-bottom: 4rem;
+      animation: fadeIn 0.8s ease-out 0.2s both;
+    }
+
+    .section-title {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+    }
+
+    .demo-area {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    #croppie-demo {
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .demo-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.625rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #050505;
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.1);
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    .result-preview {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .result-preview.show {
+      display: flex;
+    }
+
+    .result-preview img {
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Code section */
+    .code-section {
+      animation: fadeIn 0.8s ease-out 0.4s both;
+    }
+
+    .code-block {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-size: 0.8125rem;
+      line-height: 1.6;
+    }
+
+    .code-block code {
+      color: var(--text-muted);
+    }
+
+    .code-block .keyword { color: #c678dd; }
+    .code-block .string { color: #98c379; }
+    .code-block .comment { color: #5c6370; }
+    .code-block .function { color: #61afef; }
+
+    /* Footer */
+    footer {
+      margin-top: 4rem;
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      animation: fadeIn 0.8s ease-out 0.6s both;
+    }
+
+    footer a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      transition: border-color 0.2s ease;
+    }
+
+    footer a:hover {
+      border-color: var(--accent);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Croppie overrides for dark theme */
+    .croppie-container {
+      --croppie-boundary-bg: #0a0a0f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="logo">Croppie</h1>
+      <p class="tagline">the elegant image cropper</p>
+      <div class="badges">
+        <span class="badge highlight">~10KB</span>
+        <span class="badge">TypeScript</span>
+        <span class="badge">ES Modules</span>
+        <span class="badge">Zero Dependencies</span>
+      </div>
+    </header>
+
+    <section class="demo-section">
+      <h2 class="section-title">Try it</h2>
+      <div class="demo-area">
+        <div id="croppie-demo"></div>
+        <div class="demo-controls">
+          <input type="file" id="file-input" accept="image/*">
+          <button class="btn" onclick="document.getElementById('file-input').click()">
+            Upload Image
+          </button>
+          <button class="btn primary" id="crop-btn">
+            Crop →
+          </button>
+        </div>
+        <div class="result-preview" id="result-preview">
+          <img id="result-img" width="128" height="128" alt="Cropped result">
+          <span class="result-label">128×128 output</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="code-section">
+      <h2 class="section-title">Install</h2>
+      <div class="code-block">
+        <code>
+<span class="comment"># npm</span>
+npm install @bayinformatics/croppie
+
+<span class="comment"># or from git</span>
+npm install github:bayinformatics/croppie
+        </code>
+      </div>
+    </section>
+
+    <section class="code-section" style="margin-top: 2rem;">
+      <h2 class="section-title">Usage</h2>
+      <div class="code-block">
+        <code>
+<span class="keyword">import</span> Croppie <span class="keyword">from</span> <span class="string">'@bayinformatics/croppie'</span>
+<span class="keyword">import</span> <span class="string">'@bayinformatics/croppie/croppie.css'</span>
+
+<span class="keyword">const</span> cropper = <span class="keyword">new</span> <span class="function">Croppie</span>(element, {
+  viewport: { width: <span class="string">200</span>, height: <span class="string">200</span>, type: <span class="string">'circle'</span> },
+  boundary: { width: <span class="string">300</span>, height: <span class="string">300</span> }
+})
+
+<span class="comment">// Bind a file directly</span>
+<span class="keyword">await</span> cropper.<span class="function">bindFile</span>(file)
+
+<span class="comment">// Get cropped result</span>
+<span class="keyword">const</span> blob = <span class="keyword">await</span> cropper.<span class="function">result</span>({ type: <span class="string">'blob'</span> })
+        </code>
+      </div>
+    </section>
+
+    <footer>
+      <p>
+        Maintained fork of <a href="https://github.com/Foliotek/Croppie">Foliotek/Croppie</a>
+        · <a href="https://github.com/bayinformatics/croppie">GitHub</a>
+        · MIT License
+      </p>
+    </footer>
+  </div>
+
+  <script type="module">
+    import Croppie from '../dist/croppie.js'
+
+    const demoEl = document.getElementById('croppie-demo')
+    const fileInput = document.getElementById('file-input')
+    const cropBtn = document.getElementById('crop-btn')
+    const resultPreview = document.getElementById('result-preview')
+    const resultImg = document.getElementById('result-img')
+
+    const croppie = new Croppie(demoEl, {
+      viewport: { width: 200, height: 200, type: 'circle' },
+      boundary: { width: 300, height: 300 },
+      showZoomer: true
+    })
+
+    // Load default image
+    croppie.bind({ url: 'https://picsum.photos/600/400?random=1' })
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0]
+      if (file) {
+        await croppie.bindFile(file)
+        resultPreview.classList.remove('show')
+      }
+    })
+
+    cropBtn.addEventListener('click', async () => {
+      const blob = await croppie.result({
+        type: 'blob',
+        size: { width: 128, height: 128 },
+        circle: true
+      })
+      resultImg.src = URL.createObjectURL(blob)
+      resultPreview.classList.add('show')
+    })
+  </script>
+</body>
+</html>
