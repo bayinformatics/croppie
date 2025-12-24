@@ -1,5 +1,6 @@
-import { describe, expect, it, beforeEach } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach } from "bun:test";
 import { createElement, getTransformValues, setTransform } from "../../src/utils/dom.ts";
+import { installGetComputedStyleMock } from "../fixtures/mock-helpers.ts";
 
 describe("DOM utilities", () => {
 	describe("createElement", () => {
@@ -118,10 +119,17 @@ describe("DOM utilities", () => {
 
 	describe("getTransformValues", () => {
 		let element: HTMLDivElement;
+		let cleanupMock: () => void;
 
 		beforeEach(() => {
+			cleanupMock = installGetComputedStyleMock();
 			element = document.createElement("div");
 			document.body.appendChild(element);
+		});
+
+		afterEach(() => {
+			element.remove();
+			cleanupMock();
 		});
 
 		it("returns defaults when no transform is set", () => {
@@ -141,10 +149,7 @@ describe("DOM utilities", () => {
 			expect(values.scale).toBe(1);
 		});
 
-		// Note: happy-dom doesn't compute CSS transforms, so getComputedStyle returns raw values
-		// These tests would work in a real browser but are skipped here
-		// In happy-dom, getComputedStyle doesn't convert transforms to matrix()
-		it.skip("extracts translation from translate transform", () => {
+		it("extracts translation from translate transform", () => {
 			element.style.transform = "translate(50px, 100px)";
 			const values = getTransformValues(element);
 
@@ -152,14 +157,14 @@ describe("DOM utilities", () => {
 			expect(values.y).toBe(100);
 		});
 
-		it.skip("extracts scale from scale transform", () => {
+		it("extracts scale from scale transform", () => {
 			element.style.transform = "scale(2)";
 			const values = getTransformValues(element);
 
 			expect(values.scale).toBeCloseTo(2, 5);
 		});
 
-		it.skip("extracts combined translate and scale", () => {
+		it("extracts combined translate and scale", () => {
 			element.style.transform = "translate(25px, 75px) scale(1.5)";
 			const values = getTransformValues(element);
 
@@ -168,7 +173,7 @@ describe("DOM utilities", () => {
 			expect(values.scale).toBeCloseTo(1.5, 5);
 		});
 
-		it.skip("handles negative translations", () => {
+		it("handles negative translations", () => {
 			element.style.transform = "translate(-30px, -60px)";
 			const values = getTransformValues(element);
 
@@ -176,7 +181,7 @@ describe("DOM utilities", () => {
 			expect(values.y).toBeCloseTo(-60, 5);
 		});
 
-		it.skip("handles fractional values", () => {
+		it("handles fractional values", () => {
 			element.style.transform = "translate(10.5px, 20.25px) scale(0.75)";
 			const values = getTransformValues(element);
 
@@ -185,7 +190,7 @@ describe("DOM utilities", () => {
 			expect(values.scale).toBeCloseTo(0.75, 5);
 		});
 
-		it.skip("handles zero scale", () => {
+		it("handles zero scale", () => {
 			element.style.transform = "scale(0)";
 			const values = getTransformValues(element);
 
@@ -249,14 +254,19 @@ describe("DOM utilities", () => {
 		});
 	});
 
-	// Note: These roundtrip tests are skipped because happy-dom doesn't compute CSS transforms
-	// They would work in a real browser environment
-	describe.skip("setTransform and getTransformValues roundtrip", () => {
+	describe("setTransform and getTransformValues roundtrip", () => {
 		let element: HTMLDivElement;
+		let cleanupMock: () => void;
 
 		beforeEach(() => {
+			cleanupMock = installGetComputedStyleMock();
 			element = document.createElement("div");
 			document.body.appendChild(element);
+		});
+
+		afterEach(() => {
+			element.remove();
+			cleanupMock();
 		});
 
 		it("roundtrips basic values", () => {

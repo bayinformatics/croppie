@@ -79,8 +79,8 @@ export function createPinchZoomHandler(
 
 	const getDistance = (touches: TouchList): number => {
 		if (touches.length < 2) return 0;
-		const touch1 = touches.item(0);
-		const touch2 = touches.item(1);
+		const touch1 = touches[0];
+		const touch2 = touches[1];
 		if (!touch1 || !touch2) return 0;
 		const dx = touch1.clientX - touch2.clientX;
 		const dy = touch1.clientY - touch2.clientY;

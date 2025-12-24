@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import {
 	loadImage,
 	fileToDataUrl,
@@ -7,12 +7,19 @@ import {
 	calculateInitialZoom,
 } from "../../src/utils/image.ts";
 import { TINY_PNG, RED_PNG, SMALL_PNG } from "../fixtures/test-image-data-url.ts";
-import { createMockImage } from "../fixtures/mock-helpers.ts";
+import { createMockImage, installImageMock } from "../fixtures/mock-helpers.ts";
 
 describe("Image utilities", () => {
-	// Note: loadImage tests are skipped because happy-dom's Image doesn't trigger onload for data URLs
-	// These tests would work in a real browser environment
-	describe.skip("loadImage", () => {
+	describe("loadImage", () => {
+		let cleanupImageMock: () => void;
+
+		beforeEach(() => {
+			cleanupImageMock = installImageMock();
+		});
+
+		afterEach(() => {
+			cleanupImageMock();
+		});
 		it("loads a data URL image", async () => {
 			const img = await loadImage(TINY_PNG);
 
@@ -23,7 +30,8 @@ describe("Image utilities", () => {
 		it("does not set crossOrigin for data URLs", async () => {
 			const img = await loadImage(TINY_PNG);
 
-			expect(img.crossOrigin).toBe("");
+			// crossOrigin should not be set for data URLs (null or "" both indicate not set)
+			expect(img.crossOrigin === null || img.crossOrigin === "").toBe(true);
 		});
 
 		it("loads different data URL images", async () => {
@@ -36,23 +44,10 @@ describe("Image utilities", () => {
 			expect(small.src).toBe(SMALL_PNG);
 		});
 
-		it("sets crossOrigin to anonymous for external URLs", async () => {
-			// Create a promise that we control
-			let resolveLoad: () => void;
-			const loadPromise = new Promise<void>((resolve) => {
-				resolveLoad = resolve;
-			});
-
-			// Start loading - we can't await it because external URLs won't load in tests
-			const imagePromise = loadImage("https://example.com/test.png");
-
-			// Check that the image was created with crossOrigin set
-			// We need to inspect this before the load completes
-			const img = document.querySelector('img[src="https://example.com/test.png"]');
-
-			// Since we can't await an external URL, just verify the function works with data URLs
-			// The crossOrigin behavior is best tested by inspecting the source code
-		});
+		// Note: crossOrigin behavior for external URLs is best verified by inspecting
+		// the source code at src/utils/image.ts:loadImage, as external URLs cannot be
+		// tested in happy-dom. The implementation sets crossOrigin = "anonymous" for
+		// non-data-URL sources.
 
 		it("rejects when image fails to load", async () => {
 			// In happy-dom, invalid data URLs may or may not trigger error

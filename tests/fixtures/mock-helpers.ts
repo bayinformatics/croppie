@@ -3,6 +3,110 @@
  */
 
 /**
+ * Install a mock Image constructor that automatically fires onload when src is set.
+ * This works around happy-dom's limitation where Image.onload doesn't fire for data URLs.
+ *
+ * @returns A cleanup function that restores the original Image constructor
+ */
+export function installImageMock(): () => void {
+	const OriginalImage = globalThis.Image;
+
+	class MockImage extends OriginalImage {
+		private _src = "";
+		private _onload: ((event: Event) => void) | null = null;
+		private _onerror: ((event: Event) => void) | null = null;
+
+		get src(): string {
+			return this._src;
+		}
+
+		set src(value: string) {
+			this._src = value;
+			// Schedule onload/onerror to fire asynchronously (like real browsers)
+			setTimeout(() => {
+				if (value.startsWith("data:") || value.startsWith("http")) {
+					// Simulate successful load for data URLs and http URLs
+					if (this._onload) {
+						this._onload(new Event("load"));
+					}
+				} else {
+					// Simulate error for invalid URLs
+					if (this._onerror) {
+						this._onerror(new Event("error"));
+					}
+				}
+			}, 0);
+		}
+
+		get onload(): ((event: Event) => void) | null {
+			return this._onload;
+		}
+
+		set onload(handler: ((event: Event) => void) | null) {
+			this._onload = handler;
+		}
+
+		get onerror(): ((event: Event) => void) | null {
+			return this._onerror;
+		}
+
+		set onerror(handler: ((event: Event) => void) | null) {
+			this._onerror = handler;
+		}
+	}
+
+	globalThis.Image = MockImage as unknown as typeof Image;
+
+	return () => {
+		globalThis.Image = OriginalImage;
+	};
+}
+
+/**
+ * Install a mock for getComputedStyle that converts CSS transform strings to matrix format.
+ * This works around happy-dom's limitation where getComputedStyle returns raw CSS instead of matrix().
+ *
+ * @returns A cleanup function that restores the original getComputedStyle
+ */
+export function installGetComputedStyleMock(): () => void {
+	const originalGetComputedStyle = window.getComputedStyle;
+
+	window.getComputedStyle = ((element: Element) => {
+		const style = originalGetComputedStyle(element);
+
+		return new Proxy(style, {
+			get(target, prop) {
+				if (prop === "transform") {
+					const transform = (element as HTMLElement).style.transform;
+					if (!transform || transform === "none") {
+						return "none";
+					}
+
+					// Parse translate(Xpx, Ypx) scale(S) and convert to matrix format
+					const translateMatch = transform.match(
+						/translate\(\s*(-?[\d.]+)px\s*,\s*(-?[\d.]+)px\s*\)/,
+					);
+					const scaleMatch = transform.match(/scale\(\s*(-?[\d.]+)\s*\)/);
+
+					const tx = translateMatch ? Number.parseFloat(translateMatch[1]) : 0;
+					const ty = translateMatch ? Number.parseFloat(translateMatch[2]) : 0;
+					const s = scaleMatch ? Number.parseFloat(scaleMatch[1]) : 1;
+
+					// Return as 2D matrix: matrix(a, b, c, d, tx, ty)
+					// For scale and translate: matrix(s, 0, 0, s, tx, ty)
+					return `matrix(${s}, 0, 0, ${s}, ${tx}, ${ty})`;
+				}
+				return (target as unknown as Record<string | symbol, unknown>)[prop];
+			},
+		});
+	}) as typeof window.getComputedStyle;
+
+	return () => {
+		window.getComputedStyle = originalGetComputedStyle;
+	};
+}
+
+/**
  * Create an HTMLImageElement whose naturalWidth and naturalHeight match the given dimensions.
  *
  * @param width - Desired natural width in pixels (default: 400)
@@ -53,13 +157,24 @@ export function createWheelEvent(
 	deltaY: number,
 	options: Partial<WheelEventInit> = {},
 ): WheelEvent {
-	return new WheelEvent("wheel", {
+	const event = new WheelEvent("wheel", {
 		bubbles: true,
 		cancelable: true,
 		deltaY,
 		deltaMode: 0,
 		...options,
 	});
+
+	// Happy-dom doesn't properly set ctrlKey from constructor options,
+	// so we use Object.defineProperty to set it
+	if (options.ctrlKey !== undefined) {
+		Object.defineProperty(event, "ctrlKey", {
+			value: options.ctrlKey,
+			writable: false,
+		});
+	}
+
+	return event;
 }
 
 /**
@@ -106,13 +221,13 @@ export function createTouchEvent(
  * @param endX - Ending client X coordinate in pixels
  * @param endY - Ending client Y coordinate in pixels
  */
-export async function simulateDrag(
+export function simulateDrag(
 	element: HTMLElement,
 	startX: number,
 	startY: number,
 	endX: number,
 	endY: number,
-): Promise<void> {
+): void {
 	element.dispatchEvent(
 		createPointerEvent("pointerdown", { clientX: startX, clientY: startY }),
 	);

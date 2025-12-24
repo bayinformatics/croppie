@@ -360,8 +360,8 @@ npm install github:bayinformatics/croppie
       showZoomer: true
     })
 
-    // Load default image
-    croppie.bind({ url: 'https://picsum.photos/600/400?random=1' })
+    // Load default image (seeded for consistent demo)
+    croppie.bind({ url: 'https://picsum.photos/seed/croppie/600/400' })
 
     fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0]

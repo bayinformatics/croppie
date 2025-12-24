@@ -1,10 +1,8 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import { createPinchZoomHandler } from "../../src/input/zoom.ts";
 import { createTouchEvent } from "../fixtures/mock-helpers.ts";
 import type { ZoomConfig } from "../../src/types.ts";
 
-// Note: Most pinch tests are skipped because happy-dom's TouchEvent doesn't properly
-// support the touches property. These tests would work in a real browser environment.
 describe("Pinch Zoom Handler", () => {
 	let element: HTMLDivElement;
 	let currentZoom: number;
@@ -23,6 +21,10 @@ describe("Pinch Zoom Handler", () => {
 		});
 
 		config = { min: 0.5, max: 3 };
+	});
+
+	afterEach(() => {
+		element.remove();
 	});
 
 	describe("initialization", () => {
@@ -60,8 +62,7 @@ describe("Pinch Zoom Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly support TouchEvent.touches
-	describe.skip("pinch gestures", () => {
+	describe("pinch gestures", () => {
 		it("zooms in when fingers spread apart", () => {
 			createPinchZoomHandler(element, getZoom, setZoom, config);
 
@@ -181,8 +182,7 @@ describe("Pinch Zoom Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly support TouchEvent.touches
-	describe.skip("callbacks", () => {
+	describe("callbacks", () => {
 		it("calls onChange with new and previous zoom", () => {
 			const onChange = mock();
 			createPinchZoomHandler(element, getZoom, setZoom, config, { onChange });
@@ -224,15 +224,14 @@ describe("Pinch Zoom Handler", () => {
 				]),
 			);
 
-			// Should still be clamped at 3
-			expect(setZoom).toHaveBeenCalledWith(3);
-			// But onChange should not be called since zoom didn't change
+			// setZoom should NOT be called since zoom didn't actually change (clamped = current)
+			expect(setZoom).not.toHaveBeenCalled();
+			// onChange should not be called since zoom didn't change
 			expect(onChange).not.toHaveBeenCalled();
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly support TouchEvent.touches
-	describe.skip("touch end", () => {
+	describe("touch end", () => {
 		it("resets pinch tracking on touch end", () => {
 			createPinchZoomHandler(element, getZoom, setZoom, config);
 
@@ -342,8 +341,7 @@ describe("Pinch Zoom Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly support TouchEvent.touches
-	describe.skip("continuous pinch", () => {
+	describe("continuous pinch", () => {
 		it("tracks zoom changes during continuous pinch", () => {
 			createPinchZoomHandler(element, getZoom, setZoom, config);
 

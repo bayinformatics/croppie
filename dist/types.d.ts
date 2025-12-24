@@ -1,15 +1,15 @@
 /**
  * Viewport shape type - determines the cropping mask shape
  */
-export type ViewportType = 'circle' | 'square';
+export type ViewportType = "circle" | "square";
 /**
  * Output format for the cropped image
  */
-export type OutputFormat = 'png' | 'jpeg' | 'webp';
+export type OutputFormat = "png" | "jpeg" | "webp";
 /**
  * Output type - what format to return the result in
  */
-export type OutputType = 'blob' | 'base64' | 'canvas';
+export type OutputType = "blob" | "base64" | "canvas";
 /**
  * Viewport configuration - defines the visible cropping area
  */
@@ -60,7 +60,7 @@ export interface CroppieOptions {
     /** Show zoom slider control */
     showZoomer?: boolean;
     /** Enable mouse wheel zoom */
-    mouseWheelZoom?: boolean | 'ctrl';
+    mouseWheelZoom?: boolean | "ctrl";
     /** Enable EXIF orientation correction */
     enableExif?: boolean;
     /**
@@ -124,7 +124,7 @@ export interface ResultOptions {
     size?: {
         width: number;
         height: number;
-    } | 'viewport' | 'original';
+    } | "viewport" | "original";
     /** Output format (for base64/blob) */
     format?: OutputFormat;
     /** JPEG/WebP quality (0-1) */

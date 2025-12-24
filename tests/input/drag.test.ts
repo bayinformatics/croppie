@@ -1,10 +1,8 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import { createDragHandler } from "../../src/input/drag.ts";
 import { createPointerEvent } from "../fixtures/mock-helpers.ts";
 import type { TransformState } from "../../src/types.ts";
 
-// Note: Many drag tests are skipped because happy-dom's PointerEvent doesn't properly
-// handle button clicks and pointer capture. These tests would work in a real browser.
 describe("Drag Handler", () => {
 	let element: HTMLDivElement;
 	let transformState: TransformState;
@@ -15,12 +13,20 @@ describe("Drag Handler", () => {
 		element = document.createElement("div");
 		document.body.appendChild(element);
 
+		// Mock pointer capture methods (not implemented in happy-dom)
+		element.setPointerCapture = mock();
+		element.releasePointerCapture = mock();
+
 		transformState = { x: 0, y: 0, scale: 1 };
 		getTransform = () => transformState;
 		setTransform = mock((x: number, y: number) => {
 			transformState.x = x;
 			transformState.y = y;
 		});
+	});
+
+	afterEach(() => {
+		element.remove();
 	});
 
 	describe("initialization", () => {
@@ -40,8 +46,7 @@ describe("Drag Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly handle PointerEvent button property
-	describe.skip("pointer down", () => {
+	describe("pointer down", () => {
 		it("ignores right clicks", () => {
 			const onStart = mock();
 			createDragHandler(element, getTransform, setTransform, { onStart });
@@ -98,8 +103,7 @@ describe("Drag Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly handle PointerEvent
-	describe.skip("pointer move", () => {
+	describe("pointer move", () => {
 		it("does not update transform when not dragging", () => {
 			createDragHandler(element, getTransform, setTransform);
 
@@ -185,8 +189,7 @@ describe("Drag Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly handle PointerEvent
-	describe.skip("pointer up", () => {
+	describe("pointer up", () => {
 		it("does nothing when not dragging", () => {
 			const onEnd = mock();
 			createDragHandler(element, getTransform, setTransform, { onEnd });
@@ -246,8 +249,7 @@ describe("Drag Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly handle PointerEvent
-	describe.skip("pointer cancel", () => {
+	describe("pointer cancel", () => {
 		it("behaves like pointer up", () => {
 			const onEnd = mock();
 			createDragHandler(element, getTransform, setTransform, { onEnd });
@@ -260,8 +262,7 @@ describe("Drag Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly handle PointerEvent
-	describe.skip("cleanup", () => {
+	describe("cleanup", () => {
 		it("removes all event listeners", () => {
 			const onStart = mock();
 			const onMove = mock();
@@ -285,8 +286,7 @@ describe("Drag Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly handle PointerEvent
-	describe.skip("complete drag workflow", () => {
+	describe("complete drag workflow", () => {
 		it("performs a full drag operation", () => {
 			const onStart = mock();
 			const onMove = mock();

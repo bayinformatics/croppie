@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import { createWheelZoomHandler } from "../../src/input/zoom.ts";
 import { createWheelEvent } from "../fixtures/mock-helpers.ts";
 import type { ZoomConfig } from "../../src/types.ts";
@@ -21,6 +21,10 @@ describe("Wheel Zoom Handler", () => {
 		});
 
 		config = { min: 0.5, max: 3 };
+	});
+
+	afterEach(() => {
+		element.remove();
 	});
 
 	describe("initialization", () => {
@@ -124,8 +128,7 @@ describe("Wheel Zoom Handler", () => {
 		});
 	});
 
-	// Skipped: happy-dom doesn't properly pass through ctrlKey on WheelEvent
-	describe.skip("requireCtrl mode", () => {
+	describe("requireCtrl mode", () => {
 		it("ignores wheel events without ctrl when requireCtrl is true", () => {
 			createWheelZoomHandler(element, getZoom, setZoom, config, undefined, true);
 

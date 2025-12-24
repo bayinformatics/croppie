@@ -1,4 +1,4 @@
-import type { BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from './types.ts';
+import type { BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from "./types.ts";
 /**
  * Modern, TypeScript-first image cropper.
  *
