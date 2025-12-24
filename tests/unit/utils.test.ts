@@ -75,4 +75,39 @@ describe('calculateInitialZoom', () => {
     const zoom = calculateInitialZoom(200, 100, 100, 100)
     expect(zoom).toBe(1)
   })
+
+  test('handles portrait image with square viewport', () => {
+    // 100x300 image (portrait), 200x200 viewport
+    // Width ratio: 200/100 = 2.0
+    // Height ratio: 200/300 = 0.667
+    // Should use 2.0 (larger) to ensure viewport is filled
+    const zoom = calculateInitialZoom(100, 300, 200, 200)
+    expect(zoom).toBe(2)
+  })
+
+  test('handles landscape image with portrait viewport', () => {
+    // 400x200 image (landscape), 100x200 viewport
+    // Width ratio: 100/400 = 0.25
+    // Height ratio: 200/200 = 1.0
+    // Should use 1.0 (larger) to ensure viewport is filled
+    const zoom = calculateInitialZoom(400, 200, 100, 200)
+    expect(zoom).toBe(1)
+  })
+
+  test('returns 1 when image exactly matches viewport', () => {
+    const zoom = calculateInitialZoom(200, 200, 200, 200)
+    expect(zoom).toBe(1)
+  })
+
+  test('calculates zoom for very small image', () => {
+    // 50x50 image, 200x200 viewport → needs 4x zoom
+    const zoom = calculateInitialZoom(50, 50, 200, 200)
+    expect(zoom).toBe(4)
+  })
+
+  test('calculates zoom for very large image', () => {
+    // 2000x2000 image, 200x200 viewport → needs 0.1x zoom
+    const zoom = calculateInitialZoom(2000, 2000, 200, 200)
+    expect(zoom).toBe(0.1)
+  })
 })
