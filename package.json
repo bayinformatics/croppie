@@ -1,6 +1,6 @@
 {
   "name": "@bayinformatics/croppie",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A modern, TypeScript-first image cropper. Fork of Foliotek/Croppie.",
   "type": "module",
   "main": "./dist/croppie.js",
