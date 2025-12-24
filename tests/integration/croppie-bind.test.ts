@@ -65,22 +65,32 @@ describe.skip("Croppie bind", () => {
 			expect(croppie.zoom).toBe(3);
 		});
 
-		it("handles points option (with warning)", async () => {
-			const originalWarn = console.warn;
-			const warn = mock();
-			console.warn = warn;
+		describe("points option", () => {
+			let originalWarn: typeof console.warn;
 
-			croppie = new Croppie(container, {
-				viewport: { width: 100, height: 100, type: "square" },
+			beforeEach(() => {
+				originalWarn = console.warn;
 			});
 
-			await croppie.bind({
-				url: TINY_PNG,
-				points: [0, 0, 100, 100],
+			afterEach(() => {
+				console.warn = originalWarn;
 			});
 
-			expect(warn).toHaveBeenCalled();
-			console.warn = originalWarn;
+			it("handles points option (with warning)", async () => {
+				const warn = mock();
+				console.warn = warn;
+
+				croppie = new Croppie(container, {
+					viewport: { width: 100, height: 100, type: "square" },
+				});
+
+				await croppie.bind({
+					url: TINY_PNG,
+					points: [0, 0, 100, 100],
+				});
+
+				expect(warn).toHaveBeenCalled();
+			});
 		});
 	});
 
