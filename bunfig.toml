@@ -1,2 +1,4 @@
 [test]
 preload = ["./tests/integration/setup.ts"]
+coverage = true
+coverageSkipSourceFiles = true

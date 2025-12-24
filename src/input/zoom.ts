@@ -32,6 +32,9 @@ export function createWheelZoomHandler(
 		// Check for ctrl requirement
 		if (requireCtrl && !e.ctrlKey) return;
 
+		// Ignore zero-movement events (no scroll)
+		if (e.deltaY === 0) return;
+
 		e.preventDefault();
 
 		const previousZoom = getZoom();

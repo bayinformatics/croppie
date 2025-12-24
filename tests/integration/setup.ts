@@ -10,6 +10,8 @@ Object.assign(globalThis, {
   HTMLDivElement: window.HTMLDivElement,
   HTMLImageElement: window.HTMLImageElement,
   HTMLInputElement: window.HTMLInputElement,
+  HTMLCanvasElement: window.HTMLCanvasElement,
+  HTMLSpanElement: window.HTMLSpanElement,
   Element: window.Element,
   Node: window.Node,
   Event: window.Event,
@@ -18,4 +20,8 @@ Object.assign(globalThis, {
   PointerEvent: window.PointerEvent,
   TouchEvent: window.TouchEvent,
   WheelEvent: window.WheelEvent,
+  Image: window.Image,
+  Blob: window.Blob,
+  File: window.File,
+  FileReader: window.FileReader,
 })

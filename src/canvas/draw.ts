@@ -99,6 +99,7 @@ export function canvasToBlob(
 /**
  * Create a base64-encoded data URL representing the canvas image.
  *
+ * @param canvas - The HTMLCanvasElement to encode as a data URL.
  * @param format - Image format to encode (`"png"`, `"jpeg"`, etc.). Used to build the MIME type `image/{format}`.
  * @param quality - Image quality between 0 and 1 for formats that use it (e.g., `"jpeg"`). Ignored by formats that do not accept a quality parameter.
  * @returns A data URL (base64) containing the encoded image in the specified format.
