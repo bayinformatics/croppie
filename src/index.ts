@@ -7,22 +7,22 @@
  * @packageDocumentation
  */
 
-export { Croppie } from './Croppie.ts'
+export { Croppie } from "./croppie.ts";
 export type {
-  CroppieOptions,
-  CroppieData,
-  CroppieEvents,
-  CroppieEventHandler,
-  BindOptions,
-  ResultOptions,
-  CropPoints,
-  Viewport,
-  Boundary,
-  ZoomConfig,
-  ViewportType,
-  OutputFormat,
-  OutputType
-} from './types.ts'
+	CroppieOptions,
+	CroppieData,
+	CroppieEvents,
+	CroppieEventHandler,
+	BindOptions,
+	ResultOptions,
+	CropPoints,
+	Viewport,
+	Boundary,
+	ZoomConfig,
+	ViewportType,
+	OutputFormat,
+	OutputType,
+} from "./types.ts";
 
 // Default export for convenience
-export { Croppie as default } from './Croppie.ts'
+export { Croppie as default } from "./Croppie.ts";

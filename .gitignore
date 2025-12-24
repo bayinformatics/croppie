@@ -3,8 +3,11 @@ node_modules
 
 # output
 out
-dist
 *.tgz
+# Note: dist is NOT ignored - we commit built files for git-based installs
+# bun build artifacts in src (bug workaround)
+src/*.js
+src/*.js.map
 
 # code coverage
 coverage
@@ -33,5 +36,12 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Finder (MacOS) folder config
 .DS_Store
 
-# worktrees
+# Lost Pixel visual regression testing
+.lostpixel/current
+.lostpixel/difference
+
+# Claude Code workspace
+.claude/
+
+# Git worktrees
 .worktrees/
