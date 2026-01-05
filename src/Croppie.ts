@@ -33,6 +33,7 @@ import {
 	createWheelZoomHandler,
 } from "./input/zoom.ts";
 import {
+	calculateBounds,
 	calculateInitialZoom,
 	clamp,
 	fileToDataUrl,
@@ -184,6 +185,7 @@ export class Croppie {
 			(x, y) => {
 				this.transform.x = x;
 				this.transform.y = y;
+				this.constrainPosition();
 				this.updateTransform();
 				this.emitUpdate();
 			},
@@ -284,6 +286,7 @@ export class Croppie {
 			}
 		}
 
+		this.constrainPosition();
 		this.updateTransform();
 		this.updateSlider();
 	}
@@ -384,6 +387,7 @@ export class Croppie {
 			this.effectiveMinZoom,
 			this.zoomConfig.max,
 		);
+		this.constrainPosition();
 		this.updateTransform();
 		this.updateSlider();
 
@@ -420,6 +424,7 @@ export class Croppie {
 			);
 
 			this.transform = { x: 0, y: 0, scale: initialZoom };
+			this.constrainPosition();
 			this.updateTransform();
 			this.updateSlider();
 			this.emitUpdate();
@@ -508,6 +513,24 @@ export class Croppie {
 		if (this.sliderEl) {
 			this.sliderEl.value = String(this.transform.scale);
 		}
+	}
+
+	/**
+	 * Constrains the current position to keep the image covering the viewport
+	 */
+	private constrainPosition(): void {
+		if (!this.image) return;
+
+		const bounds = calculateBounds(
+			this.image.naturalWidth,
+			this.image.naturalHeight,
+			this.transform.scale,
+			this.options.viewport.width,
+			this.options.viewport.height,
+		);
+
+		this.transform.x = clamp(this.transform.x, bounds.minX, bounds.maxX);
+		this.transform.y = clamp(this.transform.y, bounds.minY, bounds.maxY);
 	}
 
 	/**

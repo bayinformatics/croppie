@@ -93,6 +93,10 @@ export declare class Croppie {
      */
     private updateSlider;
     /**
+     * Constrains the current position to keep the image covering the viewport
+     */
+    private constrainPosition;
+    /**
      * Calculates the crop points based on current transform
      */
     private getPoints;
