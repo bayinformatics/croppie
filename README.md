@@ -13,7 +13,7 @@ A modern, TypeScript-first image cropper for the web. Fork of [Foliotek/Croppie]
 - 📘 **TypeScript** - Full type definitions included
 - 🔧 **Modern APIs** - Pointer Events + touch gestures, no polyfills
 - 📱 **Mobile First** - Touch and gesture support built in
-- 🧪 **Tested** - Unit, integration, and visual regression (Lost Pixel)
+- 🧪 **Tested** - Unit, integration, and visual regression (Playwright)
 
 ## Why This Fork?
 
@@ -316,7 +316,7 @@ bun run build
 bun run lint
 ```
 
-Visual regression runs in CI using Lost Pixel against `docs/index.html`.
+Visual regression runs in CI using Playwright against test fixtures in `tests/visual/`.
 
 ## License
 
