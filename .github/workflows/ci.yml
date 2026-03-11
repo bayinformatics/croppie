@@ -55,7 +55,7 @@ jobs:
         run: bun install
 
       - name: Run tests with coverage
-        run: bun test --coverage --coverage-reporter=lcov
+        run: bun test tests/unit tests/integration tests/input tests/ui tests/utils --coverage --coverage-reporter=lcov
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

@@ -9,9 +9,7 @@ on:
 jobs:
   visual-regression:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -20,11 +18,30 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Install dependencies
         run: bun install
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
 
       - name: Build
         run: bun run build
 
-      - name: Run Lost Pixel
-        uses: lost-pixel/lost-pixel@v3
+      - name: Run visual regression tests
+        run: bunx playwright test
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-results
+          path: test-results/
+          retention-days: 7
