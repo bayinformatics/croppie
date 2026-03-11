@@ -41,3 +41,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Git worktrees
 .worktrees/
+
+# Playwright
+test-results/
+playwright-report/

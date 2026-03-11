@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Croppie Visual Test</title>
+	<link rel="stylesheet" href="/dist/croppie.css">
+	<style>
+		body {
+			margin: 0;
+			padding: 20px;
+			background: #f0f0f0;
+		}
+		#croppie-mount {
+			display: inline-block;
+		}
+	</style>
+</head>
+<body>
+	<div id="croppie-mount"></div>
+	<script type="module">
+		import Croppie from "/dist/croppie.js";
+
+		// Generate a deterministic test image via canvas
+		function createTestImage(width, height) {
+			const canvas = document.createElement("canvas");
+			canvas.width = width;
+			canvas.height = height;
+			const ctx = canvas.getContext("2d");
+
+			// Gradient background
+			const gradient = ctx.createLinearGradient(0, 0, width, height);
+			gradient.addColorStop(0, "#4f46e5");
+			gradient.addColorStop(0.5, "#818cf8");
+			gradient.addColorStop(1, "#c7d2fe");
+			ctx.fillStyle = gradient;
+			ctx.fillRect(0, 0, width, height);
+
+			// Grid lines for visual reference
+			ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+			ctx.lineWidth = 1;
+			for (let x = 0; x < width; x += 50) {
+				ctx.beginPath();
+				ctx.moveTo(x + 0.5, 0);
+				ctx.lineTo(x + 0.5, height);
+				ctx.stroke();
+			}
+			for (let y = 0; y < height; y += 50) {
+				ctx.beginPath();
+				ctx.moveTo(0, y + 0.5);
+				ctx.lineTo(width, y + 0.5);
+				ctx.stroke();
+			}
+
+			return canvas.toDataURL("image/png");
+		}
+
+		const params = new URLSearchParams(window.location.search);
+		const viewportType = params.get("viewport") || "circle";
+		const showZoomer = params.get("zoomer") !== "false";
+		const zoom = params.get("zoom") ? Number.parseFloat(params.get("zoom")) : undefined;
+
+		const el = document.getElementById("croppie-mount");
+		const croppie = new Croppie(el, {
+			viewport: { width: 200, height: 200, type: viewportType },
+			boundary: { width: 400, height: 400 },
+			showZoomer,
+		});
+
+		const imageUrl = createTestImage(800, 600);
+		await croppie.bind({ url: imageUrl, zoom });
+
+		// Signal that Croppie is ready for screenshot
+		document.body.dataset.ready = "true";
+	</script>
+</body>
+</html>
