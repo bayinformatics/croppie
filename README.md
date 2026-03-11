@@ -323,7 +323,7 @@ Visual regression runs in CI using Lost Pixel against `docs/index.html`.
 MIT - See [LICENSE](./LICENSE)
 
 Original work Copyright (c) 2015 Foliotek Inc.
-Modified work Copyright (c) 2025 Bay Informatics
+Modified work Copyright (c) 2026 Bay Informatics
 
 ## Credits
 
