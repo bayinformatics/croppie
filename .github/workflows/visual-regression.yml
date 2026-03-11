@@ -2,9 +2,9 @@ name: Visual Regression Tests
 
 on:
   push:
-    branches: [master, main]
+    branches: [main]
   pull_request:
-    branches: [master, main]
+    branches: [main]
 
 jobs:
   visual-regression:
@@ -27,4 +27,4 @@ jobs:
         run: bun run build
 
       - name: Run Lost Pixel
-        uses: lost-pixel/lost-pixel@v3.22.0
+        uses: lost-pixel/lost-pixel@v3
