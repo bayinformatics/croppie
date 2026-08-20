@@ -1,13 +1,28 @@
 {
-  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "tab"
-  },
-  "linter": {
-    "enabled": true
-  }
+	"$schema": "https://biomejs.dev/schemas/2.5.9/schema.json",
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"css": {
+		"formatter": {
+			"enabled": false
+		}
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"linter": {
+		"enabled": true
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.css"],
+			"linter": {
+				"rules": {
+					"complexity": {
+						"noImportantStyles": "off"
+					}
+				}
+			}
+		}
+	]
 }

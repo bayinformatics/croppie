@@ -1,9 +1,9 @@
 export {
-	createContainer,
 	createBoundary,
-	createViewport,
+	createContainer,
 	createOverlay,
 	createPreview,
-	createZoomSlider,
 	createSliderContainer,
+	createViewport,
+	createZoomSlider,
 } from "./elements.ts";

@@ -1,27 +1,3 @@
-import type {
-	BindOptions,
-	Boundary,
-	CropPoints,
-	CroppieData,
-	CroppieEventHandler,
-	CroppieEvents,
-	CroppieOptions,
-	ResultOptions,
-	TransformState,
-	Viewport,
-	ZoomConfig,
-} from "./types.ts";
-
-import {
-	createBoundary,
-	createContainer,
-	createOverlay,
-	createPreview,
-	createSliderContainer,
-	createViewport,
-	createZoomSlider,
-} from "./ui/index.ts";
-
 import {
 	canvasToBase64,
 	canvasToBlob,
@@ -32,6 +8,27 @@ import {
 	createPinchZoomHandler,
 	createWheelZoomHandler,
 } from "./input/zoom.ts";
+import type {
+	BindOptions,
+	Boundary,
+	CropPoints,
+	CroppieData,
+	CroppieEventHandler,
+	CroppieEvents,
+	CroppieOptions,
+	ResultOptions,
+	TransformState,
+	ZoomConfig,
+} from "./types.ts";
+import {
+	createBoundary,
+	createContainer,
+	createOverlay,
+	createPreview,
+	createSliderContainer,
+	createViewport,
+	createZoomSlider,
+} from "./ui/index.ts";
 import {
 	calculateBounds,
 	calculateInitialZoom,

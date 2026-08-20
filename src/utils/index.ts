@@ -3,15 +3,15 @@ export { clamp } from "./clamp.ts";
 export { debounce } from "./debounce.ts";
 export { createElement, getTransformValues, setTransform } from "./dom.ts";
 export {
-	loadImage,
-	fileToDataUrl,
-	getImageDimensions,
 	aspectRatio,
 	calculateInitialZoom,
+	fileToDataUrl,
+	getImageDimensions,
+	loadImage,
 } from "./image.ts";
 export {
 	normalizePoints,
-	pointsToArray,
 	type PointsArray,
 	type PointsInput,
+	pointsToArray,
 } from "./points.ts";

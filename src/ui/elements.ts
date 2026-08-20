@@ -1,4 +1,4 @@
-import type { Boundary, Viewport, ViewportType } from "../types.ts";
+import type { Boundary, Viewport } from "../types.ts";
 import { createElement } from "../utils/dom.ts";
 
 /**
