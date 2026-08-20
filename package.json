@@ -55,9 +55,9 @@
   "homepage": "https://github.com/bayinformatics/croppie#readme",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@playwright/test": "^1.60.0",
-    "@types/bun": "^1.3.13",
-    "happy-dom": "^20.9.0",
+    "@playwright/test": "^1.62.1",
+    "@types/bun": "^1.3.14",
+    "happy-dom": "^20.11.6",
     "typescript": "^5.9.3"
   },
   "engines": {
