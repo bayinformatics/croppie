@@ -1,3 +1,3 @@
 export { createDragHandler, type DragCallbacks } from "./drag.ts";
-export { createWheelZoomHandler, createPinchZoomHandler, type ZoomCallbacks, } from "./zoom.ts";
+export { createPinchZoomHandler, createWheelZoomHandler, type ZoomCallbacks, } from "./zoom.ts";
 //# sourceMappingURL=index.d.ts.map
