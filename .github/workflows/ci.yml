@@ -95,6 +95,15 @@ jobs:
           test -f dist/croppie.css || exit 1
           echo "Build artifacts verified"
 
+      - name: Check docs build parity
+        run: |
+          cp docs/croppie.js /tmp/committed-croppie.js
+          bun run build:docs
+          cmp /tmp/committed-croppie.js docs/croppie.js || {
+            echo "::error::docs/croppie.js is stale - run 'bun run build:docs' and commit the result"
+            exit 1
+          }
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
