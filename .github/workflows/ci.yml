@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Run Biome
         run: bunx biome check src
@@ -52,7 +52,7 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Run tests with coverage
         run: bun test tests/unit tests/integration tests/input tests/ui tests/utils --coverage --coverage-reporter=lcov
@@ -71,6 +71,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Snapshot committed dist
+        run: cp -r dist /tmp/dist-committed
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.2.15"
@@ -84,7 +87,7 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Build
         run: bun run build
@@ -95,14 +98,24 @@ jobs:
           test -f dist/croppie.css || exit 1
           echo "Build artifacts verified"
 
-      - name: Check docs build parity
+      - name: Check dist build parity
         run: |
-          cp docs/croppie.js /tmp/committed-croppie.js
-          bun run build:docs
-          cmp /tmp/committed-croppie.js docs/croppie.js || {
-            echo "::error::docs/croppie.js is stale - run 'bun run build:docs' and commit the result"
+          diff -r /tmp/dist-committed dist || {
+            echo "::error::dist/ is stale - run 'bun run build' and commit the result"
             exit 1
           }
+
+      - name: Check docs build parity
+        run: |
+          mkdir -p /tmp/docs-parity
+          cp docs/croppie.js docs/croppie.js.map docs/croppie.css /tmp/docs-parity/
+          bun run build:docs
+          for artifact in croppie.js croppie.js.map croppie.css; do
+            cmp "/tmp/docs-parity/$artifact" "docs/$artifact" || {
+              echo "::error::docs/$artifact is stale - run 'bun run build:docs' and commit the result"
+              exit 1
+            }
+          done
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
