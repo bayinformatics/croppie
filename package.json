@@ -22,6 +22,7 @@
     "dev": "bun build src/index.ts --outdir dist --watch",
     "build": "bun run build:js && bun run build:css && bun run build:types",
     "build:js": "bun build src/index.ts --outdir=dist --entry-naming=croppie.[ext] --minify --sourcemap",
+    "build:docs": "bun build src/index.ts --outdir docs --entry-naming croppie.[ext] --minify --sourcemap",
     "build:css": "cp src/croppie.css dist/croppie.css",
     "build:types": "tsc --emitDeclarationOnly --declaration --outDir dist",
     "test": "bun test tests/unit tests/integration tests/input tests/ui tests/utils",
@@ -54,11 +55,11 @@
   },
   "homepage": "https://github.com/bayinformatics/croppie#readme",
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@playwright/test": "^1.60.0",
-    "@types/bun": "^1.3.13",
-    "happy-dom": "^20.9.0",
-    "typescript": "^5.9.3"
+    "@biomejs/biome": "^2.5.9",
+    "@playwright/test": "^1.62.1",
+    "@types/bun": "^1.3.14",
+    "happy-dom": "^20.11.6",
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=20"
