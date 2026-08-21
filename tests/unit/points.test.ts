@@ -108,4 +108,32 @@ describe('calculateTransformFromPoints', () => {
       10, 10, 100, 100,
     )).toBeUndefined()
   })
+
+  test('clamps scale to max bounds and re-centers at the applied scale', () => {
+    // 10x10 image, 100x100 viewport, rect {2,3,7,8}: cover scale 20 clamped to 10;
+    // translation must be derived from the CLAMPED scale (10 * (5 - 4.5), 10 * (5 - 5.5))
+    const t = calculateTransformFromPoints(
+      { topLeftX: 2, topLeftY: 3, bottomRightX: 7, bottomRightY: 8 },
+      10, 10, 100, 100,
+      { min: 0.1, max: 10 },
+    )
+    expect(t).toBeDefined()
+    expect(t?.scale).toBeCloseTo(10, 9)
+    expect(t?.x).toBeCloseTo(5, 9)
+    expect(t?.y).toBeCloseTo(-5, 9)
+  })
+
+  test('clamps scale up to min bounds with translation at the applied scale', () => {
+    // 10x10 image, 100x50 viewport, rect {1,3,7,8}: cover scale 100/6 raised to 20;
+    // translation at scale 20: (20 * (5 - 4), 20 * (5 - 5.5))
+    const t = calculateTransformFromPoints(
+      { topLeftX: 1, topLeftY: 3, bottomRightX: 7, bottomRightY: 8 },
+      10, 10, 100, 50,
+      { min: 20, max: 100 },
+    )
+    expect(t).toBeDefined()
+    expect(t?.scale).toBeCloseTo(20, 9)
+    expect(t?.x).toBeCloseTo(20, 9)
+    expect(t?.y).toBeCloseTo(-10, 9)
+  })
 })

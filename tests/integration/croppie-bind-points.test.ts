@@ -70,6 +70,41 @@ describe("Croppie bind({ points })", () => {
 		expect(data.points.bottomRightY).toBeLessThanOrEqual(10);
 	});
 
+	it("falls back to centered coverage under default zoom bounds", async () => {
+		croppie = new Croppie(container, {
+			viewport: { width: 100, height: 100, type: "square" },
+			boundary: { width: 300, height: 300 },
+		});
+
+		// Cover-fit zoom for {2,3,7,8} is 20, above the default max of 10:
+		// the bind must stay centered on the full image, not drift
+		await croppie.bind({ url: SMALL_PNG, points: [2, 3, 7, 8] });
+
+		const data = croppie.get();
+		expect(data.points.topLeftX).toBeCloseTo(0, 9);
+		expect(data.points.topLeftY).toBeCloseTo(0, 9);
+		expect(data.points.bottomRightX).toBeCloseTo(10, 9);
+		expect(data.points.bottomRightY).toBeCloseTo(10, 9);
+		expect(croppie.zoom).toBeCloseTo(10, 9);
+	});
+
+	it("contains the requested rect when zoom clamps without collapsing bounds", async () => {
+		croppie = new Croppie(container, {
+			viewport: { width: 100, height: 50, type: "square" },
+			boundary: { width: 300, height: 300 },
+		});
+
+		// Cover-fit zoom for {1,3,7,8} at 100x50 viewport is ~16.7 > default max 10;
+		// after clamping, the visible region must still contain the requested rect
+		await croppie.bind({ url: SMALL_PNG, points: [1, 3, 7, 8] });
+
+		const data = croppie.get();
+		expect(data.points.topLeftY).toBeCloseTo(3, 9);
+		expect(data.points.bottomRightY).toBeCloseTo(8, 9);
+		expect(data.points.topLeftX).toBeGreaterThanOrEqual(0);
+		expect(data.points.bottomRightX).toBeLessThanOrEqual(10);
+	});
+
 	describe("warning behavior", () => {
 		let originalWarn: typeof console.warn;
 
