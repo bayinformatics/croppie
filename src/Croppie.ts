@@ -282,15 +282,11 @@ export class Croppie {
 						this.image.naturalHeight,
 						this.options.viewport.width,
 						this.options.viewport.height,
+						{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
 					)
 				: undefined;
 			if (pointsTransform) {
 				this.transform = pointsTransform;
-				this.transform.scale = clamp(
-					pointsTransform.scale,
-					this.effectiveMinZoom,
-					this.zoomConfig.max,
-				);
 			} else {
 				console.warn(
 					"[@bayinformatics/croppie] Ignoring invalid initial points:",

@@ -119,7 +119,9 @@ await cropper.bind({
 
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
-through `get()`; mismatched-aspect points are cover-fit and center-preserved.
+through `get()` while the derived zoom stays within `zoom.min`/`zoom.max`;
+mismatched-aspect points are cover-fit and center-preserved at the applied
+(clamped) zoom.
 
 #### `bindFile(file: File | Blob): Promise<void>`
 
@@ -209,7 +211,7 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 ### Key Differences from Croppie v2
 
 - v2 shipped UMD (AMD/CommonJS/global); v3 is ESM-only.
-- v2 `bind()` points/relative points are fully supported; v3 applies points on bind with cover-fit + center preservation (v2's width-only-scale/top-left-anchor quirk, [Foliotek/Croppie#767](https://github.com/Foliotek/Croppie/issues/767), is intentionally not replicated).
+- v2 `bind()` points/relative points are fully supported; v3 applies points on bind with cover-fit + center preservation within `zoomConfig` bounds (v2's width-only-scale/top-left-anchor quirk, [Foliotek/Croppie#767](https://github.com/Foliotek/Croppie/issues/767), is intentionally not replicated).
 - v2 rotation works with `enableOrientation`; v3 `rotate()` is not yet implemented.
 - v2 supported `<script>` tag usage; v3 requires a bundler.
 
