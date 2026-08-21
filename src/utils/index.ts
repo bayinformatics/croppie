@@ -10,6 +10,7 @@ export {
 	loadImage,
 } from "./image.ts";
 export {
+	calculateTransformFromPoints,
 	normalizePoints,
 	type PointsArray,
 	type PointsInput,
