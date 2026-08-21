@@ -6,9 +6,14 @@
  * Install a mock Image constructor that automatically fires onload when src is set.
  * This works around happy-dom's limitation where Image.onload doesn't fire for data URLs.
  *
+ * @param dimensions - Optional natural image dimensions to expose once loaded
+ *   (happy-dom reports naturalWidth/naturalHeight as 0 by default)
  * @returns A cleanup function that restores the original Image constructor
  */
-export function installImageMock(): () => void {
+export function installImageMock(dimensions?: {
+	width: number;
+	height: number;
+}): () => void {
 	const OriginalImage = globalThis.Image;
 
 	class MockImage extends OriginalImage {
@@ -26,6 +31,18 @@ export function installImageMock(): () => void {
 			setTimeout(() => {
 				if (value.startsWith("data:") || value.startsWith("http")) {
 					// Simulate successful load for data URLs and http URLs
+					if (dimensions) {
+						// happy-dom exposes naturalWidth/naturalHeight as readonly
+						// accessors; plain assignment throws, so define own properties
+						Object.defineProperty(this, "naturalWidth", {
+							value: dimensions.width,
+							configurable: true,
+						});
+						Object.defineProperty(this, "naturalHeight", {
+							value: dimensions.height,
+							configurable: true,
+						});
+					}
 					if (this._onload) {
 						this._onload(new Event("load"));
 					}

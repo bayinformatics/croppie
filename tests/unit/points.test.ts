@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test'
-import { normalizePoints, pointsToArray } from '../../src/utils/points.ts'
+import { calculateTransformFromPoints, normalizePoints, pointsToArray } from '../../src/utils/points.ts'
 
 describe('normalizePoints', () => {
   test('converts array format to object', () => {
@@ -44,5 +44,68 @@ describe('pointsToArray', () => {
       bottomRightY: 120
     })
     expect(result).toEqual([10, 20, 110, 120])
+  })
+})
+
+describe('calculateTransformFromPoints', () => {
+  test('reproduces matching-aspect points exactly', () => {
+    // 10x10 image, 100x100 viewport, rect {2,3,7,8}:
+    // pw = ph = 5 -> scale = 100/5 = 20; center (4.5, 5.5) vs image center (5, 5)
+    const t = calculateTransformFromPoints(
+      { topLeftX: 2, topLeftY: 3, bottomRightX: 7, bottomRightY: 8 },
+      10, 10, 100, 100,
+    )
+    expect(t).toBeDefined()
+    expect(t?.scale).toBeCloseTo(20, 9)
+    expect(t?.x).toBeCloseTo(10, 9)
+    expect(t?.y).toBeCloseTo(-10, 9)
+  })
+
+  test('preserves the rect center on a non-square image', () => {
+    // 20x10 image, 100x100 viewport, rect {0,2,10,8}:
+    // pw=10 ph=6 -> cover scale = max(100/10, 100/6) = 100/6; center (5,5) vs image center (10,5)
+    const t = calculateTransformFromPoints(
+      { topLeftX: 0, topLeftY: 2, bottomRightX: 10, bottomRightY: 8 },
+      20, 10, 100, 100,
+    )
+    expect(t).toBeDefined()
+    expect(t?.scale).toBeCloseTo(100 / 6, 9)
+    expect(t?.x).toBeCloseTo((100 / 6) * (10 - 5), 9)
+    expect(t?.y).toBeCloseTo(0, 9)
+  })
+
+  test('cover-fits mismatched-aspect rects around their center', () => {
+    // 10x10 image, 100x50 viewport, rect {2,3,8,8}:
+    // pw=6 ph=5 -> cover scale = max(100/6, 50/5) = 100/6; center (5, 5.5) vs image center (5, 5)
+    const t = calculateTransformFromPoints(
+      { topLeftX: 2, topLeftY: 3, bottomRightX: 8, bottomRightY: 8 },
+      10, 10, 100, 50,
+    )
+    expect(t).toBeDefined()
+    expect(t?.scale).toBeCloseTo(100 / 6, 9)
+    expect(t?.x).toBeCloseTo(0, 9)
+    expect(t?.y).toBeCloseTo(-50 / 6, 9)
+  })
+
+  test('returns undefined for zero-width and zero-height rects', () => {
+    expect(calculateTransformFromPoints(
+      { topLeftX: 5, topLeftY: 5, bottomRightX: 5, bottomRightY: 8 },
+      10, 10, 100, 100,
+    )).toBeUndefined()
+    expect(calculateTransformFromPoints(
+      { topLeftX: 5, topLeftY: 5, bottomRightX: 8, bottomRightY: 5 },
+      10, 10, 100, 100,
+    )).toBeUndefined()
+  })
+
+  test('returns undefined for non-finite coordinates', () => {
+    expect(calculateTransformFromPoints(
+      { topLeftX: NaN, topLeftY: 0, bottomRightX: 1, bottomRightY: 1 },
+      10, 10, 100, 100,
+    )).toBeUndefined()
+    expect(calculateTransformFromPoints(
+      { topLeftX: 0, topLeftY: Infinity, bottomRightX: 1, bottomRightY: 1 },
+      10, 10, 100, 100,
+    )).toBeUndefined()
   })
 })
