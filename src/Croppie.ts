@@ -32,6 +32,7 @@ import {
 import {
 	calculateBounds,
 	calculateInitialZoom,
+	calculateTransformFromPoints,
 	clamp,
 	fileToDataUrl,
 	loadImage,
@@ -274,10 +275,25 @@ export class Croppie {
 		// Apply initial points if provided
 		if (bindOptions.points) {
 			const normalizedPoints = normalizePoints(bindOptions.points);
-			if (normalizedPoints) {
-				// TODO: Calculate transform from points - not yet implemented
+			const pointsTransform = normalizedPoints
+				? calculateTransformFromPoints(
+						normalizedPoints,
+						this.image.naturalWidth,
+						this.image.naturalHeight,
+						this.options.viewport.width,
+						this.options.viewport.height,
+					)
+				: undefined;
+			if (pointsTransform) {
+				this.transform = pointsTransform;
+				this.transform.scale = clamp(
+					pointsTransform.scale,
+					this.effectiveMinZoom,
+					this.zoomConfig.max,
+				);
+			} else {
 				console.warn(
-					"[@bayinformatics/croppie] Initial points are not yet fully supported. Provided:",
+					"[@bayinformatics/croppie] Ignoring invalid initial points:",
 					normalizedPoints,
 				);
 			}

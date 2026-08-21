@@ -1,4 +1,4 @@
-import type { CropPoints, PointsArray } from "../types";
+import type { CropPoints, PointsArray, TransformState } from "../types";
 
 // Re-export for convenience
 export type { PointsArray };
@@ -52,4 +52,56 @@ export function pointsToArray(points: CropPoints): PointsArray {
 		points.bottomRightX,
 		points.bottomRightY,
 	];
+}
+
+/**
+ * Derive the transform that makes the viewport show the region described by
+ * `points` within an image of the given natural size.
+ *
+ * The scale cover-fits the rect to the viewport (the larger of
+ * `viewportWidth / rectWidth` and `viewportHeight / rectHeight`), so the
+ * requested region always fills the viewport; the translation preserves the
+ * rect's center. Aspect-matched points reproduce exactly through
+ * {@link Croppie.get | Croppie#get}.
+ *
+ * @param points - Crop region in natural image coordinates
+ * @param imageWidth - Natural width of the image
+ * @param imageHeight - Natural height of the image
+ * @param viewportWidth - Width of the crop viewport
+ * @param viewportHeight - Height of the crop viewport
+ * @returns The transform to apply, or `undefined` when any coordinate is
+ *   non-finite or the rect has a non-positive width or height.
+ */
+export function calculateTransformFromPoints(
+	points: CropPoints,
+	imageWidth: number,
+	imageHeight: number,
+	viewportWidth: number,
+	viewportHeight: number,
+): TransformState | undefined {
+	const { topLeftX, topLeftY, bottomRightX, bottomRightY } = points;
+	if (
+		![topLeftX, topLeftY, bottomRightX, bottomRightY].every(Number.isFinite)
+	) {
+		return undefined;
+	}
+
+	const pointWidth = bottomRightX - topLeftX;
+	const pointHeight = bottomRightY - topLeftY;
+	if (pointWidth <= 0 || pointHeight <= 0) {
+		return undefined;
+	}
+
+	// Cover-fit: the larger ratio wins so the whole rect stays in view
+	const scale = Math.max(
+		viewportWidth / pointWidth,
+		viewportHeight / pointHeight,
+	);
+
+	// Preserve the requested rect's center relative to the image center
+	return {
+		x: scale * (imageWidth / 2 - (topLeftX + bottomRightX) / 2),
+		y: scale * (imageHeight / 2 - (topLeftY + bottomRightY) / 2),
+		scale,
+	};
 }
