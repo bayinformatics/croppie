@@ -108,7 +108,8 @@ export function createWheelZoomHandler(
  *
  * When exactly two such fingers are down, their distance and the current zoom are
  * captured; every move then proposes `initialZoom * distance / initialDistance`, anchored
- * at their midpoint. A zoom changed by something else mid-pinch (`bind()`, `reset()`,
+ * at their midpoint. When a lift leaves exactly two fingers down (a third finger landed
+ * and lifted), they are measured again and the pinch carries on. A zoom changed by something else mid-pinch (`bind()`, `reset()`,
  * `setZoom()`) becomes the new starting point instead of being overwritten by the next
  * move. Like the wheel handler it neither clamps nor emits.
  *
@@ -151,13 +152,18 @@ export function createPinchZoomHandler(
 		);
 	};
 
+	/** Starts measuring a pinch from the two fingers' current distance and the current zoom. */
+	const startPinch = (touches: Touch[]) => {
+		initialDistance = getDistance(touches);
+		initialZoom = getZoom();
+		lastZoom = initialZoom;
+	};
+
 	const handleTouchStart = (e: TouchEvent) => {
 		const touches = ownTouches(e);
 		if (touches.length === 2) {
 			e.preventDefault();
-			initialDistance = getDistance(touches);
-			initialZoom = getZoom();
-			lastZoom = initialZoom;
+			startPinch(touches);
 		}
 	};
 
@@ -181,8 +187,16 @@ export function createPinchZoomHandler(
 		}
 	};
 
-	const handleTouchEnd = () => {
-		initialDistance = 0;
+	const handleTouchEnd = (e: TouchEvent) => {
+		// Two fingers still down (a third one lifted, say) carry on pinching from where they
+		// are now; with fewer there is no pinch. With more, the moves are ignored until a
+		// lift leaves two
+		const touches = ownTouches(e);
+		if (touches.length === 2) {
+			startPinch(touches);
+		} else if (touches.length < 2) {
+			initialDistance = 0;
+		}
 	};
 
 	element.addEventListener("touchstart", handleTouchStart, { passive: false });

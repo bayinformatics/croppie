@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Dragging inside a CSS-scaled ancestor (`transform: scale()`, `zoom`) keeps the image under the pointer instead of lagging behind or overshooting it, as wheel and pinch zoom already did.
 - Pinch zoom only counts fingers that went down on the cropper: a finger resting elsewhere on the page (a thumb, the zoom slider, another cropper) no longer turns a one-finger pan into pan plus zoom, and no longer blocks a two-finger pinch.
 - A `bind()`, `bindFile()`, `reset()` or `setZoom()` that lands during a pinch is no longer overwritten by the next finger move; the pinch carries on from the new zoom.
+- A third finger that lands and lifts during a pinch no longer stops the two fingers still down from zooming.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
 
 ### Internal
