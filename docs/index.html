@@ -395,7 +395,7 @@
       .plate-1 figcaption > * { grid-column: 1 / 13; }
       .detail { grid-column: 1 / 13; display: grid; grid-template-columns: 112px 1fr; gap: 20px; align-items: start; }
       .crop { margin-bottom: 0; }
-      .detail > div { padding-top: 4px; }
+      .detail > figcaption { padding-top: 4px; }
       .result-col { display: grid; grid-template-columns: 128px 1fr; gap: 24px; align-items: center; }
       .result { margin-bottom: 0; }
       .note > div, .note > pre { grid-column: 1 / 13; }
@@ -423,133 +423,134 @@
     </div>
   </header>
 
-  <main class="wrap" id="top">
-    <h1 class="title">Croppie</h1>
-
-    <section class="intro grid">
-      <p class="statement a-b">Every picture has a better picture somewhere inside it.</p>
-      <div class="blurb c">
-        <p>Croppie is a small, typed image cropper for the browser. Drag, zoom, and cut out the part that matters.</p>
-        <p>Art books have done this for centuries. They call it a <em>detail</em>.</p>
-      </div>
-      <dl class="record d">
-        <div><dt>Object</dt><dd>Croppie, v3</dd></div>
-        <div><dt>Maker</dt><dd>Bay Informatics</dd></div>
-        <div><dt>After</dt><dd>Foliotek's Croppie</dd></div>
-        <div><dt>Medium</dt><dd>TypeScript on canvas</dd></div>
-        <div><dt>Dimensions</dt><dd>~5 KB gzipped</dd></div>
-        <div><dt>Requires</dt><dd>Nothing else</dd></div>
-        <div><dt>Credit line</dt><dd>MIT License</dd></div>
-      </dl>
-    </section>
-
-    <figure class="plate-1">
-      <div class="painting marked">
-        <img src="images/garden-2560.jpg" srcset="images/garden-1600.jpg 1600w, images/garden-2560.jpg 2560w, images/garden-3840.jpg 3840w" sizes="(min-width: 1280px) 1240px, calc(100vw - 32px)" width="2560" height="1457" alt="The Garden of Earthly Delights, a triptych by Hieronymus Bosch">
-        <button class="hotspot" data-detail="0" style="left: 18.5%; top: 31.6%;" aria-label="Open figure 2 in the cropper"><span>Fig. 2</span></button>
-        <button class="hotspot round" data-detail="1" style="left: 50.4%; top: 27.1%;" aria-label="Open figure 3 in the cropper"><span>Fig. 3</span></button>
-        <button class="hotspot" data-detail="2" style="left: 93.5%; top: 64.5%;" aria-label="Open figure 4 in the cropper"><span>Fig. 4</span></button>
-      </div>
-      <figcaption class="caption grid">
-        <p class="a-b"><span class="fig">Fig. 1</span>Hieronymus Bosch, <em>The Garden of Earthly Delights</em>, c. 1490–1510. Oil on oak panels. Museo del Prado, Madrid. Public domain.</p>
-        <p class="c-d">Outlines mark the three details below. Select one to open it in the cropper.</p>
-      </figcaption>
-    </figure>
-
-    <section class="details grid" id="details">
-      <header class="section-head a">
-        <p class="label"><span class="num">I</span>Plates</p>
-        <h2>Details</h2>
-        <p>Three crops of Fig. 1, one from each panel.</p>
-      </header>
-
-      <figure class="detail b">
-        <div class="crop marked"><img src="images/detail-giraffe.jpg" width="800" height="800" loading="lazy" alt="Detail: a giraffe"></div>
-        <div>
-          <figcaption class="caption"><span class="fig">Fig. 2</span>Left panel. A giraffe wanders Paradise.</figcaption>
-          <button class="send" data-detail="0">Crop this ↓</button>
-        </div>
-      </figure>
-
-      <figure class="detail c">
-        <div class="crop round marked marks-round"><img src="images/detail-sphere.jpg" width="800" height="800" loading="lazy" alt="Detail: a blue sphere"></div>
-        <div>
-          <figcaption class="caption"><span class="fig">Fig. 3</span>Center panel. Bathers in a blue sphere.</figcaption>
-          <button class="send" data-detail="1">Crop this ↓</button>
-        </div>
-      </figure>
-
-      <figure class="detail d">
-        <div class="crop marked"><img src="images/detail-prince.jpg" width="800" height="800" loading="lazy" alt="Detail: the bird-headed Prince of Hell"></div>
-        <div>
-          <figcaption class="caption"><span class="fig">Fig. 4</span>Right panel. The bird-headed Prince of Hell.</figcaption>
-          <button class="send" data-detail="2">Crop this ↓</button>
-        </div>
-      </figure>
-    </section>
-  </main>
-
-  <section class="room" id="try">
+  <main>
     <div class="wrap">
-      <div class="grid">
+      <h1 class="title">Croppie</h1>
+
+      <section class="intro grid">
+        <p class="statement a-b">Every picture has a better picture somewhere inside it.</p>
+        <div class="blurb c">
+          <p>Croppie is a small, typed image cropper for the browser. Drag, zoom, and cut out the part that matters.</p>
+          <p>Art books have done this for centuries. They call it a <em>detail</em>.</p>
+        </div>
+        <dl class="record d">
+          <div><dt>Object</dt><dd>Croppie, v3</dd></div>
+          <div><dt>Maker</dt><dd>Bay Informatics</dd></div>
+          <div><dt>After</dt><dd>Foliotek's Croppie</dd></div>
+          <div><dt>Medium</dt><dd>TypeScript on canvas</dd></div>
+          <div><dt>Dimensions</dt><dd>~5 KB gzipped</dd></div>
+          <div><dt>Requires</dt><dd>Nothing else</dd></div>
+          <div><dt>Credit line</dt><dd>MIT License</dd></div>
+        </dl>
+      </section>
+
+      <figure class="plate-1">
+        <div class="painting marked">
+          <img src="images/garden-2560.jpg" srcset="images/garden-1600.jpg 1600w, images/garden-2560.jpg 2560w, images/garden-3840.jpg 3840w" sizes="(min-width: 1280px) 1240px, calc(100vw - 32px)" width="2560" height="1457" alt="The Garden of Earthly Delights, a triptych by Hieronymus Bosch">
+          <button class="hotspot" data-detail="0" style="left: 18.5%; top: 31.6%;" aria-label="Open figure 2 in the cropper"><span>Fig. 2</span></button>
+          <button class="hotspot round" data-detail="1" style="left: 50.4%; top: 27.1%;" aria-label="Open figure 3 in the cropper"><span>Fig. 3</span></button>
+          <button class="hotspot" data-detail="2" style="left: 93.5%; top: 64.5%;" aria-label="Open figure 4 in the cropper"><span>Fig. 4</span></button>
+        </div>
+        <figcaption class="caption grid">
+          <p class="a-b"><span class="fig">Fig. 1</span>Hieronymus Bosch, <em>The Garden of Earthly Delights</em>, c. 1490–1510. Oil on oak panels. Museo del Prado, Madrid. Public domain.</p>
+          <p class="c-d">Outlines mark the three details below. Select one to open it in the cropper.</p>
+        </figcaption>
+      </figure>
+
+      <section class="details grid" id="details">
         <header class="section-head a">
-          <p class="label"><span class="num">II</span>Room</p>
-          <h2>Make your own detail</h2>
-          <ol class="steps">
-            <li>Drag to move around the painting.</li>
-            <li>Scroll, pinch, or use the slider to zoom.</li>
-            <li>Crop to keep what's inside the circle.</li>
-          </ol>
+          <p class="label"><span class="num">I</span>Plates</p>
+          <h2>Details</h2>
+          <p>Three crops of Fig. 1, one from each panel.</p>
         </header>
 
-        <div class="stage-col b-c">
-          <div class="stage" id="stage">
-            <div class="stage-marks marked" id="stage-marks" aria-hidden="true"></div>
-            <div id="croppie-demo"></div>
-          </div>
-          <div class="buttons">
-            <button class="btn solid" id="crop-btn">Crop the detail →</button>
-            <input type="file" id="file-input" accept="image/*">
-            <button class="btn" id="upload-btn">Use your own image</button>
-          </div>
-          <p class="caption"><span class="fig">Fig. 5</span>The cropper. Interactive.</p>
-        </div>
+        <figure class="detail b">
+          <div class="crop marked"><img src="images/detail-giraffe.jpg" width="800" height="800" loading="lazy" alt="Detail: a giraffe"></div>
+          <figcaption>
+            <p class="caption"><span class="fig">Fig. 2</span>Left panel. A giraffe wanders Paradise.</p>
+            <button class="send" data-detail="0">Crop this ↓</button>
+          </figcaption>
+        </figure>
 
-        <div class="result-col d" aria-live="polite">
-          <div class="result marked marks-round" id="result">
-            <span>Your detail<br>appears here</span>
-            <img id="result-img" width="128" height="128" alt="Your cropped detail">
+        <figure class="detail c">
+          <div class="crop round marked marks-round"><img src="images/detail-sphere.jpg" width="800" height="800" loading="lazy" alt="Detail: a blue sphere"></div>
+          <figcaption>
+            <p class="caption"><span class="fig">Fig. 3</span>Center panel. Bathers in a blue sphere.</p>
+            <button class="send" data-detail="1">Crop this ↓</button>
+          </figcaption>
+        </figure>
+
+        <figure class="detail d">
+          <div class="crop marked"><img src="images/detail-prince.jpg" width="800" height="800" loading="lazy" alt="Detail: the bird-headed Prince of Hell"></div>
+          <figcaption>
+            <p class="caption"><span class="fig">Fig. 4</span>Right panel. The bird-headed Prince of Hell.</p>
+            <button class="send" data-detail="2">Crop this ↓</button>
+          </figcaption>
+        </figure>
+      </section>
+    </div>
+
+    <section class="room" id="try">
+      <div class="wrap">
+        <div class="grid">
+          <header class="section-head a">
+            <p class="label"><span class="num">II</span>Room</p>
+            <h2>Make your own detail</h2>
+            <ol class="steps">
+              <li>Drag to move around the painting.</li>
+              <li>Scroll, pinch, or use the slider to zoom.</li>
+              <li>Crop to keep what's inside the circle.</li>
+            </ol>
+          </header>
+
+          <div class="stage-col b-c">
+            <div class="stage" id="stage">
+              <div class="stage-marks marked" id="stage-marks" aria-hidden="true"></div>
+              <div id="croppie-demo"></div>
+            </div>
+            <div class="buttons">
+              <button class="btn solid" id="crop-btn">Crop the detail →</button>
+              <input type="file" id="file-input" accept="image/*">
+              <button class="btn" id="upload-btn">Use your own image</button>
+            </div>
+            <p class="caption"><span class="fig">Fig. 5</span>The cropper. Interactive.</p>
           </div>
-          <p class="caption" id="result-caption"><span class="fig">Fig. 6</span>Not yet cropped.</p>
+
+          <div class="result-col d" aria-live="polite">
+            <div class="result marked marks-round" id="result">
+              <span>Your detail<br>appears here</span>
+              <img id="result-img" width="128" height="128" alt="Your cropped detail">
+            </div>
+            <p class="caption" id="result-caption"><span class="fig">Fig. 6</span>Not yet cropped.</p>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="wrap">
-    <section class="notes grid" id="install">
-      <header class="section-head a">
-        <p class="label"><span class="num">III</span>Appendix</p>
-        <h2>Notes</h2>
-      </header>
+    <div class="wrap">
+      <section class="notes grid" id="install">
+        <header class="section-head a">
+          <p class="label"><span class="num">III</span>Appendix</p>
+          <h2>Notes</h2>
+        </header>
 
-      <div class="note b-d">
-        <div>
-          <h3><span class="fig">1.</span>Installation</h3>
-          <p>From npm, or straight from the repository.</p>
-        </div>
+        <div class="note b-d">
+          <div>
+            <h3><span class="fig">1.</span>Installation</h3>
+            <p>From npm, or straight from the repository.</p>
+          </div>
 <pre><span class="co"># npm</span>
 npm install @bayinformatics/croppie
 
 <span class="co"># or from git</span>
 npm install github:bayinformatics/croppie</pre>
-      </div>
-
-      <div class="note b-d">
-        <div>
-          <h3><span class="fig">2.</span>Use</h3>
-          <p>Mount on any element, bind an image, take the result as a blob, base64 string, or canvas.</p>
         </div>
+
+        <div class="note b-d">
+          <div>
+            <h3><span class="fig">2.</span>Use</h3>
+            <p>Mount on any element, bind an image, take the result as a blob, base64 string, or canvas.</p>
+          </div>
 <pre><span class="k">import</span> Croppie <span class="k">from</span> <span class="s">'@bayinformatics/croppie'</span>
 <span class="k">import</span> <span class="s">'@bayinformatics/croppie/croppie.css'</span>
 
@@ -563,9 +564,12 @@ npm install github:bayinformatics/croppie</pre>
 
 <span class="co">// Get the cropped result</span>
 <span class="k">const</span> blob = <span class="k">await</span> cropper.<span class="f">result</span>({ type: <span class="s">'blob'</span> })</pre>
-      </div>
-    </section>
+        </div>
+      </section>
+    </div>
+  </main>
 
+  <div class="wrap">
     <footer class="colophon grid">
       <p class="label a">Colophon</p>
       <p class="b">Set in Bodoni Moda and Archivo. Figures reproduced from Hieronymus Bosch, <em>The Garden of Earthly Delights</em>, in the public domain.</p>
@@ -593,36 +597,67 @@ npm install github:bayinformatics/croppie</pre>
     const result = document.getElementById('result')
     const resultImg = document.getElementById('result-img')
     const resultCaption = document.getElementById('result-caption')
+    const emptyCaption = resultCaption.innerHTML
 
-    // Size the boundary to fill its column
-    const w = Math.min(600, Math.floor(stage.parentElement.clientWidth))
-    const h = Math.round(w * 0.72)
-    const vp = Math.round(Math.min(h * 0.72, 300))
-    stage.style.width = `${w}px`
-    stageMarks.style.width = `${w}px`
-    stageMarks.style.height = `${h}px`
+    // Size the boundary to fill its column. Croppie's boundary is fixed-size,
+    // so the cropper is rebuilt when the column changes width.
+    let croppie
+    let width = 0
+    const mount = () => {
+      const w = Math.min(600, stage.parentElement.clientWidth)
+      if (w === width) return false
+      width = w
+      const h = Math.round(w * 0.72)
+      const vp = Math.round(Math.min(h * 0.72, 300))
+      stage.style.width = `${w}px`
+      stageMarks.style.width = `${w}px`
+      stageMarks.style.height = `${h}px`
+      croppie?.destroy()
+      croppie = new Croppie(demoEl, {
+        viewport: { width: vp, height: vp, type: 'circle' },
+        boundary: { width: w, height: h },
+        showZoomer: true,
+      })
+      return true
+    }
+    mount()
 
-    const croppie = new Croppie(demoEl, {
-      viewport: { width: vp, height: vp, type: 'circle' },
-      boundary: { width: w, height: h },
-      showZoomer: true,
-    })
-
-    let queue = Promise.resolve()
-    let bound = false
-    const showDetail = (i) => {
-      bound = true
-      queue = queue.then(() => croppie.bind({ url: IMAGE, points: DETAILS[i] }))
+    // Binds run one at a time, so a slow load can't land on top of a later one.
+    // Each resolves true or false; a failed bind is logged and the queue stays usable.
+    let queue = Promise.resolve(true)
+    const enqueue = (task) => {
+      queue = queue.then(task).then(() => true, (err) => { console.error(err); return false })
       return queue
     }
 
-    // Load the big scan only when the cropper is about to scroll into view
-    const lazy = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
+    // What the cropper shows: the scan's URL, or the visitor's own File
+    let source = null
+
+    const showDetail = (i) => {
       lazy.disconnect()
-      if (!bound) showDetail(1)
+      return enqueue(async () => {
+        await croppie.bind({ url: IMAGE, points: DETAILS[i] })
+        source = IMAGE
+      })
+    }
+
+    // Load the big scan only when the cropper is about to scroll into view
+    const lazy = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) showDetail(1)
     }, { rootMargin: '600px 0px' })
     lazy.observe(stage)
+
+    // Rebuild at the new width, keeping the scan's framing (an upload re-fits)
+    let resizeTimer
+    new ResizeObserver(() => {
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(() => enqueue(async () => {
+        const { points } = croppie.get()
+        if (!mount() || !source) return
+        if (source === IMAGE) await croppie.bind({ url: IMAGE, points })
+        else await croppie.bindFile(source)
+      }), 150)
+    }).observe(stage.parentElement)
 
     // Figs. 2–4: light up the matching outline, and send a detail to the cropper
     const hotspots = [...document.querySelectorAll('.hotspot')]
@@ -634,9 +669,10 @@ npm install github:bayinformatics/croppie</pre>
     }
 
     for (const el of document.querySelectorAll('[data-detail]')) {
-      el.addEventListener('click', async () => {
-        document.getElementById('try').scrollIntoView({ behavior: 'smooth' })
-        await showDetail(Number(el.dataset.detail))
+      el.addEventListener('click', () => {
+        // No behavior option: the page's scroll-behavior applies, reduced motion included
+        document.getElementById('try').scrollIntoView()
+        showDetail(Number(el.dataset.detail))
       })
     }
 
@@ -644,25 +680,33 @@ npm install github:bayinformatics/croppie</pre>
     const links = [...document.querySelectorAll('.bar nav a[href^="#"]')]
     const sections = links.map((a) => document.getElementById(a.hash.slice(1)))
 
+    let current
     const markCurrent = () => {
       const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2
-      let current = atBottom ? sections.length - 1 : -1
-      if (!atBottom) sections.forEach((s, i) => { if (s.getBoundingClientRect().top <= innerHeight * 0.4) current = i })
-      links.forEach((a, i) => i === current ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current'))
+      let next = atBottom ? sections.length - 1 : -1
+      if (!atBottom) sections.forEach((s, i) => { if (s.getBoundingClientRect().top <= innerHeight * 0.4) next = i })
+      if (next === current) return
+      current = next
+      links.forEach((a, i) => i === next ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current'))
     }
 
-    addEventListener('scroll', () => requestAnimationFrame(markCurrent), { passive: true })
+    // Scroll events already fire at most once per frame, ahead of rendering
+    addEventListener('scroll', markCurrent, { passive: true })
+    addEventListener('resize', markCurrent)
     markCurrent()
 
     document.getElementById('upload-btn').addEventListener('click', () => fileInput.click())
 
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0]
-      if (file) {
-        bound = true
-        queue = queue.then(() => croppie.bindFile(file))
-        await queue
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0]
+      // Clear the input so choosing the same file again still fires 'change'
+      fileInput.value = ''
+      if (!file) return
+      lazy.disconnect()
+      if (await enqueue(() => croppie.bindFile(file))) {
+        source = file
         result.classList.remove('has-img')
+        resultCaption.innerHTML = emptyCaption
       }
     })
 
