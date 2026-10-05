@@ -38,4 +38,4 @@ export {
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./transform.js";
-export { validateOptions } from "./validate.js";
+export { positiveFinite, validateOptions } from "./validate.js";

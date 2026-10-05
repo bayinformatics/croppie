@@ -5,13 +5,17 @@ import { toNumber } from "./number.js";
 const PREFIX = "[@bayinformatics/croppie]";
 
 /**
- * A dimension or zoom limit as a number. A numeric string (as read from a data attribute,
- * such as `"200"` or `" 5 "`) is converted with `toNumber()`, like `setZoom()` converts one.
+ * A dimension, size or zoom limit as a number. A numeric string (as read from a data
+ * attribute, such as `"200"` or `" 5 "`) is converted with `toNumber()`, like `setZoom()`
+ * converts one.
  *
+ * @param name - The option's name for the error message (such as `"viewport.width"`)
+ * @param value - The value to check
+ * @returns The value as a number
  * @throws RangeError unless the value is then a positive, finite number (a blank or
  *   non-numeric string, or a value that is neither a number nor a string, is not)
  */
-function positiveFinite(name: string, value: unknown): number {
+export function positiveFinite(name: string, value: unknown): number {
 	const number =
 		typeof value === "number" || typeof value === "string"
 			? toNumber(value)

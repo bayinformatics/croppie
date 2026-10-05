@@ -220,7 +220,7 @@ Clean up and remove the cropper. It is safe to call more than once. Afterwards `
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `type` | `'blob' \| 'base64' \| 'canvas'` | Required | Output type |
-| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution. An `'original'` or custom size is scaled down, keeping its shape, to at most 16,777,216 px (4096×4096) and 16,384 px a side, so the canvas stays within what browsers can allocate (iOS Safari draws nothing on a larger one), then rounded to whole pixels. A size of another shape than the viewport keeps the proportions, with transparent or `backgroundColor` bars |
+| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution. An `'original'` or custom size is scaled down, keeping its shape, to at most 16,777,216 px (4096×4096) and 16,384 px a side, so the canvas stays within what browsers can allocate (iOS Safari draws nothing on a larger one), then rounded to whole pixels; a custom width or height that is not a positive finite number rejects with a `RangeError`. A size of another shape than the viewport keeps the proportions, with transparent or `backgroundColor` bars |
 | `format` | `'png' \| 'jpeg' \| 'webp'` | `'png'` | Output format for blob/base64 |
 | `quality` | `number` | `0.92` | JPEG/WebP quality (0-1) |
 | `circle` | `boolean` | `viewport.type === 'circle'` | Apply circular mask |

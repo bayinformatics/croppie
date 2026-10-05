@@ -41,6 +41,7 @@ import {
 	fileToDataUrl,
 	loadImage,
 	normalizePoints,
+	positiveFinite,
 	resolveMinZoom,
 	setTransform,
 	validateOptions,
@@ -473,7 +474,8 @@ export class Croppie {
 	 * viewport centers the crop and leaves the rest transparent (or `backgroundColor`). An
 	 * `"original"` or custom size is scaled down, keeping its shape, to at most 16,777,216 px
 	 * (4096x4096) and 16,384 px a side, so the canvas stays within what browsers can allocate
-	 * (iOS Safari draws nothing on a larger one), and rounded to whole pixels.
+	 * (iOS Safari draws nothing on a larger one), and rounded to whole pixels. A custom
+	 * width or height that is not a positive finite number rejects with a `RangeError`.
 	 */
 	result(options: ResultOptions & { type: "blob" }): Promise<Blob>;
 	result(options: ResultOptions & { type: "base64" }): Promise<string>;
@@ -504,9 +506,11 @@ export class Croppie {
 				frame.bottomRightY - frame.topLeftY,
 			));
 		} else if (options.size && options.size !== "viewport") {
+			// A size that is not a positive finite number would give a 0-wide canvas and a
+			// misleading encoding error later
 			({ width: outputWidth, height: outputHeight } = capCanvasSize(
-				options.size.width,
-				options.size.height,
+				positiveFinite("size.width", options.size.width),
+				positiveFinite("size.height", options.size.height),
 			));
 		} else {
 			outputWidth = viewport.width;
