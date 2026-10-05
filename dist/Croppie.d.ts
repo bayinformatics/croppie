@@ -1,4 +1,4 @@
-import type { BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from "./types.js";
+import type { BindFileOptions, BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from "./types.js";
 /**
  * Modern, TypeScript-first image cropper.
  *
@@ -117,12 +117,17 @@ export declare class Croppie {
      */
     private load;
     /**
-     * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
-     * empty file input) rejects with a `TypeError` before anything changes, so it does not
-     * cancel a bind that is still loading. Like `bind()`, it rejects with an `AbortError`
-     * when a later bind supersedes it or the instance is destroyed while the file loads.
+     * Binds a File or Blob to the cropper, with the same `options` as `bind()` except `url`:
+     * `rotation`, `orientation`, `points` and `zoom` apply exactly as there (an invalid
+     * `rotation` rejects with a `RangeError` before anything changes; malformed `points` are
+     * ignored with a warning), so a file can be bound back with the data `get()` returned.
+     *
+     * Anything else than a File or Blob (such as the `undefined` of an empty file input)
+     * rejects with a `TypeError` before anything changes, so it does not cancel a bind that is
+     * still loading. Like `bind()`, it rejects with an `AbortError` when a later bind
+     * supersedes it or the instance is destroyed while the file loads.
      */
-    bindFile(file: File | Blob): Promise<void>;
+    bindFile(file: File | Blob, options?: BindFileOptions): Promise<void>;
     /**
      * Gets the current cropped result. The return type follows `options.type`:
      * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
@@ -185,7 +190,8 @@ export declare class Croppie {
      *
      * Emits `rotate`, then `update`, then `zoom` if the zoom had to change: the zoom limits are
      * recomputed for the rotated image, so with a non-square viewport a quarter turn may raise
-     * the zoom to the new minimum. Rotating by a full turn or 0, before an image is bound or
+     * the zoom to the new minimum. As with `setZoom()`, when an `update` listener zooms again,
+     * only its final zoom is reported. Rotating by a full turn or 0, before an image is bound or
      * after `destroy()` does nothing. `points` in `get()` stay in the natural frame.
      * Calling it while the user is dragging is not special-cased.
      *
@@ -194,13 +200,24 @@ export declare class Croppie {
      */
     rotate(degrees: number): void;
     /**
-     * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+     * Restores the rotation `bind()` started with, re-centers the image and returns to the
+     * coverage zoom of that rotation (clamped to the zoom limits).
      *
-     * The zoom goes through the same path as `setZoom()`, so the events follow the same
-     * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
-     * position did, and no stale `zoom` when an `update` listener zooms again.
+     * Emits `rotate` when the rotation changed, then `update`, then `zoom` when the zoom
+     * changed. As with `setZoom()`, when an `update` listener zooms again, only its final zoom
+     * is reported.
      */
     reset(): void;
+    /**
+     * Shows the rotation, position and zoom that `rotate()` or `reset()` settled, then emits
+     * their events in the documented order: `rotate` when the rotation changed, `update`, and
+     * `zoom` when the settled zoom differs from `previousZoom`.
+     *
+     * Like `applyZoom()`, the `zoom` event is decided from the zoom settled here, before any
+     * listener runs: when a listener zooms again, its nested call already emitted the final
+     * zoom and this one emits none, so `zoom` never reports a value that was already replaced.
+     */
+    private commitTurn;
     /**
      * Destroys the cropper and cleans up
      */
@@ -218,7 +235,7 @@ export declare class Croppie {
      */
     private assertNotDestroyed;
     /**
-     * Resolves the effective minimum zoom for an image shown at `rotation` (see
+     * Resolves the effective minimum zoom for the bound image shown at `rotation` (see
      * `resolveMinZoom`), stores it with the coverage zoom of the image as displayed (the one
      * place both are computed), and syncs the slider's `min`, so the slider range is never
      * inverted.
@@ -243,7 +260,7 @@ export declare class Croppie {
      * The `<img>` keeps its natural size with transform-origin 0 0, so the transform is
      * `translate(tx, ty) scale(s) rotate(r)`. The rotation is about the displayed image's
      * centre, which sits at `(x, y)` from the boundary centre, so
-     * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`, written out per rotation.
+     * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`, with `R` from `rotateOffset()`.
      */
     private updateTransform;
     /**

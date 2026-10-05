@@ -32,7 +32,9 @@ export declare function createOverlay(boundary: Boundary, viewport: Viewport): H
  * Create the image element used as the crop preview.
  *
  * The element is configured with alt text, non-draggable behavior, absolute positioning,
- * origin at the top-left, and no maximum width/height so it can be transformed freely.
+ * origin at the top-left, no maximum width/height so it can be transformed freely, and an
+ * inline `image-orientation: from-image` (also in croppie.css) so it shows the EXIF-oriented
+ * pixels the geometry assumes, whatever the host's CSS.
  *
  * @returns The configured HTMLImageElement used to display the source image inside the cropper.
  */
