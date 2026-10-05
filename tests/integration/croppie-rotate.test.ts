@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { CropPoints, CroppieOptions, Rotation } from "../../src/types.ts";
+import {
+	getLastMockContext,
+	restoreCanvasMocks,
+	setupCanvasMocks,
+} from "../canvas/mocks.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
@@ -482,6 +487,133 @@ describe("Croppie rotate", () => {
 			croppie.reset();
 
 			expect(events.map((e) => e.name)).toEqual(["update"]);
+		});
+	});
+
+	describe("result()", () => {
+		// 20x10 image in a 100x50 viewport; zoom 5 covers it, 10 after a quarter turn
+		const wide = { width: 100, height: 50, type: "square" as const };
+
+		beforeEach(() => {
+			setupCanvasMocks();
+		});
+
+		afterEach(() => {
+			restoreCanvasMocks();
+		});
+
+		async function resultFor(
+			rotation: number,
+			size: "original" | "viewport",
+		): Promise<HTMLCanvasElement> {
+			create({ viewport: wide });
+			await croppie.bind({ url: SMALL_PNG, zoom: 5 });
+			croppie.rotate(rotation);
+			return croppie.result({ type: "canvas", size });
+		}
+
+		it("keeps the plain draw call at rotation 0", async () => {
+			await resultFor(0, "viewport");
+
+			const ctx = getLastMockContext();
+			expect(ctx?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				0,
+				0,
+				20,
+				10,
+				0,
+				0,
+				100,
+				50,
+			);
+			expect(ctx?.rotate).not.toHaveBeenCalled();
+		});
+
+		it("returns the viewport size for size 'viewport' after a quarter turn", async () => {
+			const canvas = await resultFor(90, "viewport");
+
+			expect(canvas.width).toBe(100);
+			expect(canvas.height).toBe(50);
+		});
+
+		it("returns the displayed crop size for size 'original' after a quarter turn", async () => {
+			// Viewport 100x50 at zoom 10 spans 10x5 displayed px: the canvas is 10x5
+			// (not the 5x10 of the natural-frame crop)
+			const canvas = await resultFor(90, "original");
+
+			expect(canvas.width).toBe(10);
+			expect(canvas.height).toBe(5);
+		});
+
+		it("draws the natural crop 5x10 rotated into the 10x5 canvas", async () => {
+			await resultFor(90, "original");
+
+			const ctx = getLastMockContext();
+			expect(ctx?.translate).toHaveBeenCalledWith(5, 2.5);
+			expect(ctx?.rotate).toHaveBeenCalledWith(Math.PI / 2);
+			// Natural source {7.5, 0, 12.5, 10}, drawn into a 5x10 box centred on the origin
+			expect(ctx?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				7.5,
+				0,
+				5,
+				10,
+				-2.5,
+				-5,
+				5,
+				10,
+			);
+		});
+
+		it("draws into a box the size of the viewport after a quarter turn", async () => {
+			await resultFor(90, "viewport");
+
+			const ctx = getLastMockContext();
+			expect(ctx?.translate).toHaveBeenCalledWith(50, 25);
+			expect(ctx?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				7.5,
+				0,
+				5,
+				10,
+				-25,
+				-50,
+				50,
+				100,
+			);
+		});
+
+		it("rotates by 180 without swapping the output size", async () => {
+			const canvas = await resultFor(180, "original");
+
+			expect(canvas.width).toBe(20);
+			expect(canvas.height).toBe(10);
+			const ctx = getLastMockContext();
+			expect(ctx?.rotate).toHaveBeenCalledWith(Math.PI);
+			expect(ctx?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				0,
+				0,
+				20,
+				10,
+				-10,
+				-5,
+				20,
+				10,
+			);
+		});
+
+		it("applies a bind-time rotation to the result", async () => {
+			create({ viewport: wide });
+			await croppie.bind({ url: SMALL_PNG, rotation: 90 });
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			// Coverage of the displayed 10x20 image in a 100x50 viewport is 10: 10x5 px
+			expect(canvas.width).toBe(10);
+			expect(canvas.height).toBe(5);
+			expect(getLastMockContext()?.rotate).toHaveBeenCalledWith(Math.PI / 2);
 		});
 	});
 });

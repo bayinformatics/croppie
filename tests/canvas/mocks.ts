@@ -25,6 +25,10 @@ export interface MockCanvasContext {
 	ellipse: ReturnType<typeof mock>;
 	closePath: ReturnType<typeof mock>;
 	clip: ReturnType<typeof mock>;
+	save: ReturnType<typeof mock>;
+	restore: ReturnType<typeof mock>;
+	translate: ReturnType<typeof mock>;
+	rotate: ReturnType<typeof mock>;
 	drawImage: ReturnType<typeof mock>;
 	fillStyle: string;
 	imageSmoothingEnabled: boolean;
@@ -46,6 +50,10 @@ export function createMockCanvasContext(): MockCanvasContext {
 		ellipse: mock(),
 		closePath: mock(),
 		clip: mock(),
+		save: mock(),
+		restore: mock(),
+		translate: mock(),
+		rotate: mock(),
 		drawImage: mock(),
 		fillStyle: "",
 		// The defaults of a real 2D context
