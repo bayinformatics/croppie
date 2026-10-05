@@ -674,7 +674,7 @@ describe("canvas draw", () => {
 
 		it("letterboxes a frame larger than the image inside the rotated box", () => {
 			// 100x100 output, frame of 1000x1000 natural px around the 400x300 image
-			drawCroppedImage(
+			const canvas = drawCroppedImage(
 				image,
 				{
 					topLeftX: -300,
@@ -688,13 +688,13 @@ describe("canvas draw", () => {
 			);
 
 			// Scale 0.1: the image is 40x30 in a 100x100 box centred on the origin, offset
-			// by the 30x35 of empty space before it
-			expect(lastContext().drawImage).toHaveBeenCalledWith(
-				image,
+			// by the 30x35 of empty space before it. A 10x shrink is first halved to 50x38.
+			expect(contextOf(canvas).drawImage).toHaveBeenCalledWith(
+				expect.objectContaining({ tagName: "CANVAS", width: 50, height: 38 }),
 				0,
 				0,
-				400,
-				300,
+				50,
+				38,
 				-20,
 				-15,
 				40,

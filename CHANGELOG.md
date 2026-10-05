@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?) scripts.
 - `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work.
 - `rotate(degrees)` rotates the image clockwise by any multiple of 90 (closes #20); `bind({ rotation })` sets the initial rotation, `get()` returns `rotation`, `reset()` restores the bind-time rotation, and a `rotate` event is emitted. `points` stay in the natural frame and `result()` renders the rotated image. New `Rotation` type.
-- `enableExif` now reads the EXIF Orientation tag of JPEGs bound as data URLs (including `bindFile()`) and reports it as `get().orientation` (closes #21); it never rotates pixels, because browsers already display such images upright. `bind({ orientation })` is an explicit override mapped to a rotation. New `readJpegOrientation()` export for bytes you fetched yourself.
+- `enableExif` now reads the EXIF Orientation tag of JPEGs bound with `bindFile()` or as data URLs and reports it as `get().orientation` (closes #21); it never rotates pixels, because browsers already display such images upright. `bind({ orientation })` is an explicit override mapped to a rotation. New `readJpegOrientation()` export for bytes you fetched yourself.
 - `result()` is typed by its output type: `"blob"` returns `Promise<Blob>`, `"base64"` `Promise<string>`, `"canvas"` `Promise<HTMLCanvasElement>` (a generic overload remains for runtime-only types).
 - The zoom slider has `aria-label="Zoom"` and a percentage `aria-valuetext`, and a visible keyboard focus ring in Firefox as well as WebKit browsers.
 
@@ -39,6 +39,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- `bindFile()` hands the browser the file through an object URL instead of a base64 data URL. WebKit paid for the data URL, tens of megabytes for a large photo, on every repaint, so dragging a 48 MP photo in Safari took about 600 ms per frame; it now keeps up. Binding no longer copies the file into a string, and only the first 256 KiB is read for `enableExif`. The object URL is revoked when another image replaces it, when the bind is superseded or fails, and on `destroy()`.
+- `result()` shrinks a large source in halving steps before the final draw, so crops of large photos are no longer jagged and speckled in Safari, where a single `drawImage` aliases even with high-quality smoothing. No step canvas exceeds 16,777,216 pixels, the iOS canvas limit.
 - The transform computed from `bind({ points })` now derives from the zoom after it has been clamped to the zoom limits (#23).
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.

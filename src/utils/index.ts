@@ -7,7 +7,11 @@ export {
 	getTransformValues,
 	setTransform,
 } from "./dom.js";
-export { readDataUrlOrientation, readJpegOrientation } from "./exif.js";
+export {
+	readBlobOrientation,
+	readDataUrlOrientation,
+	readJpegOrientation,
+} from "./exif.js";
 export {
 	aspectRatio,
 	calculateContainZoom,

@@ -40,11 +40,11 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	exifOrientationToRotation,
-	fileToDataUrl,
 	loadImage,
 	naturalRectToRotated,
 	normalizePoints,
 	normalizeRotation,
+	readBlobOrientation,
 	readDataUrlOrientation,
 	resolveMinZoom,
 	rotatedRectToNatural,
@@ -99,6 +99,8 @@ export class Croppie {
 	private initialRotation: Rotation = 0;
 	/** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
 	private exifOrientation: number | undefined;
+	/** The object URL `bindFile()` made for the bound image; revoked once nothing shows it. */
+	private objectUrl: string | undefined;
 	private zoomConfig: ZoomConfig;
 	/** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
 	private configuredMinZoom: number | undefined;
@@ -287,6 +289,7 @@ export class Croppie {
 		bindOptions: BindOptions,
 		generation: number,
 		rotation: Rotation,
+		file?: { orientation: number | undefined },
 	): Promise<void> {
 		let image: HTMLImageElement;
 		try {
@@ -305,16 +308,22 @@ export class Croppie {
 		}
 		this.image = image;
 
+		// The previous file's object URL is no longer shown or cropped from
+		this.revokeObjectUrl();
+		if (file) this.objectUrl = bindOptions.url;
+
 		if (this.previewEl) {
 			// Use the loaded image's src to ensure preview matches the image we crop from
 			// (important for URLs that return different content on each request)
 			this.previewEl.src = this.image.src;
 		}
 
-		// Read the tag from the data URL's prefix; the browser has already oriented the pixels,
-		// so it is only reported, never applied
+		// A file's tag was read from its first bytes, a data URL's comes from its prefix. The
+		// browser has already oriented the pixels, so it is only reported, never applied
 		this.exifOrientation = this.options.enableExif
-			? readDataUrlOrientation(bindOptions.url)
+			? file
+				? file.orientation
+				: readDataUrlOrientation(bindOptions.url)
 			: undefined;
 		if (
 			bindOptions.orientation !== undefined &&
@@ -386,16 +395,27 @@ export class Croppie {
 		// still being read supersedes this one
 		const generation = ++this.bindGeneration;
 
-		let dataUrl: string;
-		try {
-			dataUrl = await fileToDataUrl(file);
-		} catch (error) {
+		let orientation: number | undefined;
+		if (this.options.enableExif) {
+			try {
+				orientation = await readBlobOrientation(file);
+			} catch (error) {
+				if (this.isStaleBind(generation)) return;
+				throw error;
+			}
 			if (this.isStaleBind(generation)) return;
-			throw error;
 		}
-		if (this.isStaleBind(generation)) return;
 
-		await this.load({ url: dataUrl }, generation, 0);
+		// An object URL hands the browser the file itself. A base64 data URL of a large photo
+		// is a string of tens of megabytes that WebKit pays for on every repaint, which made
+		// dragging a 48 MP photo take ~600 ms per frame in Safari.
+		const url = URL.createObjectURL(file);
+		try {
+			await this.load({ url }, generation, 0, { orientation });
+		} finally {
+			// Superseded, failed, or destroyed before it was shown: nothing else will revoke it
+			if (this.objectUrl !== url) URL.revokeObjectURL(url);
+		}
 	}
 
 	/**
@@ -644,6 +664,7 @@ export class Croppie {
 		this.destroyed = true;
 		// Invalidate any bind that is still loading
 		this.bindGeneration++;
+		this.revokeObjectUrl();
 
 		// Run all cleanup functions
 		for (const cleanup of this.cleanupFns) {
@@ -704,6 +725,15 @@ export class Croppie {
 				`[@bayinformatics/croppie] ${method}() called on a destroyed instance`,
 			);
 		}
+	}
+
+	/**
+	 * Revokes the object URL of a bound file, if there is one
+	 */
+	private revokeObjectUrl(): void {
+		if (this.objectUrl === undefined) return;
+		URL.revokeObjectURL(this.objectUrl);
+		this.objectUrl = undefined;
 	}
 
 	/**

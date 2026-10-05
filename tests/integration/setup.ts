@@ -24,4 +24,6 @@ Object.assign(globalThis, {
 	Blob: window.Blob,
 	File: window.File,
 	FileReader: window.FileReader,
+	// happy-dom's URL, so createObjectURL() accepts happy-dom's Blob and File
+	URL: window.URL,
 });
