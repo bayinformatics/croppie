@@ -198,6 +198,13 @@ export class Croppie {
 		);
 		this.cleanupFns.push(dragCleanup);
 
+		// The drag handler turns off every browser touch gesture on the boundary. Without
+		// zoom there is no pinch handler, so give pinch-zoom back to the browser: a pinch
+		// over the cropper then zooms the page instead of doing nothing
+		if (!this.options.enableZoom) {
+			this.boundaryEl.style.touchAction = "pinch-zoom";
+		}
+
 		// Wheel zoom handler
 		if (this.options.enableZoom && this.options.mouseWheelZoom) {
 			const requireCtrl = this.options.mouseWheelZoom === "ctrl";
