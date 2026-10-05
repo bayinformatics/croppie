@@ -9,10 +9,9 @@ export interface DragCallbacks {
 interface DragState {
 	/** The pointer driving the drag, or null when idle. */
 	pointerId: number | null;
-	startX: number;
-	startY: number;
-	startTransformX: number;
-	startTransformY: number;
+	/** The pointer position at the previous event, in client pixels. */
+	lastClientX: number;
+	lastClientY: number;
 }
 
 /**
@@ -20,6 +19,10 @@ interface DragState {
  *
  * Sets up handlers that read the current transform via `getTransform`, update it via `setTransform`
  * while the primary pointer is dragged, and invoke the optional lifecycle callbacks.
+ *
+ * Each move adds the pointer movement since the previous event to the current position, so
+ * a change made while the button is held (a zoom about the cursor, a rotation) is kept
+ * rather than undone by the next move.
  *
  * Only the pointer that started the drag is followed: events from other pointers are
  * ignored, except that a second pointer going down ends the drag so a two-finger
@@ -29,7 +32,8 @@ interface DragState {
  *
  * @param element - The HTMLElement to enable dragging on
  * @param getTransform - Function that returns the element's current TransformState
- * @param setTransform - Function to update the element's transform coordinates (`x`, `y`)
+ * @param setTransform - Function to update the element's transform coordinates (`x`, `y`); it
+ *   may clamp them, and the next move starts from the result
  * @param callbacks - Optional callbacks invoked on drag start, move, and end
  * @returns A cleanup function that removes the installed event listeners
  */
@@ -41,10 +45,8 @@ export function createDragHandler(
 ): () => void {
 	const state: DragState = {
 		pointerId: null,
-		startX: 0,
-		startY: 0,
-		startTransformX: 0,
-		startTransformY: 0,
+		lastClientX: 0,
+		lastClientY: 0,
 	};
 
 	const tryCapture = (pointerId: number) => {
@@ -86,29 +88,26 @@ export function createDragHandler(
 		}
 
 		state.pointerId = e.pointerId;
-		state.startX = e.clientX;
-		state.startY = e.clientY;
-
-		const transform = getTransform();
-		state.startTransformX = transform.x;
-		state.startTransformY = transform.y;
+		state.lastClientX = e.clientX;
+		state.lastClientY = e.clientY;
 
 		tryCapture(e.pointerId);
 		element.style.cursor = "grabbing";
 
-		callbacks?.onStart?.(transform);
+		callbacks?.onStart?.(getTransform());
 	};
 
 	const handlePointerMove = (e: PointerEvent) => {
 		if (e.pointerId !== state.pointerId) return;
 
-		const deltaX = e.clientX - state.startX;
-		const deltaY = e.clientY - state.startY;
+		const deltaX = e.clientX - state.lastClientX;
+		const deltaY = e.clientY - state.lastClientY;
+		state.lastClientX = e.clientX;
+		state.lastClientY = e.clientY;
 
-		const newX = state.startTransformX + deltaX;
-		const newY = state.startTransformY + deltaY;
-
-		setTransform(newX, newY);
+		// Relative to the current position, which a zoom or rotation may have moved mid-drag
+		const { x, y } = getTransform();
+		setTransform(x + deltaX, y + deltaY);
 
 		const transform = getTransform();
 		callbacks?.onMove?.(transform);
