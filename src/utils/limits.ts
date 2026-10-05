@@ -1,0 +1,45 @@
+/** Default minimum zoom, used when `zoom.min` is not configured. */
+export const DEFAULT_MIN_ZOOM = 0.1;
+/** Default maximum zoom, used when `zoom.max` is not configured. */
+export const DEFAULT_MAX_ZOOM = 10;
+
+export interface MinZoomInput {
+	/** `options.zoom.min` as given by the caller; `undefined` when unset. */
+	configuredMin: number | undefined;
+	/** The maximum zoom. */
+	max: number;
+	/** Zoom at which the image just covers the viewport (the larger ratio). */
+	coverage: number;
+	/** Zoom at which the whole image fits inside the viewport (the smaller ratio). */
+	contain: number;
+	/** `zoom.enforceMinimumCoverage !== false`. */
+	enforceMinimumCoverage: boolean;
+}
+
+/**
+ * Resolve the lowest zoom the user may reach for the bound image.
+ *
+ * ```
+ * enforce (default): floor = configuredMin !== undefined ? max(configuredMin, coverage) : coverage
+ * no enforce:        floor = configuredMin ?? min(0.1, contain)
+ * result = min(floor, max)
+ * ```
+ *
+ * With coverage enforced and `zoom.min` unset the floor is the per-image coverage zoom, so
+ * a large photo (coverage below 0.1) can zoom out until it just covers the viewport instead
+ * of being stopped at an unreachable 0.1. The result never exceeds `max`: a small image
+ * whose coverage zoom is above `max` would otherwise give an inverted slider range
+ * (`min > max`).
+ */
+export function resolveMinZoom(input: MinZoomInput): number {
+	const { configuredMin, max, coverage, contain, enforceMinimumCoverage } =
+		input;
+
+	const floor = enforceMinimumCoverage
+		? configuredMin !== undefined
+			? Math.max(configuredMin, coverage)
+			: coverage
+		: (configuredMin ?? Math.min(DEFAULT_MIN_ZOOM, contain));
+
+	return Math.min(floor, max);
+}

@@ -9,11 +9,18 @@ export {
 } from "./dom.js";
 export {
 	aspectRatio,
+	calculateContainZoom,
 	calculateInitialZoom,
 	fileToDataUrl,
 	getImageDimensions,
 	loadImage,
 } from "./image.js";
+export {
+	DEFAULT_MAX_ZOOM,
+	DEFAULT_MIN_ZOOM,
+	type MinZoomInput,
+	resolveMinZoom,
+} from "./limits.js";
 export {
 	calculateTransformFromPoints,
 	normalizePoints,

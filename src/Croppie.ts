@@ -32,20 +32,24 @@ import {
 import {
 	CENTER_ANCHOR,
 	calculateBounds,
+	calculateContainZoom,
 	calculateInitialZoom,
 	calculateTransformFromPoints,
 	clamp,
+	DEFAULT_MAX_ZOOM,
+	DEFAULT_MIN_ZOOM,
 	fileToDataUrl,
 	loadImage,
 	normalizePoints,
+	resolveMinZoom,
 	setTransform,
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./utils/index.js";
 
 const DEFAULT_ZOOM: ZoomConfig = {
-	min: 0.1,
-	max: 10,
+	min: DEFAULT_MIN_ZOOM,
+	max: DEFAULT_MAX_ZOOM,
 };
 
 /**
@@ -83,7 +87,9 @@ export class Croppie {
 	private image: HTMLImageElement | null = null;
 	private transform: TransformState = { x: 0, y: 0, scale: 1 };
 	private zoomConfig: ZoomConfig;
-	private effectiveMinZoom = 0.1;
+	/** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
+	private configuredMinZoom: number | undefined;
+	private effectiveMinZoom = DEFAULT_MIN_ZOOM;
 
 	// Event handlers
 	private eventHandlers: Map<
@@ -111,6 +117,7 @@ export class Croppie {
 			enableZoom: options.enableZoom ?? true,
 		};
 
+		this.configuredMinZoom = options.zoom?.min;
 		this.zoomConfig = {
 			...DEFAULT_ZOOM,
 			...options.zoom,
@@ -150,7 +157,7 @@ export class Croppie {
 		if (this.options.enableZoom && this.options.showZoomer) {
 			const sliderWrap = createSliderContainer();
 			this.sliderEl = createZoomSlider(
-				this.zoomConfig.min,
+				this.configuredMinZoom ?? DEFAULT_MIN_ZOOM,
 				this.zoomConfig.max,
 				this.transform.scale,
 			);
@@ -236,20 +243,8 @@ export class Croppie {
 			this.previewEl.src = this.image.src;
 		}
 
-		// Calculate minimum zoom to cover viewport
-		const coverageZoom = calculateInitialZoom(
-			this.image.naturalWidth,
-			this.image.naturalHeight,
-			this.options.viewport.width,
-			this.options.viewport.height,
-		);
-
-		// Calculate effective min zoom (enforce coverage by default)
-		if (this.zoomConfig.enforceMinimumCoverage !== false) {
-			this.effectiveMinZoom = Math.max(this.zoomConfig.min, coverageZoom);
-		} else {
-			this.effectiveMinZoom = this.zoomConfig.min;
-		}
+		// Resolve the zoom limits for this image and sync the slider's min
+		const coverageZoom = this.updateZoomLimits(this.image);
 
 		// Calculate initial zoom
 		const initialZoom = bindOptions.zoom ?? coverageZoom;
@@ -259,11 +254,6 @@ export class Croppie {
 			y: 0,
 			scale: clamp(initialZoom, this.effectiveMinZoom, this.zoomConfig.max),
 		};
-
-		// Update slider min to reflect effective minimum
-		if (this.sliderEl) {
-			this.sliderEl.min = String(this.effectiveMinZoom);
-		}
 
 		// Apply initial points if provided
 		if (bindOptions.points) {
@@ -437,12 +427,7 @@ export class Croppie {
 	reset(): void {
 		if (this.image) {
 			const previousZoom = this.transform.scale;
-			const coverageZoom = calculateInitialZoom(
-				this.image.naturalWidth,
-				this.image.naturalHeight,
-				this.options.viewport.width,
-				this.options.viewport.height,
-			);
+			const coverageZoom = this.updateZoomLimits(this.image);
 
 			// Clamp to effective minimum zoom (same logic as bind)
 			const initialZoom = clamp(
@@ -518,6 +503,37 @@ export class Croppie {
 		this.eventHandlers
 			.get(event)
 			?.delete(handler as CroppieEventHandler<keyof CroppieEvents>);
+	}
+
+	/**
+	 * Resolves the effective minimum zoom for an image (see `resolveMinZoom`) and syncs
+	 * the slider's `min`, so the slider range is never inverted.
+	 *
+	 * @returns The zoom at which the image covers the viewport
+	 */
+	private updateZoomLimits(image: HTMLImageElement): number {
+		const { naturalWidth, naturalHeight } = image;
+		const { width, height } = this.options.viewport;
+		const coverage = calculateInitialZoom(
+			naturalWidth,
+			naturalHeight,
+			width,
+			height,
+		);
+
+		this.effectiveMinZoom = resolveMinZoom({
+			configuredMin: this.configuredMinZoom,
+			max: this.zoomConfig.max,
+			coverage,
+			contain: calculateContainZoom(naturalWidth, naturalHeight, width, height),
+			enforceMinimumCoverage: this.zoomConfig.enforceMinimumCoverage !== false,
+		});
+
+		if (this.sliderEl) {
+			this.sliderEl.min = String(this.effectiveMinZoom);
+		}
+
+		return coverage;
 	}
 
 	/**

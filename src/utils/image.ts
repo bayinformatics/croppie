@@ -92,3 +92,21 @@ export function calculateInitialZoom(
 	// Use the larger ratio to ensure viewport is filled
 	return Math.max(widthRatio, heightRatio);
 }
+
+/**
+ * Compute the scale factor that fits a whole image inside a viewport.
+ *
+ * @param imageWidth - Image width in pixels
+ * @param imageHeight - Image height in pixels
+ * @param viewportWidth - Viewport width in pixels
+ * @param viewportHeight - Viewport height in pixels
+ * @returns The scale factor at which the entire image is visible inside the viewport (the smaller of the two ratios, so never above `calculateInitialZoom`)
+ */
+export function calculateContainZoom(
+	imageWidth: number,
+	imageHeight: number,
+	viewportWidth: number,
+	viewportHeight: number,
+): number {
+	return Math.min(viewportWidth / imageWidth, viewportHeight / imageHeight);
+}

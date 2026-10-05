@@ -39,7 +39,14 @@ export interface Boundary {
  * Zoom configuration
  */
 export interface ZoomConfig {
-	/** Minimum zoom level (default: 0.1) */
+	/**
+	 * Minimum zoom level. When unset, the minimum is derived per image: with
+	 * `enforceMinimumCoverage` (the default) it is the zoom at which the image just covers
+	 * the viewport, so a large photo can zoom out further than 0.1; without it, it is
+	 * `min(0.1, the zoom at which the whole image fits)`. When set, it is a floor, and
+	 * with `enforceMinimumCoverage` the effective minimum is `max(min, coverage zoom)`.
+	 * The effective minimum never exceeds `max`.
+	 */
 	min: number;
 	/** Maximum zoom level (default: 10) */
 	max: number;
