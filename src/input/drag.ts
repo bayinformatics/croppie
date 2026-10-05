@@ -32,8 +32,9 @@ interface DragState {
  * ignored, except that a second pointer going down ends the drag so a two-finger
  * pinch does not also pan, and a finger put down while another finger is down on the
  * element never starts one. Fingers resting elsewhere on the page do not count. The drag
- * also ends when the pointer loses its capture, and a new press of the same pointer (its
- * pointerup was lost) starts a fresh drag.
+ * also ends when the pointer loses its capture. A new press of the same pointer, or the
+ * first finger of a new touch, while a drag is still running means that drag's pointerup
+ * was lost: it ends, and the new press starts a fresh drag.
  * Pointer capture is best-effort: when the browser or the environment lacks
  * `setPointerCapture`/`releasePointerCapture`, or they throw, dragging still works.
  *
@@ -96,9 +97,14 @@ export function createDragHandler(
 	const handlePointerDown = (e: PointerEvent) => {
 		let joinsFinger = false;
 		if (e.pointerType === "touch") {
-			// The first finger of a touch is the only one down anywhere: a finger still
-			// listed lost its pointerup
-			if (e.isPrimary) fingers.clear();
+			if (e.isPrimary) {
+				// The first finger of a touch is the only one down anywhere: a finger still
+				// listed lost its pointerup, and so did the pointer of a drag still running
+				// (a finger, or a mouse released outside the element without capture). That
+				// drag is over, and this finger starts a fresh one below
+				fingers.clear();
+				endDrag(true);
+			}
 			joinsFinger = fingers.size > 0;
 			fingers.add(e.pointerId);
 		}
