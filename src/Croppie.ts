@@ -396,7 +396,9 @@ export class Croppie {
 	 *
 	 * Clamps the request to the effective limits, zooms about `anchor` so the image point
 	 * under it stays put, re-clamps the position, syncs the slider and emits `update`
-	 * then `zoom`. Nothing is emitted when the clamped zoom did not change.
+	 * then `zoom`. Nothing is emitted when the clamped zoom did not change. When an `update`
+	 * listener zooms again, that nested call emits the final `zoom` and this one emits none,
+	 * so `zoom` never reports a value that has already been replaced.
 	 *
 	 * @param requested - Requested zoom level; not clamped by the caller
 	 * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
@@ -422,6 +424,8 @@ export class Croppie {
 		if (zoom === previousZoom) return;
 
 		this.emitUpdate();
+		// An update listener zoomed again: its nested call already emitted the final zoom
+		if (this.transform.scale !== zoom) return;
 		this.emitEvent("zoom", { zoom, previousZoom });
 	}
 
