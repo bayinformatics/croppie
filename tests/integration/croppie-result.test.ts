@@ -1,5 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	expectTypeOf,
+	it,
+} from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
+import type { ResultOptions } from "../../src/types.ts";
 import {
 	getLastMockContext,
 	restoreCanvasMocks,
@@ -87,29 +95,29 @@ describe("Croppie result", () => {
 		});
 
 		it("uses viewport size by default", async () => {
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas.width).toBe(100);
 			expect(canvas.height).toBe(100);
 		});
 
 		it("uses viewport size when size is viewport", async () => {
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				size: "viewport",
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas.width).toBe(100);
 			expect(canvas.height).toBe(100);
 		});
 
 		it("uses custom size when provided", async () => {
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				size: { width: 200, height: 150 },
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas.width).toBe(200);
 			expect(canvas.height).toBe(150);
@@ -118,10 +126,10 @@ describe("Croppie result", () => {
 		it("uses original size when size is original", async () => {
 			// The original size is based on the cropped region in image coordinates
 			// This depends on zoom level and viewport size
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				size: "original",
-			})) as HTMLCanvasElement;
+			});
 
 			// Original size depends on the cropped region - check it's valid
 			expect(canvas.width).toBeGreaterThan(0);
@@ -138,35 +146,35 @@ describe("Croppie result", () => {
 		});
 
 		it("defaults to png format", async () => {
-			const result = (await croppie.result({ type: "base64" })) as string;
+			const result = await croppie.result({ type: "base64" });
 
 			expect(result).toMatch(/^data:image\/png/);
 		});
 
 		it("supports jpeg format", async () => {
-			const result = (await croppie.result({
+			const result = await croppie.result({
 				type: "base64",
 				format: "jpeg",
-			})) as string;
+			});
 
 			expect(result).toMatch(/^data:image\/jpeg/);
 		});
 
 		it("supports webp format", async () => {
-			const result = (await croppie.result({
+			const result = await croppie.result({
 				type: "base64",
 				format: "webp",
-			})) as string;
+			});
 
 			expect(result).toMatch(/^data:image\/webp/);
 		});
 
 		it("applies quality to blob", async () => {
-			const blob = (await croppie.result({
+			const blob = await croppie.result({
 				type: "blob",
 				format: "jpeg",
 				quality: 0.5,
-			})) as Blob;
+			});
 
 			expect(blob.type).toBe("image/jpeg");
 		});
@@ -179,9 +187,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
-			})) as HTMLCanvasElement;
+			});
 
 			// Circle rendering is applied (we can't easily verify the content in tests)
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
@@ -193,9 +201,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
 		});
@@ -206,10 +214,10 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				circle: true,
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
 		});
@@ -220,10 +228,10 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				circle: false,
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
 		});
@@ -238,19 +246,19 @@ describe("Croppie result", () => {
 		});
 
 		it("accepts background color", async () => {
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				backgroundColor: "#ff0000",
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
 		});
 
 		it("accepts rgba background color", async () => {
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				backgroundColor: "rgba(255, 0, 0, 0.5)",
-			})) as HTMLCanvasElement;
+			});
 
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
 		});
@@ -339,10 +347,10 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind({ url: SMALL_PNG, zoom: 3 }); // 10x10 image
 
-			const canvas = (await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				size: "original",
-			})) as HTMLCanvasElement;
+			});
 
 			// The viewport spans 100 / 3 = 33.33 image px, letterboxed around the 10x10 image
 			expect(canvas.width).toBe(33);
@@ -374,6 +382,49 @@ describe("Croppie result", () => {
 				80,
 				60,
 			);
+		});
+	});
+
+	describe("result() typing", () => {
+		beforeEach(async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+		});
+
+		it("narrows the return type by the output type", async () => {
+			expectTypeOf(croppie.result({ type: "blob" })).toEqualTypeOf<
+				Promise<Blob>
+			>();
+			expectTypeOf(croppie.result({ type: "base64" })).toEqualTypeOf<
+				Promise<string>
+			>();
+			expectTypeOf(croppie.result({ type: "canvas" })).toEqualTypeOf<
+				Promise<HTMLCanvasElement>
+			>();
+
+			// And the narrowed values really are those types at runtime
+			expect(await croppie.result({ type: "blob" })).toBeInstanceOf(Blob);
+			expect(typeof (await croppie.result({ type: "base64" }))).toBe("string");
+			expect((await croppie.result({ type: "canvas" })).tagName).toBe("CANVAS");
+		});
+
+		it("narrows when format, size and quality options are passed too", () => {
+			expectTypeOf(
+				croppie.result({ type: "blob", format: "jpeg", quality: 0.5 }),
+			).toEqualTypeOf<Promise<Blob>>();
+			expectTypeOf(
+				croppie.result({ type: "canvas", size: { width: 10, height: 10 } }),
+			).toEqualTypeOf<Promise<HTMLCanvasElement>>();
+		});
+
+		it("falls back to the union for an output type only known at runtime", () => {
+			const options: ResultOptions = { type: "canvas" };
+
+			expectTypeOf(croppie.result(options)).toEqualTypeOf<
+				Promise<Blob | string | HTMLCanvasElement>
+			>();
 		});
 	});
 });
