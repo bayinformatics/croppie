@@ -446,4 +446,58 @@ describe("Croppie result", () => {
 			>();
 		});
 	});
+
+	describe("a size of another shape than the viewport", () => {
+		it("keeps the image's proportions and centres the crop between bars", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 600, height: 400 });
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 100, type: "square" },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 1 });
+
+			const canvas = await croppie.result({
+				type: "canvas",
+				size: { width: 100, height: 100 },
+			});
+
+			// The 200x100 crop at half size is 100x50, with a 25px bar above and below
+			expect([canvas.width, canvas.height]).toEqual([100, 100]);
+			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				200,
+				150,
+				200,
+				100,
+				0,
+				25,
+				100,
+				50,
+			);
+		});
+
+		it("masks a circle viewport with a circle, not an ellipse", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 400, height: 300 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "circle" },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 0.5 });
+
+			await croppie.result({
+				type: "canvas",
+				size: { width: 200, height: 100 },
+			});
+
+			expect(getLastMockContext()?.ellipse).toHaveBeenCalledWith(
+				100,
+				50,
+				50,
+				50,
+				0,
+				0,
+				Math.PI * 2,
+			);
+		});
+	});
 });

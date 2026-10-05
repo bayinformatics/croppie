@@ -96,7 +96,14 @@ describe("canvas draw", () => {
 		});
 
 		it("clips to a circle before drawing when circle is set", () => {
-			drawCroppedImage(image, POINTS, 100, 100, { circle: true });
+			// A square frame fills the square output
+			drawCroppedImage(
+				image,
+				{ topLeftX: 10, topLeftY: 20, bottomRightX: 60, bottomRightY: 70 },
+				100,
+				100,
+				{ circle: true },
+			);
 
 			const ctx = lastContext();
 			expect(ctx.beginPath).toHaveBeenCalledTimes(1);
@@ -115,7 +122,14 @@ describe("canvas draw", () => {
 		});
 
 		it("clips to an ellipse, not a circle, for a non-square output", () => {
-			drawCroppedImage(image, POINTS, 100, 50, { circle: true });
+			// A 2:1 frame (a non-square viewport) fills the 2:1 output
+			drawCroppedImage(
+				image,
+				{ topLeftX: 10, topLeftY: 20, bottomRightX: 60, bottomRightY: 45 },
+				100,
+				50,
+				{ circle: true },
+			);
 
 			expect(lastContext().ellipse).toHaveBeenCalledWith(
 				50,
@@ -362,6 +376,122 @@ describe("canvas draw", () => {
 			await expect(canvasToBlob(canvas)).rejects.toThrow(
 				"Failed to create blob from canvas",
 			);
+		});
+	});
+
+	describe("drawCroppedImage into an output of another shape than the frame", () => {
+		// A 50x50 natural-frame rectangle inside the 400x300 image
+		const square = {
+			topLeftX: 10,
+			topLeftY: 20,
+			bottomRightX: 60,
+			bottomRightY: 70,
+		};
+
+		it("keeps the image's proportions and centres it between two bars", () => {
+			// Scale 1 in a 2:1 output: 50x50, not stretched to 100x50, with 25px either side
+			drawCroppedImage(image, square, 100, 50);
+
+			expect(lastContext().drawImage).toHaveBeenCalledWith(
+				image,
+				10,
+				20,
+				50,
+				50,
+				25,
+				0,
+				50,
+				50,
+			);
+		});
+
+		it("puts the bars above and below in a taller output", () => {
+			drawCroppedImage(image, square, 50, 100);
+
+			expect(lastContext().drawImage).toHaveBeenCalledWith(
+				image,
+				10,
+				20,
+				50,
+				50,
+				0,
+				25,
+				50,
+				50,
+			);
+		});
+
+		it("clips a circle, not an ellipse, around the centred frame", () => {
+			drawCroppedImage(image, square, 100, 50, { circle: true });
+
+			expect(lastContext().ellipse).toHaveBeenCalledWith(
+				50,
+				25,
+				25,
+				25,
+				0,
+				0,
+				Math.PI * 2,
+			);
+		});
+
+		it("fills the whole output, bars included, with the background colour", () => {
+			drawCroppedImage(image, square, 100, 50, { backgroundColor: "#fff" });
+
+			const ctx = lastContext();
+			expect(ctx.fillRect).toHaveBeenCalledWith(0, 0, 100, 50);
+			expect(firstCall(ctx.fillRect)).toBeLessThan(firstCall(ctx.drawImage));
+		});
+
+		it("centres a frame that extends past the image too", () => {
+			// The 1000x1000 frame at scale 0.1 is 100x100 in the middle of the 200x100 output,
+			// and the 400x300 image 40x30 in the middle of that
+			drawCroppedImage(
+				image,
+				{
+					topLeftX: -300,
+					topLeftY: -350,
+					bottomRightX: 700,
+					bottomRightY: 650,
+				},
+				200,
+				100,
+			);
+
+			expect(lastContext().drawImage).toHaveBeenCalledWith(
+				image,
+				0,
+				0,
+				400,
+				300,
+				80,
+				35,
+				40,
+				30,
+			);
+		});
+
+		it("fills an output that is the frame's shape rounded to whole pixels", () => {
+			// size 'original' of a 101.5x20.3 frame is 102x20; one scale would draw it 100x20,
+			// leaving a 1px gap at either end
+			drawCroppedImage(
+				image,
+				{
+					topLeftX: 10,
+					topLeftY: 20,
+					bottomRightX: 111.5,
+					bottomRightY: 40.3,
+				},
+				102,
+				20,
+			);
+
+			const [, , , , , dx, dy, dw, dh] =
+				lastContext().drawImage.mock.calls[0] ?? [];
+			expect(dx).toBeCloseTo(0, 9);
+			expect(dy).toBeCloseTo(0, 9);
+			expect(dw).toBeCloseTo(102, 9);
+			expect(dh).toBeCloseTo(20, 9);
 		});
 	});
 });
