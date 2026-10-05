@@ -10,6 +10,16 @@
 	},
 	"overrides": [
 		{
+			"includes": ["tests/**"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noExplicitAny": "off"
+					}
+				}
+			}
+		},
+		{
 			"includes": ["src/croppie.css"],
 			"formatter": {
 				"enabled": false

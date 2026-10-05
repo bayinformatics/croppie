@@ -38,8 +38,8 @@
     "test:visual": "bun run build && bunx playwright test",
     "test:all": "bun run build && bun run test && bunx playwright test",
     "test:watch": "bun test --watch",
-    "lint": "biome check src",
-    "lint:fix": "biome check --write src",
+    "lint": "biome check src tests playwright.config.ts",
+    "lint:fix": "biome check --write src tests playwright.config.ts",
     "typecheck": "tsc -p tsconfig.test.json",
     "check:package": "publint && attw --pack . --profile esm-only --exclude-entrypoints ./croppie.css ./style.css",
     "prepublishOnly": "bun run build"
