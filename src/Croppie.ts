@@ -715,7 +715,8 @@ export class Croppie {
 	 *
 	 * Emits `rotate`, then `update`, then `zoom` if the zoom had to change: the zoom limits are
 	 * recomputed for the rotated image, so with a non-square viewport a quarter turn may raise
-	 * the zoom to the new minimum. Rotating by a full turn or 0, before an image is bound or
+	 * the zoom to the new minimum. As with `setZoom()`, when an `update` listener zooms again,
+	 * only its final zoom is reported. Rotating by a full turn or 0, before an image is bound or
 	 * after `destroy()` does nothing. `points` in `get()` stay in the natural frame.
 	 * Calling it while the user is dragging is not special-cased.
 	 *
@@ -744,26 +745,16 @@ export class Croppie {
 			);
 		}
 
-		this.constrainPosition();
-		this.updateTransform();
-		this.updateSlider();
-
-		this.emitEvent("rotate", { rotation, previousRotation });
-		this.emitUpdate();
-		if (this.transform.scale !== previousZoom) {
-			this.emitEvent("zoom", {
-				zoom: this.transform.scale,
-				previousZoom,
-			});
-		}
+		this.commitTurn(previousRotation, previousZoom);
 	}
 
 	/**
-	 * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+	 * Restores the rotation `bind()` started with, re-centers the image and returns to the
+	 * coverage zoom of that rotation (clamped to the zoom limits).
 	 *
-	 * The zoom goes through the same path as `setZoom()`, so the events follow the same
-	 * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
-	 * position did, and no stale `zoom` when an `update` listener zooms again.
+	 * Emits `rotate` when the rotation changed, then `update`, then `zoom` when the zoom
+	 * changed. As with `setZoom()`, when an `update` listener zooms again, only its final zoom
+	 * is reported.
 	 */
 	reset(): void {
 		if (this.destroyed || !this.image) return;
@@ -778,22 +769,35 @@ export class Croppie {
 		if (rotation !== previousRotation) {
 			this.updateZoomLimits(this.image, rotation);
 		}
-		const zoom = clamp(
-			this.coverage,
-			this.effectiveMinZoom,
-			this.zoomConfig.max,
-		);
-		this.transform = { x: 0, y: 0, scale: zoom, rotation };
+		this.transform = {
+			x: 0,
+			y: 0,
+			scale: clamp(this.coverage, this.effectiveMinZoom, this.zoomConfig.max),
+			rotation,
+		};
+
+		this.commitTurn(previousRotation, previousZoom);
+	}
+
+	/**
+	 * Shows the rotation, position and zoom that `rotate()` or `reset()` settled, then emits
+	 * their events in the documented order: `rotate` when the rotation changed, `update`, and
+	 * `zoom` when the settled zoom differs from `previousZoom`.
+	 *
+	 * Like `applyZoom()`, the `zoom` event is decided from the zoom settled here, before any
+	 * listener runs: when a listener zooms again, its nested call already emitted the final
+	 * zoom and this one emits none, so `zoom` never reports a value that was already replaced.
+	 */
+	private commitTurn(previousRotation: Rotation, previousZoom: number): void {
 		this.constrainPosition();
 		this.updateTransform();
 		this.updateSlider();
 
+		const { rotation, scale: zoom } = this.transform;
 		if (rotation !== previousRotation) {
 			this.emitEvent("rotate", { rotation, previousRotation });
 		}
 		this.emitUpdate();
-		// Like applyZoom(): when an update listener zoomed again, its nested call already
-		// emitted the final zoom, so this one emits none
 		if (zoom !== previousZoom && this.transform.scale === zoom) {
 			this.emitEvent("zoom", { zoom, previousZoom });
 		}
