@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - A `default` condition in the package `exports` map, so `require("@bayinformatics/croppie")` works natively on Node 22.12+ (it loads the ES module).
 - A `./package.json` export.
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
+- Type declarations for the `./croppie.css` and `./style.css` exports, so `import '@bayinformatics/croppie/croppie.css'` type-checks under TypeScript 7, whose default `noUncheckedSideEffectImports` rejected it (TS2882).
 - `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?) scripts.
 - `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work.
 
@@ -32,15 +33,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - The transform computed from `bind({ points })` now derives from the zoom after it has been clamped to the zoom limits (#23).
+- `bind({ points })` accepts v2's string coordinates (as v2's `get()` returned them) instead of ignoring them with a warning.
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.
 - `setZoom(NaN)` (or any non-finite value) is ignored instead of corrupting the transform, and every zoom input goes through one code path with one clamp.
+- The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
 
 ### Internal
 
 - Integration suites for `bind`, `zoom` and `result` (65 tests) are no longer skipped; the image and canvas mocks resolve fixture dimensions and a 2D context, `src/canvas/draw.ts` is covered, and tests are formatted, linted and type-checked.
+- Tests pin `result()`'s quality, circle and `backgroundColor` handling and `loadImage()`'s `crossOrigin` for remote URLs.
 - CI: a composite setup action, least-privilege `permissions`, `cancel-in-progress`, current major versions of all actions, `check:package` in the build job, and CI runs for pull requests against any base branch.
 - Publishing runs lint, typecheck, tests, build and `check:package` first, verifies that the release tag matches `package.json`, and clears `dist/` before downloading the built artifact.
 - Playwright replaced Lost Pixel for visual regression (#16), with an HTML report, retries and `forbidOnly` on CI.
@@ -56,7 +60,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Demo image and the size badge in the README.
+- Demo image and the size badge on the demo page.
 
 ## [3.0.2] - 2025-12-24
 
@@ -73,7 +77,7 @@ Includes the untagged 3.0.1.
 
 ### Internal
 
-- CI workflow with lint, test, build and security checks; publishing to npm and GitHub Packages with provenance, plus a `workflow_dispatch` trigger.
+- CI workflow with lint, test and build jobs; publishing to npm and GitHub Packages with provenance, plus a `workflow_dispatch` trigger.
 
 ## [3.0.0] - 2025-12-24
 

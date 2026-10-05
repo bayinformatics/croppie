@@ -231,8 +231,10 @@ export class Croppie {
 		this.image = await loadImage(bindOptions.url);
 
 		if (this.previewEl) {
-			// Use the loaded image's src to ensure preview matches the image we crop from
-			// (important for URLs that return different content on each request)
+			// Show the image we crop from. In the loader's CORS mode the browser reuses the image
+			// it already loaded; in any other mode it requests the URL again, which costs a second
+			// download and can return different pixels (e.g. a URL that serves a random image)
+			this.previewEl.crossOrigin = this.image.crossOrigin;
 			this.previewEl.src = this.image.src;
 		}
 
