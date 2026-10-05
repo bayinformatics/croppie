@@ -33,13 +33,13 @@ describe("normalizePoints", () => {
 	});
 
 	test("throws error for array with wrong length", () => {
-		expect(() => normalizePoints([10, 20, 110] as any)).toThrow(
+		expect(() =>
+			normalizePoints([10, 20, 110] as unknown as PointsArray),
+		).toThrow("PointsArray must have exactly 4 elements");
+		expect(() => normalizePoints([10, 20] as unknown as PointsArray)).toThrow(
 			"PointsArray must have exactly 4 elements",
 		);
-		expect(() => normalizePoints([10, 20] as any)).toThrow(
-			"PointsArray must have exactly 4 elements",
-		);
-		expect(() => normalizePoints([] as any)).toThrow(
+		expect(() => normalizePoints([] as unknown as PointsArray)).toThrow(
 			"PointsArray must have exactly 4 elements",
 		);
 	});
