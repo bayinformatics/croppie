@@ -1,4 +1,4 @@
-import type { CropPoints, PointsArray, TransformState } from "../types";
+import type { CropPoints, PointsArray, TransformState } from "../types.js";
 export type { PointsArray };
 /**
  * Input type that accepts either format
@@ -7,10 +7,10 @@ export type PointsInput = CropPoints | PointsArray;
 /**
  * Normalize a points input into a CropPoints object.
  *
- * Coordinates given as strings are parsed with `parseFloat`, as Croppie v2's `bind()` did:
- * v2's `get()` returned its points as strings (e.g. `["50", "50", "150", "150"]`), which
- * apps stored and pass back. A string that is not a number becomes `NaN`, which
- * `calculateTransformFromPoints` rejects.
+ * Coordinates given as strings are converted to numbers: v2's `get()` returned its points
+ * as `toFixed()` strings (e.g. `["50", "50", "150", "150"]`), which apps stored and pass
+ * back. Only a plain decimal string counts; any other string (such as `"50px"`, `"0x10"`
+ * or `""`) becomes `NaN`, which `calculateTransformFromPoints` rejects.
  *
  * @param points - An array [topLeftX, topLeftY, bottomRightX, bottomRightY], a CropPoints object, or `undefined`.
  * @returns A new CropPoints object corresponding to `points`, or `undefined` if `points` is `undefined`.

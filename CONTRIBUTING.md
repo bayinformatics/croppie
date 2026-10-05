@@ -5,7 +5,7 @@ Thanks for helping out. This is a short guide to getting a change merged.
 ## Prerequisites
 
 - [Bun](https://bun.sh) at the version pinned in [`.bun-version`](.bun-version) (currently 1.4.2). CI reads that file, and a different Bun version can produce a different bundle, which fails the build-parity check. If you manage runtimes with [mise](https://mise.jdx.dev), `mise use bun@$(cat .bun-version)` is enough. Confirm with `bun --version`: package scripts call `bun` and `bunx` again internally, so the pinned version has to be the first `bun` on your `PATH` (an older global install earlier on the `PATH` silently wins).
-- Node 22 or newer with npm (needed by `bun run check:package`, which runs `npm pack`, and to try the published package, e.g. `require()` / `import` smoke tests).
+- Node 22 or newer with npm for the tooling (needed by `bun run check:package`, which runs `npm pack`, and to try the published package, e.g. `require()` / `import` smoke tests). This applies to working on Croppie only: the published package supports Node 20 and newer (`engines.node`).
 - Chromium for the visual tests: `bunx playwright install chromium`.
 
 ```sh
@@ -26,7 +26,7 @@ Use `--frozen-lockfile` so you never change `bun.lock` by accident. Change depen
 | `bun run typecheck` | Type-checks `src`, `tests` and the Playwright config (`tsconfig.test.json`) |
 | `bun run build` | Cleans `dist/`, then builds the bundle, CSS and type declarations |
 | `bun run build:docs` | Builds the demo bundle in `docs/` |
-| `bun run check:package` | `publint` + `attw` against the packed tarball |
+| `bun run check:package` | Checks that the type declarations in `dist/` import with `.js` specifiers, then `publint` + `attw` against the packed tarball |
 | `bun run dev` | Watch build into `dist/` (run `bun run build` before committing) |
 
 Before you commit, run `bun run lint && bun run typecheck && bun run test`.
@@ -73,5 +73,5 @@ If Linux CI reports pixel differences that are not a regression (for example aft
 
 1. Merge the PR(s) to `main`; make sure `CHANGELOG.md` has the date and `package.json` the version.
 2. Create a GitHub release whose tag is `v<version>` targeting `main`.
-3. `publish.yml` runs lint, typecheck, tests, build and `check:package`, verifies the tag matches `package.json`, then publishes to npm and GitHub Packages.
+3. `publish.yml` first verifies that the tag matches `package.json`, then runs lint, typecheck, tests, build and `check:package`, then publishes to npm and GitHub Packages. A manual run (`workflow_dispatch`) has to be started on the tag `v<version>`; on a branch it stops before building.
 4. Check `npm view @bayinformatics/croppie version`.

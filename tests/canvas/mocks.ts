@@ -58,7 +58,7 @@ export function createMockCanvasContext(): MockCanvasContext {
  * Install test-friendly mocks on HTMLCanvasElement prototypes.
  *
  * Mocks:
- * - `getContext("2d")` — returns a `MockCanvasContext` (the same one for repeated calls on a canvas; happy-dom returns `null`). Other context ids return `null`.
+ * - `getContext("2d")` — returns a `MockCanvasContext` (the same one for repeated calls on a canvas; happy-dom returns `null`). Other context ids go to the original `getContext`, as in `createMockCanvas()`.
  * - `toBlob(callback, type, quality)` — invokes `callback` with a `Blob` whose data is `"mock-canvas-data"` and whose MIME type is `type` or `"image/png"`.
  * - `toDataURL(type, quality)` — returns a data URL of the form `data:<type or "image/png">;base64,mockbase64data`.
  */
@@ -76,12 +76,19 @@ export function setupCanvasMocks(): void {
 
 	mockContexts = new WeakMap();
 	lastMockContext = undefined;
+	const realGetContext = originalGetContext as (
+		this: HTMLCanvasElement,
+		contextId: string,
+		...options: unknown[]
+	) => RenderingContext | null;
 	HTMLCanvasElement.prototype.getContext = function (
 		this: HTMLCanvasElement,
 		contextId: string,
+		...options: unknown[]
 	) {
 		if (contextId !== "2d") {
-			return null;
+			// Only "2d" is mocked; other context ids get the original, like createMockCanvas
+			return realGetContext.call(this, contextId, ...options);
 		}
 		let ctx = mockContexts.get(this);
 		if (!ctx) {

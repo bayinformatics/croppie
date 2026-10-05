@@ -308,9 +308,10 @@ export class Croppie {
 		this.image = image;
 
 		if (this.previewEl) {
-			// Show the image we crop from. In the loader's CORS mode the browser reuses the image
-			// it already loaded; in any other mode it requests the URL again, which costs a second
-			// download and can return different pixels (e.g. a URL that serves a random image)
+			// Show the image we crop from. In the loader's CORS mode the browser can reuse the image
+			// it already loaded (when the response is cacheable); in any other mode it requests the
+			// URL again, which can cost a second download and return different pixels (e.g. a URL
+			// that serves a random image)
 			this.previewEl.crossOrigin = this.image.crossOrigin;
 			this.previewEl.src = this.image.src;
 		}

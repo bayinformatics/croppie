@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 import {
+	EXTERNAL_URL,
 	fixtureDimensions,
 	SMALL_PNG,
 	TINY_PNG,
@@ -223,6 +224,32 @@ describe("Croppie bind", () => {
 
 			await croppie.bind(SMALL_PNG);
 			expect(preview.src).toBe(SMALL_PNG);
+		});
+
+		it("loads a remote image in the loader's CORS mode, so the browser can reuse it", async () => {
+			// fixtureDimensions only sizes the data URL fixtures
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 400, height: 300 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+
+			await croppie.bind(EXTERNAL_URL);
+
+			const preview = container.querySelector(".cr-image") as HTMLImageElement;
+			expect(preview.crossOrigin).toBe("anonymous");
+			expect(preview.src).toBe(EXTERNAL_URL);
+		});
+
+		it("gives a data URL no CORS mode, like the loader", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+
+			await croppie.bind(SMALL_PNG);
+
+			const preview = container.querySelector(".cr-image") as HTMLImageElement;
+			expect(preview.crossOrigin).toBeNull();
 		});
 	});
 
