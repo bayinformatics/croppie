@@ -4,6 +4,7 @@ import {
 	createPointerEvent,
 	createWheelEvent,
 	installImageMock,
+	simulateDrag,
 } from "../fixtures/mock-helpers.ts";
 import { TINY_PNG } from "../fixtures/test-image-data-url.ts";
 
@@ -400,6 +401,73 @@ describe("Croppie events", () => {
 
 			expect(croppie.zoom).toBe(2);
 			expect(order).toEqual([]);
+		});
+	});
+
+	describe("drag updates", () => {
+		// 400x300 image at its coverage zoom (1/3) in a 100x100 viewport: the image is
+		// 133.3 x 100, so the pan range is x in [-16.7, 16.7] and y is locked to 0
+		async function bindCovered(): Promise<HTMLElement> {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+			return container.querySelector(".cr-boundary") as HTMLElement;
+		}
+
+		it("emits no update for a fully clamped vertical drag", async () => {
+			const boundary = await bindCovered();
+			const handler = mock();
+			croppie.on("update", handler);
+
+			simulateDrag(boundary, 100, 100, 100, 160);
+
+			expect(handler).not.toHaveBeenCalled();
+		});
+
+		it("emits update only while the clamped position changes", async () => {
+			const boundary = await bindCovered();
+			const handler = mock();
+			croppie.on("update", handler);
+
+			boundary.dispatchEvent(
+				createPointerEvent("pointerdown", { clientX: 100, clientY: 100 }),
+			);
+			// x: 10 (moved), 16.7 (moved, clamped), then 16.7 again (no change)
+			for (const clientX of [110, 120, 130]) {
+				boundary.dispatchEvent(
+					createPointerEvent("pointermove", { clientX, clientY: 100 }),
+				);
+			}
+			boundary.dispatchEvent(createPointerEvent("pointerup"));
+
+			expect(handler).toHaveBeenCalledTimes(2);
+		});
+
+		it("a second pointer going down ends the pan", async () => {
+			const boundary = await bindCovered();
+			const handler = mock();
+			croppie.on("update", handler);
+
+			boundary.dispatchEvent(
+				createPointerEvent("pointerdown", {
+					pointerId: 1,
+					clientX: 100,
+					clientY: 100,
+				}),
+			);
+			boundary.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 2 }),
+			);
+			boundary.dispatchEvent(
+				createPointerEvent("pointermove", {
+					pointerId: 1,
+					clientX: 110,
+					clientY: 100,
+				}),
+			);
+
+			expect(handler).not.toHaveBeenCalled();
 		});
 	});
 });

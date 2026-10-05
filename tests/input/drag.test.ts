@@ -283,10 +283,261 @@ describe("Drag Handler", () => {
 			element.dispatchEvent(createPointerEvent("pointerdown"));
 			element.dispatchEvent(createPointerEvent("pointermove"));
 			element.dispatchEvent(createPointerEvent("pointerup"));
+			element.dispatchEvent(createPointerEvent("lostpointercapture"));
 
 			expect(onStart).not.toHaveBeenCalled();
 			expect(onMove).not.toHaveBeenCalled();
 			expect(onEnd).not.toHaveBeenCalled();
+		});
+
+		it("removes the lostpointercapture listener", () => {
+			const onEnd = mock();
+			const cleanup = createDragHandler(element, getTransform, setTransform, {
+				onEnd,
+			});
+
+			element.dispatchEvent(createPointerEvent("pointerdown"));
+			cleanup();
+			element.dispatchEvent(createPointerEvent("lostpointercapture"));
+
+			expect(onEnd).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("pointer id tracking", () => {
+		function start(onEnd = mock(), onStart = mock()) {
+			createDragHandler(element, getTransform, setTransform, {
+				onStart,
+				onEnd,
+			});
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", {
+					pointerId: 1,
+					clientX: 100,
+					clientY: 100,
+				}),
+			);
+			return { onStart, onEnd };
+		}
+
+		it("ignores moves from another pointer", () => {
+			start();
+
+			element.dispatchEvent(
+				createPointerEvent("pointermove", {
+					pointerId: 2,
+					clientX: 150,
+					clientY: 150,
+				}),
+			);
+
+			expect(setTransform).not.toHaveBeenCalled();
+		});
+
+		it("keeps following the active pointer", () => {
+			start();
+
+			element.dispatchEvent(
+				createPointerEvent("pointermove", {
+					pointerId: 1,
+					clientX: 130,
+					clientY: 100,
+				}),
+			);
+
+			expect(setTransform).toHaveBeenCalledWith(30, 0);
+		});
+
+		it("ignores pointerup from another pointer", () => {
+			const { onEnd } = start();
+
+			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 2 }));
+
+			expect(onEnd).not.toHaveBeenCalled();
+			expect(element.style.cursor).toBe("grabbing");
+			// Still dragging with the original pointer
+			element.dispatchEvent(
+				createPointerEvent("pointermove", {
+					pointerId: 1,
+					clientX: 120,
+					clientY: 100,
+				}),
+			);
+			expect(setTransform).toHaveBeenCalledWith(20, 0);
+		});
+
+		it("ignores pointercancel from another pointer", () => {
+			const { onEnd } = start();
+
+			element.dispatchEvent(
+				createPointerEvent("pointercancel", { pointerId: 2 }),
+			);
+
+			expect(onEnd).not.toHaveBeenCalled();
+		});
+
+		it("ends the drag when a second pointer goes down (pinch takes over)", () => {
+			const { onEnd, onStart } = start();
+
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 2 }),
+			);
+
+			expect(onEnd).toHaveBeenCalledTimes(1);
+			expect(onStart).toHaveBeenCalledTimes(1);
+			expect(element.style.cursor).toBe("grab");
+			expect(element.releasePointerCapture).toHaveBeenCalledWith(1);
+
+			// Neither finger pans any more
+			for (const pointerId of [1, 2]) {
+				element.dispatchEvent(
+					createPointerEvent("pointermove", {
+						pointerId,
+						clientX: 200,
+						clientY: 200,
+					}),
+				);
+			}
+			expect(setTransform).not.toHaveBeenCalled();
+		});
+
+		it("does not end twice when the first finger lifts after the second ended the drag", () => {
+			const { onEnd } = start();
+
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 2 }),
+			);
+			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 1 }));
+			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 2 }));
+
+			expect(onEnd).toHaveBeenCalledTimes(1);
+		});
+
+		it("starts a new drag after the previous one ended", () => {
+			const { onStart } = start();
+			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 1 }));
+
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 3 }),
+			);
+
+			expect(onStart).toHaveBeenCalledTimes(2);
+		});
+
+		it("releases capture for the active pointer only", () => {
+			start();
+
+			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 2 }));
+			expect(element.releasePointerCapture).not.toHaveBeenCalled();
+
+			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 1 }));
+			expect(element.releasePointerCapture).toHaveBeenCalledTimes(1);
+			expect(element.releasePointerCapture).toHaveBeenCalledWith(1);
+		});
+	});
+
+	describe("lost pointer capture", () => {
+		it("ends the drag when the active pointer loses capture", () => {
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, { onEnd });
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 1 }),
+			);
+
+			element.dispatchEvent(
+				createPointerEvent("lostpointercapture", { pointerId: 1 }),
+			);
+
+			expect(onEnd).toHaveBeenCalledTimes(1);
+			expect(element.style.cursor).toBe("grab");
+			// The capture is already gone, so there is nothing to release
+			expect(element.releasePointerCapture).not.toHaveBeenCalled();
+		});
+
+		it("ignores lostpointercapture from another pointer", () => {
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, { onEnd });
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 1 }),
+			);
+
+			element.dispatchEvent(
+				createPointerEvent("lostpointercapture", { pointerId: 2 }),
+			);
+
+			expect(onEnd).not.toHaveBeenCalled();
+		});
+
+		it("ignores the lostpointercapture that follows a normal pointerup", () => {
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, { onEnd });
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 1 }),
+			);
+			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 1 }));
+
+			// Browsers fire lostpointercapture after the capture is released
+			element.dispatchEvent(
+				createPointerEvent("lostpointercapture", { pointerId: 1 }),
+			);
+
+			expect(onEnd).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe("pointer capture support", () => {
+		it("starts a drag when setPointerCapture is missing", () => {
+			Object.assign(element, { setPointerCapture: undefined });
+			const onStart = mock();
+			createDragHandler(element, getTransform, setTransform, { onStart });
+
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { clientX: 100, clientY: 100 }),
+			);
+			element.dispatchEvent(
+				createPointerEvent("pointermove", { clientX: 140, clientY: 100 }),
+			);
+
+			expect(onStart).toHaveBeenCalledTimes(1);
+			expect(setTransform).toHaveBeenCalledWith(40, 0);
+		});
+
+		it("starts a drag when setPointerCapture throws", () => {
+			element.setPointerCapture = mock(() => {
+				throw new DOMException("no such pointer", "NotFoundError");
+			});
+			const onStart = mock();
+			createDragHandler(element, getTransform, setTransform, { onStart });
+
+			element.dispatchEvent(createPointerEvent("pointerdown"));
+
+			expect(onStart).toHaveBeenCalledTimes(1);
+			expect(element.style.cursor).toBe("grabbing");
+		});
+
+		it("ends the drag when releasePointerCapture is missing", () => {
+			Object.assign(element, { releasePointerCapture: undefined });
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, { onEnd });
+
+			element.dispatchEvent(createPointerEvent("pointerdown"));
+			element.dispatchEvent(createPointerEvent("pointerup"));
+
+			expect(onEnd).toHaveBeenCalledTimes(1);
+			expect(element.style.cursor).toBe("grab");
+		});
+
+		it("ends the drag when releasePointerCapture throws", () => {
+			element.releasePointerCapture = mock(() => {
+				throw new DOMException("not captured", "NotFoundError");
+			});
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, { onEnd });
+
+			element.dispatchEvent(createPointerEvent("pointerdown"));
+			element.dispatchEvent(createPointerEvent("pointerup"));
+
+			expect(onEnd).toHaveBeenCalledTimes(1);
 		});
 	});
 
