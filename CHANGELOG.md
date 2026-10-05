@@ -47,6 +47,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Invalid options throw a `RangeError` from the constructor (non-positive or non-finite viewport, boundary or zoom limits, `zoom.min` greater than `zoom.max`).
 - A zoom option given as `undefined` (for example `zoom: { max: props.maxZoom }` with the prop unset) gets its default instead of turning every zoom, point and slider value into `NaN`.
 - `bind()`, `bindFile()` and `result()` on a destroyed instance reject with a clear error, `setZoom()`, `zoom =` and `reset()` do nothing, and `destroy()` is idempotent. Overlapping `bind()` calls resolve to the last one, and a bind that is still loading when the instance is destroyed no longer applies an image to a dead instance.
+- A `bind()` whose `points` array does not have exactly 4 entries rejects before changing anything, instead of leaving the new image half-applied and cancelling a bind that is still loading.
 - Error messages from failed image loads no longer embed the whole data URL.
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, a new press of the same pointer after a lost `pointerup` starts a fresh drag, and pointer capture is guarded so dragging still works where it is missing or throws.

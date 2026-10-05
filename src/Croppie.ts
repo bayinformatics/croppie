@@ -246,7 +246,10 @@ export class Croppie {
 	}
 
 	/**
-	 * Loads an image into the cropper
+	 * Loads an image into the cropper.
+	 *
+	 * A `points` array without exactly 4 entries rejects before anything changes, so it
+	 * neither half-applies the new image nor cancels a bind that is still loading.
 	 */
 	async bind(options: BindOptions | string): Promise<void> {
 		this.assertNotDestroyed("bind");
@@ -254,17 +257,25 @@ export class Croppie {
 		const bindOptions: BindOptions =
 			typeof options === "string" ? { url: options } : options;
 
-		await this.load(bindOptions, ++this.bindGeneration);
+		// Validate before claiming a generation, so a bad call cannot supersede a good bind
+		// or leave a half-applied image behind
+		const points = bindOptions.points
+			? normalizePoints(bindOptions.points)
+			: undefined;
+
+		await this.load(bindOptions, ++this.bindGeneration, points);
 	}
 
 	/**
-	 * Loads and applies an image for a bind that claimed `generation`. If the instance was
-	 * destroyed or a newer bind started meanwhile, resolves without applying or emitting
-	 * anything, and without surfacing a load error nobody is waiting for any more.
+	 * Loads and applies an image for a bind that claimed `generation`, with the `points` that
+	 * `bind()` resolved from `bindOptions` before claiming it. If the instance was destroyed
+	 * or a newer bind started meanwhile, resolves without applying or emitting anything, and
+	 * without surfacing a load error nobody is waiting for any more.
 	 */
 	private async load(
 		bindOptions: BindOptions,
 		generation: number,
+		points?: CropPoints,
 	): Promise<void> {
 		let image: HTMLImageElement;
 		try {
@@ -309,24 +320,21 @@ export class Croppie {
 		};
 
 		// Apply initial points if provided
-		if (bindOptions.points) {
-			const normalizedPoints = normalizePoints(bindOptions.points);
-			const pointsTransform = normalizedPoints
-				? calculateTransformFromPoints(
-						normalizedPoints,
-						this.image.naturalWidth,
-						this.image.naturalHeight,
-						this.options.viewport.width,
-						this.options.viewport.height,
-						{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
-					)
-				: undefined;
+		if (points) {
+			const pointsTransform = calculateTransformFromPoints(
+				points,
+				this.image.naturalWidth,
+				this.image.naturalHeight,
+				this.options.viewport.width,
+				this.options.viewport.height,
+				{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
+			);
 			if (pointsTransform) {
 				this.transform = pointsTransform;
 			} else {
 				console.warn(
 					"[@bayinformatics/croppie] Ignoring invalid initial points:",
-					normalizedPoints,
+					points,
 				);
 			}
 		}
