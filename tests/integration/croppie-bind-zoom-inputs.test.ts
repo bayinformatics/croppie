@@ -5,6 +5,7 @@ import type {
 	CroppieOptions,
 	PointsArray,
 } from "../../src/types.ts";
+import { buildJpegHeader } from "../fixtures/exif-jpeg.js";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
@@ -15,8 +16,16 @@ const SLOW = "https://example.com/slow.jpg"; // 600x600, loads after 20ms
 function dimensions(src: string): { width: number; height: number } {
 	if (src === OTHER) return { width: 800, height: 400 };
 	if (src === SLOW) return { width: 600, height: 600 };
-	// PHOTO and every data URL (SMALL_PNG)
+	// PHOTO and every data URL (the JPEG headers below, SMALL_PNG)
 	return { width: 400, height: 300 };
+}
+
+function jpegDataUrl(orientation: number): string {
+	let binary = "";
+	for (const byte of buildJpegHeader(orientation)) {
+		binary += String.fromCharCode(byte);
+	}
+	return `data:image/jpeg;base64,${btoa(binary)}`;
 }
 
 // A 400x300 image in a 100x100 viewport covers it at a zoom of 1/3
@@ -313,6 +322,63 @@ describe("Croppie bind and zoom inputs", () => {
 			await croppie.bind(SMALL_PNG);
 
 			expect(preview(root).crossOrigin).toBeNull();
+		});
+	});
+
+	describe("the double-rotation warning of bind({ orientation })", () => {
+		const doubleRotationWarnings = () =>
+			warn.mock.calls.filter((call) =>
+				String(call[0]).includes("rotated twice"),
+			);
+
+		it("does not fire when an explicit rotation overrides the orientation", async () => {
+			const { croppie } = mount({ enableExif: true });
+
+			await croppie.bind({ url: jpegDataUrl(6), orientation: 6, rotation: 0 });
+
+			expect(croppie.get().rotation).toBe(0);
+			expect(warn).not.toHaveBeenCalled();
+		});
+
+		it("does not fire when get() is restored into bind() for a tagged file", async () => {
+			const { croppie } = mount({ enableExif: true });
+			const url = jpegDataUrl(6);
+			await croppie.bind(url);
+			const saved = croppie.get();
+
+			await croppie.bind({ url, ...saved });
+
+			expect(saved.orientation).toBe(6);
+			expect(croppie.get().rotation).toBe(0);
+			expect(warn).not.toHaveBeenCalled();
+		});
+
+		it("does not fire for orientation 1, which turns nothing", async () => {
+			const { croppie } = mount({ enableExif: true });
+
+			await croppie.bind({ url: jpegDataUrl(6), orientation: 1 });
+
+			expect(croppie.get().rotation).toBe(0);
+			expect(warn).not.toHaveBeenCalled();
+		});
+
+		it("does not fire next to the warning that a mirrored orientation is ignored", async () => {
+			const { croppie } = mount({ enableExif: true });
+
+			await croppie.bind({ url: jpegDataUrl(6), orientation: 5 });
+
+			expect(croppie.get().rotation).toBe(0);
+			expect(warn).toHaveBeenCalledTimes(1);
+			expect(String(warn.mock.calls[0]?.[0])).toContain("Ignoring");
+		});
+
+		it("still fires when the orientation's turn is applied on top of the file's tag", async () => {
+			const { croppie } = mount({ enableExif: true });
+
+			await croppie.bind({ url: jpegDataUrl(6), orientation: 3 });
+
+			expect(croppie.get().rotation).toBe(180);
+			expect(doubleRotationWarnings()).toHaveLength(1);
 		});
 	});
 
