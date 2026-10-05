@@ -145,7 +145,12 @@ export interface BindOptions {
 export interface ResultOptions {
 	/** Output type */
 	type: OutputType;
-	/** Output dimensions */
+	/**
+	 * Output dimensions (default `"viewport"`). The image keeps its proportions: a size of
+	 * another shape than the viewport centres the crop and leaves the rest transparent (or
+	 * `backgroundColor`). `"original"` is the viewport area at image resolution, rounded to
+	 * whole pixels.
+	 */
 	size?: { width: number; height: number } | "viewport" | "original";
 	/** Output format (for base64/blob) */
 	format?: OutputFormat;

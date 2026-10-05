@@ -386,6 +386,9 @@ export class Croppie {
 	/**
 	 * Gets the current cropped result. The return type follows `options.type`:
 	 * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
+	 *
+	 * The image keeps its proportions at every `size`: a size of another shape than the
+	 * viewport centres the crop and leaves the rest transparent (or `backgroundColor`).
 	 */
 	result(options: ResultOptions & { type: "blob" }): Promise<Blob>;
 	result(options: ResultOptions & { type: "base64" }): Promise<string>;
