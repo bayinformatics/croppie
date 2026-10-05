@@ -500,4 +500,73 @@ describe("Croppie result", () => {
 			);
 		});
 	});
+
+	describe("size 'original' zoomed out far past the image", () => {
+		/** Binds an image with coverage not enforced, then zooms out (clamped to the minimum). */
+		async function bindZoomedOut(setup: {
+			image: { width: number; height: number };
+			viewport: { width: number; height: number };
+			minZoom?: number;
+			zoom: number;
+		}): Promise<void> {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock(setup.image);
+			croppie = new Croppie(container, {
+				viewport: { ...setup.viewport, type: "square" },
+				zoom: { min: setup.minZoom, enforceMinimumCoverage: false },
+			});
+			await croppie.bind({ url: TINY_PNG });
+			croppie.setZoom(setup.zoom);
+		}
+
+		it("caps the canvas of a mostly empty frame at 4096x4096", async () => {
+			// A 400x400 viewport at zoom 0.01 spans 40000x40000 image px: 1.6 gigapixels
+			await bindZoomedOut({
+				image: { width: 2000, height: 2000 },
+				viewport: { width: 400, height: 400 },
+				minZoom: 0.01,
+				zoom: 0.01,
+			});
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			expect([canvas.width, canvas.height]).toEqual([4096, 4096]);
+			// Scaled by 4096 / 40000, the image is 204.8 px square in the middle
+			const [, , , , , dx, dy, dw, dh] =
+				getLastMockContext()?.drawImage.mock.calls[0] ?? [];
+			expect(dw).toBeCloseTo(204.8, 6);
+			expect(dh).toBeCloseTo(204.8, 6);
+			expect(dx + dw / 2).toBeCloseTo(2048, 6);
+			expect(dy + dh / 2).toBeCloseTo(2048, 6);
+		});
+
+		it("scales a frame around a large image to the image's area, keeping its shape", async () => {
+			// Zoomed out to fit, a 1000x200 viewport spans 40320x8064 px around the 6048x8064
+			// photo; scaled by sqrt(6048 / 40320) it has as many pixels as the photo
+			await bindZoomedOut({
+				image: { width: 6048, height: 8064 },
+				viewport: { width: 1000, height: 200 },
+				zoom: 0,
+			});
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			// 5:1 like the viewport, 48.8 MP like the photo
+			expect([canvas.width, canvas.height]).toEqual([15616, 3123]);
+		});
+
+		it("keeps the image resolution for a large crop inside the image", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 6000, height: 6000 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 0.02 });
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			// 5000x5000 is above 4096x4096 but has no empty margin, so it is not scaled
+			expect([canvas.width, canvas.height]).toEqual([5000, 5000]);
+		});
+	});
 });
