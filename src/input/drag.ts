@@ -30,7 +30,10 @@ interface DragState {
  *
  * Only the pointer that started the drag is followed: events from other pointers are
  * ignored, except that a second pointer going down ends the drag so a two-finger
- * pinch does not also pan. The drag also ends when the pointer loses its capture.
+ * pinch does not also pan, and a finger put down while another finger is down on the
+ * element never starts one. Fingers resting elsewhere on the page do not count. The drag
+ * also ends when the pointer loses its capture, and a new press of the same pointer (its
+ * pointerup was lost) starts a fresh drag.
  * Pointer capture is best-effort: when the browser or the environment lacks
  * `setPointerCapture`/`releasePointerCapture`, or they throw, dragging still works.
  *
@@ -53,6 +56,13 @@ export function createDragHandler(
 		lastClientY: 0,
 		scale: { x: 1, y: 1 },
 	};
+
+	/**
+	 * The touch pointers that went down on the element and are still down. Their pointerup
+	 * reaches the element wherever they lift: a touch is captured to the element it went
+	 * down on, and the finger that started a drag keeps this element's capture until it lifts.
+	 */
+	const fingers = new Set<number>();
 
 	const tryCapture = (pointerId: number) => {
 		if (typeof element.setPointerCapture !== "function") return;
@@ -84,13 +94,33 @@ export function createDragHandler(
 	};
 
 	const handlePointerDown = (e: PointerEvent) => {
+		let joinsFinger = false;
+		if (e.pointerType === "touch") {
+			// The first finger of a touch is the only one down anywhere: a finger still
+			// listed lost its pointerup
+			if (e.isPrimary) fingers.clear();
+			joinsFinger = fingers.size > 0;
+			fingers.add(e.pointerId);
+		}
+
+		// A pointer cannot go down twice without an up, so this one's pointerup was lost
+		// (released in another window, say) and its drag is over. The capture is not
+		// released: a left press captures the same pointer again straight away.
+		if (e.pointerId === state.pointerId) endDrag(false);
+
 		if (e.button !== 0) return; // Only left click
 
 		if (state.pointerId !== null) {
-			// A second pointer joined (pinch): stop panning instead of fighting over the image
-			if (e.pointerId !== state.pointerId) endDrag(true);
+			// A second pointer joined (pinch): stop panning instead of fighting over the
+			// image. The first pointer keeps its capture, so its pointerup still reaches
+			// the element if it lifts outside.
+			endDrag(false);
 			return;
 		}
+
+		// With a finger already down on the element this one makes a pinch (one finger of
+		// a pinch lifted and put back, say), so it does not pan
+		if (joinsFinger) return;
 
 		state.pointerId = e.pointerId;
 		state.lastClientX = e.clientX;
@@ -120,12 +150,15 @@ export function createDragHandler(
 	};
 
 	const handlePointerUp = (e: PointerEvent) => {
+		fingers.delete(e.pointerId);
 		if (e.pointerId !== state.pointerId) return;
 
 		endDrag(true);
 	};
 
 	const handleLostPointerCapture = (e: PointerEvent) => {
+		// Its pointerup may no longer reach the element, so the finger stops counting
+		fingers.delete(e.pointerId);
 		if (e.pointerId !== state.pointerId) return;
 
 		// The capture is already gone, so there is nothing to release
@@ -149,5 +182,6 @@ export function createDragHandler(
 		element.removeEventListener("pointerup", handlePointerUp);
 		element.removeEventListener("pointercancel", handlePointerUp);
 		element.removeEventListener("lostpointercapture", handleLostPointerCapture);
+		fingers.clear();
 	};
 }

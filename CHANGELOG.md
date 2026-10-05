@@ -28,7 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Zooming (slider, mouse wheel, pinch, `setZoom()`) keeps the point under the viewport centre, the cursor or the finger midpoint fixed, instead of always zooming about the image centre, so the image no longer drifts after a pan.
 - Mouse wheel zoom is multiplicative: ×1.1 per 100px notch, scaled by `deltaY` and `deltaMode` and capped at one notch per event (it was a fixed ±0.1 step).
 - Event contract: `bind()` now emits one `update`; `setZoom()` and `zoom =` emit `zoom`; `reset()` emits `zoom` when the zoom changed; `zoom` and `update` are emitted only when the clamped value actually changed; `update` fires before `zoom`. A drag that the bounds fully absorb no longer emits `update`. A `zoom` event is never emitted for a zoom that an `update` listener already replaced: only the final change is reported. See the Events table in the README.
-- A second touch ends an active drag, so a pinch takes over instead of also panning.
+- A second touch ends an active drag, and a finger put down while another finger is down on the cropper never starts one (fingers resting elsewhere on the page do not count), so a pinch, also one resumed with a replacement finger, takes over instead of also panning.
 
 ### Fixed
 
@@ -39,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `setZoom(NaN)` (or any non-finite value; a numeric string, such as a range input's `value`, is still converted) is ignored instead of corrupting the transform, and every zoom input goes through one code path with one clamp.
 - `bind({ zoom })` with a non-finite zoom (`NaN`, `±Infinity`) starts at the coverage zoom instead of leaving a `NaN` transform that no later zoom could repair.
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
-- Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, and pointer capture is guarded so dragging still works where it is missing or throws.
+- Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, a new press of the same pointer after a lost `pointerup` starts a fresh drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - Dragging moves the image from where it currently is, so a zoom (wheel, pinch, slider, `setZoom()`) or `reset()` made while the button is held is no longer undone by the next pointer move, and moving back after dragging against an edge moves the image straight away.
 - Dragging inside a CSS-scaled ancestor (`transform: scale()`, `zoom`) keeps the image under the pointer instead of lagging behind or overshooting it, as wheel and pinch zoom already did.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
