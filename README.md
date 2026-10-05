@@ -184,7 +184,7 @@ Get current crop data (points and zoom).
 
 #### `setZoom(value: number): void`
 
-Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport centre; non-finite values are ignored. Emits `update` and `zoom` when the clamped zoom changed.
+Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport center; a numeric string is converted, and a non-finite value or a blank or non-numeric string is ignored. Emits `update` and `zoom` when the clamped zoom changed.
 
 #### `zoom: number`
 
@@ -238,7 +238,7 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 | Slider, mouse wheel, pinch, `setZoom()`, `zoom =` | only when the clamped zoom changed | only when the clamped zoom changed |
 | `reset()` | always | only when the zoom changed |
 
-Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport centre (slider, `setZoom()`) fixed. One mouse-wheel notch (100px) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan.
+Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport centre (slider, `setZoom()`) fixed. One mouse-wheel notch (100px, or 3 lines for a mouse that scrolls by lines) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan; when the fingers of a pinch lift until one is left, that finger pans again.
 
 ### Zoom and accessibility
 

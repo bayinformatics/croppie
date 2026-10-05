@@ -99,7 +99,7 @@ export declare class Croppie {
      * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
      * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
      * A numeric string (such as a range input's `value`) is converted to a number;
-     * a value that is then not finite is ignored.
+     * a value that is then not finite, a blank string included, is ignored.
      */
     setZoom(value: number): void;
     /**
@@ -113,6 +113,7 @@ export declare class Croppie {
      *
      * @param requested - Requested zoom level; not clamped by the caller
      * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
+     * @returns Whether the zoom changed, in which case `update` was emitted
      */
     private applyZoom;
     /**
@@ -120,7 +121,11 @@ export declare class Croppie {
      */
     rotate(degrees: 90 | 180 | 270 | -90): void;
     /**
-     * Resets the cropper to initial state
+     * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+     *
+     * The zoom goes through the same path as `setZoom()`, so the events follow the same
+     * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
+     * position did, and no stale `zoom` when an `update` listener zooms again.
      */
     reset(): void;
     /**
@@ -150,6 +155,11 @@ export declare class Croppie {
      * @returns The zoom at which the image covers the viewport
      */
     private updateZoomLimits;
+    /**
+     * The smallest zoom at which `image` covers the viewport: where `bind()` starts by default
+     * and `reset()` returns to.
+     */
+    private coverageZoom;
     /**
      * Updates the CSS transform on the preview element
      */

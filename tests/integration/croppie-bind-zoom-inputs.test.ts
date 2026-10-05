@@ -236,6 +236,50 @@ describe("Croppie bind and zoom inputs", () => {
 		}
 	});
 
+	describe("string zoom values: blank and non-numeric strings are ignored", () => {
+		// [value, zoom after setZoom()/zoom = from 2, zoom after bind()]. A blank string is not
+		// a number, although Number("") and Number(" ") are 0
+		const CASES: Array<[string, number, number]> = [
+			["", 2, COVERAGE_ZOOM],
+			[" ", 2, COVERAGE_ZOOM],
+			["abc", 2, COVERAGE_ZOOM],
+			["1.5", 1.5, 1.5],
+		];
+
+		for (const [value, afterSet, afterBind] of CASES) {
+			const label = JSON.stringify(value);
+			const bindStart =
+				afterBind === COVERAGE_ZOOM ? "the coverage zoom" : afterBind;
+
+			it(`setZoom(${label}) leaves the zoom at ${afterSet}`, async () => {
+				const { croppie } = mount();
+				await croppie.bind({ url: PHOTO, zoom: 2 });
+
+				croppie.setZoom(value as unknown as number);
+
+				expect(croppie.zoom).toBe(afterSet);
+			});
+
+			it(`zoom = ${label} leaves the zoom at ${afterSet}`, async () => {
+				const { croppie } = mount();
+				await croppie.bind({ url: PHOTO, zoom: 2 });
+
+				croppie.zoom = value as unknown as number;
+
+				expect(croppie.zoom).toBe(afterSet);
+			});
+
+			it(`bind({ zoom: ${label} }) starts at ${bindStart}`, async () => {
+				// Coverage not enforced, so the coverage zoom is not the minimum zoom that 0 clamps to
+				const { croppie } = mount({ zoom: { enforceMinimumCoverage: false } });
+
+				await croppie.bind({ url: PHOTO, zoom: value as unknown as number });
+
+				expect(croppie.zoom).toBeCloseTo(afterBind, 9);
+			});
+		}
+	});
+
 	describe("zoom events when an update listener zooms again", () => {
 		/** Caps the zoom at 2 from an update listener and records the zoom events. */
 		async function mountCapped() {

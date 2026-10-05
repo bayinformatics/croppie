@@ -51,18 +51,24 @@ export function normalizePoints(
 }
 
 /**
- * A plain decimal number, optionally signed and with an exponent, with surrounding
- * whitespace: "12.50", "-3", ".5", "5.", "1e2". Not "50px", "0x10", "1,5", "Infinity" or "".
+ * A plain decimal number, optionally signed and with an exponent: "12.50", "-3", ".5",
+ * "5.", "1e2". Not "50px", "0x10", "1,5", "Infinity" or "". Callers trim the string first.
+ *
+ * Every alternative is unambiguous (a digit run can only be matched one way), so the match
+ * is linear in the input length: no catastrophic backtracking on hostile strings such as
+ * thousands of digits followed by junk.
  */
-const DECIMAL = /^\s*[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?\s*$/;
+const DECIMAL = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
 
 /**
- * A coordinate as a number. A string (v2's `get()` format) must be a plain decimal number;
- * any other string becomes `NaN`. (`Number()` alone would read "0x10" as 16 and "" as 0.)
+ * A coordinate as a number. A string (v2's `get()` format) must be a plain decimal number,
+ * surrounding whitespace allowed; any other string becomes `NaN`. (`Number()` alone would
+ * read "0x10" as 16 and "" as 0.)
  */
 function toCoordinate(value: unknown): number {
 	if (typeof value !== "string") return value as number;
-	return DECIMAL.test(value) ? Number(value) : Number.NaN;
+	const trimmed = value.trim();
+	return DECIMAL.test(trimmed) ? Number(trimmed) : Number.NaN;
 }
 
 /**

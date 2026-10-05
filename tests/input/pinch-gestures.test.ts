@@ -73,6 +73,42 @@ describe("pinch: only fingers that went down on the element count", () => {
 		// Midpoint (220, 150) is 70px right of the element centre (150, 150)
 		expect(anchor).toEqual({ x: 70, y: 0 });
 	});
+
+	it("two fingers keep pinching after a third finger lands and lifts", () => {
+		const a = { clientX: 75, clientY: 150 };
+		const b = { clientX: 225, clientY: 150 };
+
+		touch(
+			"touchstart",
+			{ clientX: 100, clientY: 150 },
+			{ clientX: 200, clientY: 150 },
+		);
+		touch("touchmove", a, b); // 100px apart -> 150px apart
+		expect(currentZoom).toBeCloseTo(1.5, 9);
+
+		touch("touchstart", a, b, { clientX: 150, clientY: 250 });
+		touch("touchend", a, b); // the third finger lifted; A and B are still down
+		touch(
+			"touchmove",
+			{ clientX: 50, clientY: 150 },
+			{ clientX: 250, clientY: 150 },
+		);
+
+		// 150px -> 200px apart from the zoom of 1.5 the two fingers had reached
+		expect(currentZoom).toBeCloseTo(2, 9);
+	});
+
+	it("stops pinching when one of the two fingers lifts", () => {
+		touch(
+			"touchstart",
+			{ clientX: 100, clientY: 150 },
+			{ clientX: 200, clientY: 150 },
+		);
+		touch("touchend", { clientX: 100, clientY: 150 });
+		touch("touchmove", { clientX: 50, clientY: 150 });
+
+		expect(requestZoom).not.toHaveBeenCalled();
+	});
 });
 
 describe("pinch: a zoom change mid-gesture is kept, not overwritten", () => {

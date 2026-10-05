@@ -46,6 +46,7 @@ import {
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./utils/index.js";
+import { toNumber } from "./utils/number.js";
 
 /**
  * `normalizePoints()` for `bind()`: an array without exactly 4 entries gives `undefined`, so
@@ -224,15 +225,12 @@ export class Croppie {
 				this.updateTransform();
 				this.emitUpdate();
 			},
+			undefined,
+			// Without zoom there is no pinch handler, so the browser keeps pinch-zoom: a pinch
+			// over the cropper then zooms the page instead of doing nothing
+			{ touchAction: this.options.enableZoom ? "none" : "pinch-zoom" },
 		);
 		this.cleanupFns.push(dragCleanup);
-
-		// The drag handler turns off every browser touch gesture on the boundary. Without
-		// zoom there is no pinch handler, so give pinch-zoom back to the browser: a pinch
-		// over the cropper then zooms the page instead of doing nothing
-		if (!this.options.enableZoom) {
-			this.boundaryEl.style.touchAction = "pinch-zoom";
-		}
 
 		// Wheel zoom handler
 		if (this.options.enableZoom && this.options.mouseWheelZoom) {
@@ -320,9 +318,9 @@ export class Croppie {
 		const coverageZoom = this.updateZoomLimits(this.image);
 
 		// Calculate initial zoom. As in setZoom(), a numeric string is converted and a value
-		// that is then not finite (NaN, ±Infinity) is ignored: the coverage zoom applies instead
-		// of a NaN that no later zoom could repair
-		const requestedZoom = Number(bindOptions.zoom ?? coverageZoom);
+		// that is then not finite (NaN, ±Infinity, a blank or non-numeric string) is ignored:
+		// the coverage zoom applies instead of a NaN that no later zoom could repair
+		const requestedZoom = toNumber(bindOptions.zoom ?? coverageZoom);
 		const initialZoom = Number.isFinite(requestedZoom)
 			? requestedZoom
 			: coverageZoom;
@@ -521,10 +519,10 @@ export class Croppie {
 	 * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
 	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
 	 * A numeric string (such as a range input's `value`) is converted to a number;
-	 * a value that is then not finite is ignored.
+	 * a value that is then not finite, a blank string included, is ignored.
 	 */
 	setZoom(value: number): void {
-		this.applyZoom(Number(value));
+		this.applyZoom(toNumber(value));
 	}
 
 	/**
@@ -538,12 +536,13 @@ export class Croppie {
 	 *
 	 * @param requested - Requested zoom level; not clamped by the caller
 	 * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
+	 * @returns Whether the zoom changed, in which case `update` was emitted
 	 */
 	private applyZoom(
 		requested: number,
 		anchor: ZoomAnchor = CENTER_ANCHOR,
-	): void {
-		if (this.destroyed || !Number.isFinite(requested)) return;
+	): boolean {
+		if (this.destroyed || !Number.isFinite(requested)) return false;
 
 		const previousZoom = this.transform.scale;
 		const zoom = clamp(requested, this.effectiveMinZoom, this.zoomConfig.max);
@@ -557,12 +556,14 @@ export class Croppie {
 		// Always sync, so a slider drag the clamp rejected snaps back
 		this.updateSlider();
 
-		if (zoom === previousZoom) return;
+		if (zoom === previousZoom) return false;
 
 		this.emitUpdate();
 		// An update listener zoomed again: its nested call already emitted the final zoom
-		if (this.transform.scale !== zoom) return;
-		this.emitEvent("zoom", { zoom, previousZoom });
+		if (this.transform.scale === zoom) {
+			this.emitEvent("zoom", { zoom, previousZoom });
+		}
+		return true;
 	}
 
 	/**
@@ -574,35 +575,24 @@ export class Croppie {
 	}
 
 	/**
-	 * Resets the cropper to initial state
+	 * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+	 *
+	 * The zoom goes through the same path as `setZoom()`, so the events follow the same
+	 * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
+	 * position did, and no stale `zoom` when an `update` listener zooms again.
 	 */
 	reset(): void {
-		if (this.destroyed) return;
+		if (this.destroyed || !this.image) return;
 
-		if (this.image) {
-			const previousZoom = this.transform.scale;
-			const coverageZoom = this.updateZoomLimits(this.image);
+		// Resolve the zoom limits again, like bind(), and go to the coverage zoom
+		this.transform.x = 0;
+		this.transform.y = 0;
+		if (this.applyZoom(this.updateZoomLimits(this.image))) return;
 
-			// Clamp to effective minimum zoom (same logic as bind)
-			const initialZoom = clamp(
-				coverageZoom,
-				this.effectiveMinZoom,
-				this.zoomConfig.max,
-			);
-
-			this.transform = { x: 0, y: 0, scale: initialZoom };
-			this.constrainPosition();
-			this.updateTransform();
-			this.updateSlider();
-			this.emitUpdate();
-
-			if (previousZoom !== this.transform.scale) {
-				this.emitEvent("zoom", {
-					zoom: this.transform.scale,
-					previousZoom,
-				});
-			}
-		}
+		// Same zoom: only the position changed, and applyZoom() emitted nothing
+		this.constrainPosition();
+		this.updateTransform();
+		this.emitUpdate();
 	}
 
 	/**
@@ -691,12 +681,7 @@ export class Croppie {
 	private updateZoomLimits(image: HTMLImageElement): number {
 		const { naturalWidth, naturalHeight } = image;
 		const { width, height } = this.options.viewport;
-		const coverage = calculateInitialZoom(
-			naturalWidth,
-			naturalHeight,
-			width,
-			height,
-		);
+		const coverage = this.coverageZoom(image);
 
 		this.effectiveMinZoom = resolveMinZoom({
 			configuredMin: this.zoomConfig.min,
@@ -711,6 +696,19 @@ export class Croppie {
 		}
 
 		return coverage;
+	}
+
+	/**
+	 * The smallest zoom at which `image` covers the viewport: where `bind()` starts by default
+	 * and `reset()` returns to.
+	 */
+	private coverageZoom(image: HTMLImageElement): number {
+		return calculateInitialZoom(
+			image.naturalWidth,
+			image.naturalHeight,
+			this.options.viewport.width,
+			this.options.viewport.height,
+		);
 	}
 
 	/**
