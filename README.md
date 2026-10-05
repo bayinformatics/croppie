@@ -246,16 +246,23 @@ cropper.on('update', (data) => {
 cropper.on('zoom', ({ zoom, previousZoom }) => {
   console.log(`Zoom: ${previousZoom} → ${zoom}`)
 })
+
+cropper.on('rotate', ({ rotation, previousRotation }) => {
+  console.log(`Rotation: ${previousRotation}° → ${rotation}°`)
+})
 ```
 
 `update` carries the same data as `get()`; `zoom` carries `{ zoom, previousZoom }`; `rotate` carries `{ rotation, previousRotation }` and fires from `rotate()` and from `reset()` when it restores a different rotation. Within one change `rotate` fires first, then `update`, then `zoom`. Nothing is emitted when nothing changed (for example a zoom request that is clamped to the current zoom, or a drag the bounds absorb entirely).
 
-| Source | `update` | `zoom` |
-|--------|----------|--------|
-| `bind()` completes | once, with the initial data | no |
-| Dragging the image | only when the (clamped) position changed | no |
-| Slider, mouse wheel, pinch, `setZoom()`, `zoom =` | only when the clamped zoom changed | only when the clamped zoom changed |
-| `reset()` | always | only when the zoom changed |
+| Source | `rotate` | `update` | `zoom` |
+|--------|----------|----------|--------|
+| `bind()` completes | no | once, with the initial data | no |
+| Dragging the image | no | only when the (clamped) position changed | no |
+| Slider, mouse wheel, pinch, `setZoom()`, `zoom =` | no | only when the clamped zoom changed | only when the clamped zoom changed |
+| `rotate()` | always | always | only when the zoom changed (a quarter turn can raise it to the new minimum) |
+| `reset()` | only when the bind-time rotation differs from the current one | always | only when the zoom changed |
+
+`rotate()` with 0 or a full turn, before an image is bound or after `destroy()` does nothing and emits nothing. When an `update` listener zooms again, its own `zoom` event reports the final zoom and the change that caused the `update` emits none, so `zoom` never reports a value that was already replaced.
 
 Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport centre (slider, `setZoom()`) fixed. One mouse-wheel notch (100px, or 3 lines for a mouse that scrolls by lines) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan; when the fingers of a pinch lift until one is left, that finger pans again.
 
