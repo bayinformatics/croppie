@@ -1,7 +1,7 @@
 /**
  * Describe a URL for an error message without dumping it whole.
  *
- * A data URL can be megabytes of base64 (a photo from `bindFile()`), so it is summarised as
+ * A data URL can be megabytes of base64 (a photo from `bindFile()`), so it is summarized as
  * `data:<mime>;…(<n> chars)`; any other URL is cut to 120 characters plus an ellipsis.
  *
  * @param url - The URL to describe

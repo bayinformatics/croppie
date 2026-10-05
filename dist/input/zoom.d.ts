@@ -18,7 +18,7 @@ export declare const WHEEL_MAX_PX = 100;
 /**
  * The zoom factor for one wheel event: multiplicative, scaled by how far the wheel moved.
  *
- * The delta is normalised to pixels from `deltaMode`, capped to one notch, and then
+ * The delta is normalized to pixels from `deltaMode`, capped to one notch, and then
  * `1.1 ** (-px / 100)`: a mouse notch zooms by 1.1 (up) or 1/1.1 (down) and a
  * trackpad's small deltas zoom smoothly. Scrolling up (negative `deltaY`) zooms in.
  */

@@ -2,7 +2,7 @@ import type { CroppieOptions } from "../types.js";
 /**
  * Validate the options passed to the `Croppie` constructor.
  *
- * Throws a `RangeError` for values that would silently produce NaN/Infinity maths or an
+ * Throws a `RangeError` for values that would silently produce NaN/Infinity math or an
  * unusable slider: a viewport or boundary dimension that is not a positive finite number,
  * a `zoom.min` / `zoom.max` that is not, or `zoom.min > zoom.max` (a lone `min` is
  * compared with the default max, a lone `max` with the default min). A boundary smaller
