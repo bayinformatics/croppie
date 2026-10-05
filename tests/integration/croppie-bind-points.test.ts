@@ -274,7 +274,10 @@ describe("Croppie bind({ points })", () => {
 				url: RED_PNG,
 				points: [] as unknown as PointsArray,
 			});
-			await slow;
+			// The superseded bind rejects with an AbortError
+			await expect(slow).rejects.toThrow(
+				"bind() was superseded by a later bind() call",
+			);
 
 			expect(warn).toHaveBeenCalledTimes(1);
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;
