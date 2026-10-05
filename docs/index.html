@@ -714,10 +714,12 @@ npm install github:bayinformatics/croppie</pre>
 
     document.getElementById('crop-btn').addEventListener('click', async () => {
       await queue
-      const blob = await croppie.result({ type: 'blob', size: { width: 128, height: 128 }, circle: true })
+      // Shown at 128 CSS px, so render enough pixels to stay sharp on high-density screens
+      const px = Math.round(128 * Math.min(Math.max(devicePixelRatio || 1, 1), 3))
+      const blob = await croppie.result({ type: 'blob', size: { width: px, height: px }, circle: true })
       if (resultImg.src) URL.revokeObjectURL(resultImg.src)
       resultImg.src = URL.createObjectURL(blob)
-      resultCaption.innerHTML = `<span class="fig">Fig. 6</span>Your detail. Cropped ${when.format(new Date())}. PNG, 128 × 128 px.`
+      resultCaption.innerHTML = `<span class="fig">Fig. 6</span>Your detail. Cropped ${when.format(new Date())}. PNG, ${px} × ${px} px.`
       result.classList.remove('has-img')
       void result.offsetWidth
       result.classList.add('has-img')
