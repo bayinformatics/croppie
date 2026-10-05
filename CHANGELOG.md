@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - Dragging moves the image from where it currently is, so a zoom (wheel, pinch, slider, `setZoom()`) or `reset()` made while the button is held is no longer undone by the next pointer move, and moving back after dragging against an edge moves the image straight away.
+- Dragging inside a CSS-scaled ancestor (`transform: scale()`, `zoom`) keeps the image under the pointer instead of lagging behind or overshooting it, as wheel and pinch zoom already did.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
 
 ### Internal

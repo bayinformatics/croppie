@@ -1,4 +1,5 @@
 import type { TransformState } from "../types.js";
+import { clientToLayoutScale } from "../utils/dom.js";
 
 export interface DragCallbacks {
 	onStart?: (state: TransformState) => void;
@@ -12,6 +13,8 @@ interface DragState {
 	/** The pointer position at the previous event, in client pixels. */
 	lastClientX: number;
 	lastClientY: number;
+	/** Layout pixels per client pixel of the element, measured when the drag starts. */
+	scale: { x: number; y: number };
 }
 
 /**
@@ -22,7 +25,8 @@ interface DragState {
  *
  * Each move adds the pointer movement since the previous event to the current position, so
  * a change made while the button is held (a zoom about the cursor, a rotation) is kept
- * rather than undone by the next move.
+ * rather than undone by the next move. The movement is converted from client pixels to the
+ * element's layout pixels, so the image follows the pointer under a CSS-scaled ancestor.
  *
  * Only the pointer that started the drag is followed: events from other pointers are
  * ignored, except that a second pointer going down ends the drag so a two-finger
@@ -32,8 +36,8 @@ interface DragState {
  *
  * @param element - The HTMLElement to enable dragging on
  * @param getTransform - Function that returns the element's current TransformState
- * @param setTransform - Function to update the element's transform coordinates (`x`, `y`); it
- *   may clamp them, and the next move starts from the result
+ * @param setTransform - Function to update the element's transform coordinates (`x`, `y`, in
+ *   the element's layout pixels); it may clamp them, and the next move starts from the result
  * @param callbacks - Optional callbacks invoked on drag start, move, and end
  * @returns A cleanup function that removes the installed event listeners
  */
@@ -47,6 +51,7 @@ export function createDragHandler(
 		pointerId: null,
 		lastClientX: 0,
 		lastClientY: 0,
+		scale: { x: 1, y: 1 },
 	};
 
 	const tryCapture = (pointerId: number) => {
@@ -90,6 +95,7 @@ export function createDragHandler(
 		state.pointerId = e.pointerId;
 		state.lastClientX = e.clientX;
 		state.lastClientY = e.clientY;
+		state.scale = clientToLayoutScale(element);
 
 		tryCapture(e.pointerId);
 		element.style.cursor = "grabbing";
@@ -100,8 +106,8 @@ export function createDragHandler(
 	const handlePointerMove = (e: PointerEvent) => {
 		if (e.pointerId !== state.pointerId) return;
 
-		const deltaX = e.clientX - state.lastClientX;
-		const deltaY = e.clientY - state.lastClientY;
+		const deltaX = (e.clientX - state.lastClientX) * state.scale.x;
+		const deltaY = (e.clientY - state.lastClientY) * state.scale.y;
 		state.lastClientX = e.clientX;
 		state.lastClientY = e.clientY;
 
