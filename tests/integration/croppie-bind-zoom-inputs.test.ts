@@ -6,10 +6,11 @@ import type {
 	PointsArray,
 } from "../../src/types.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
+import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
 const PHOTO = "https://example.com/photo.jpg"; // 400x300
 
-// PHOTO and every data URL
+// PHOTO and every data URL (SMALL_PNG)
 const DIMENSIONS = { width: 400, height: 300 };
 
 // A 400x300 image in a 100x100 viewport covers it at a zoom of 1/3
@@ -31,6 +32,10 @@ describe("Croppie bind and zoom inputs", () => {
 		});
 		mounted.push({ croppie, root });
 		return { croppie, root };
+	}
+
+	function preview(root: HTMLElement): HTMLImageElement {
+		return root.querySelector(".cr-image") as HTMLImageElement;
 	}
 
 	beforeEach(() => {
@@ -96,6 +101,25 @@ describe("Croppie bind and zoom inputs", () => {
 
 			expect(warn).toHaveBeenCalledTimes(1);
 			expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
+		});
+	});
+
+	describe("preview image", () => {
+		it("loads a remote image in the loader's CORS mode, so the browser can reuse it", async () => {
+			const { croppie, root } = mount();
+
+			await croppie.bind(PHOTO);
+
+			expect(preview(root).crossOrigin).toBe("anonymous");
+			expect(preview(root).src).toBe(PHOTO);
+		});
+
+		it("gives a data URL no CORS mode, like the loader", async () => {
+			const { croppie, root } = mount();
+
+			await croppie.bind(SMALL_PNG);
+
+			expect(preview(root).crossOrigin).toBeNull();
 		});
 	});
 });

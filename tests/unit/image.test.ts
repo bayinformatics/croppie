@@ -8,6 +8,7 @@ import {
 } from "../../src/utils/image.ts";
 import { createMockImage, installImageMock } from "../fixtures/mock-helpers.ts";
 import {
+	EXTERNAL_URL,
 	RED_PNG,
 	SMALL_PNG,
 	TINY_PNG,
@@ -48,10 +49,12 @@ describe("Image utilities", () => {
 			expect(small.src).toBe(SMALL_PNG);
 		});
 
-		// Note: crossOrigin behavior for external URLs is best verified by inspecting
-		// the source code at src/utils/image.ts:loadImage, as external URLs cannot be
-		// tested in happy-dom. The implementation sets crossOrigin = "anonymous" for
-		// non-data-URL sources.
+		it("sets crossOrigin to anonymous for remote URLs", async () => {
+			// Without it a cross-origin image taints the canvas and result() cannot encode it
+			const img = await loadImage(EXTERNAL_URL);
+
+			expect(img.crossOrigin).toBe("anonymous");
+		});
 
 		it("rejects when image fails to load", async () => {
 			// In happy-dom, invalid data URLs may or may not trigger error
