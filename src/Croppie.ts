@@ -43,6 +43,7 @@ import {
 	normalizePoints,
 	resolveMinZoom,
 	setTransform,
+	validateOptions,
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./utils/index.js";
@@ -101,6 +102,7 @@ export class Croppie {
 	private cleanupFns: Array<() => void> = [];
 
 	constructor(element: HTMLElement, options: CroppieOptions) {
+		validateOptions(options);
 		this.element = element;
 
 		// Calculate default boundary (viewport + 100px padding)
@@ -235,7 +237,15 @@ export class Croppie {
 		const bindOptions: BindOptions =
 			typeof options === "string" ? { url: options } : options;
 
-		this.image = await loadImage(bindOptions.url);
+		const image = await loadImage(bindOptions.url);
+
+		// A 0x0 image (e.g. an SVG without a size) would make every zoom calculation Infinity
+		if (!(image.naturalWidth > 0 && image.naturalHeight > 0)) {
+			throw new Error(
+				"[@bayinformatics/croppie] Image has no intrinsic size (0×0); cannot bind",
+			);
+		}
+		this.image = image;
 
 		if (this.previewEl) {
 			// Use the loaded image's src to ensure preview matches the image we crop from
