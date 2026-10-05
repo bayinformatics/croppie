@@ -182,9 +182,15 @@ export class Croppie {
 			this.boundaryEl,
 			() => this.transform,
 			(x, y) => {
+				const { x: previousX, y: previousY } = this.transform;
 				this.transform.x = x;
 				this.transform.y = y;
 				this.constrainPosition();
+
+				// A drag the bounds fully absorb (e.g. vertical on a landscape image) moves nothing
+				if (this.transform.x === previousX && this.transform.y === previousY) {
+					return;
+				}
 				this.updateTransform();
 				this.emitUpdate();
 			},
