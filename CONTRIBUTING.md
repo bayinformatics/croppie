@@ -21,7 +21,7 @@ Use `--frozen-lockfile` so you never change `bun.lock` by accident. Change depen
 | `bun run test` | Unit + integration tests (`bun test`, with coverage; lcov in `coverage/lcov.info`) |
 | `bun run test:watch` | Tests in watch mode |
 | `bun run test:visual` | Builds, then runs the Playwright screenshot tests |
-| `bun run lint` | Biome over `src`, `tests` and `playwright.config.ts` |
+| `bun run lint` | Biome over `src`, `tests`, `scripts` and `playwright.config.ts` |
 | `bun run lint:fix` | Same, applying fixes |
 | `bun run typecheck` | Type-checks `src`, `tests` and the Playwright config (`tsconfig.test.json`) |
 | `bun run build` | Cleans `dist/`, then builds the bundle, CSS and type declarations |

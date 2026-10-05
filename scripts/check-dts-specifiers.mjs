@@ -25,7 +25,9 @@ function declarationFiles(dir) {
 
 const files = declarationFiles(root);
 if (files.length === 0) {
-	console.error("check-dts-specifiers: no .d.ts files in dist/ (run the build first)");
+	console.error(
+		"check-dts-specifiers: no .d.ts files in dist/ (run the build first)",
+	);
 	process.exit(1);
 }
 
