@@ -4,8 +4,11 @@
 // would get `any` for the missing types. Run by `check:package`.
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = new URL("../dist/", import.meta.url).pathname;
+// fileURLToPath, not URL.pathname: that keeps %20 and other escapes in the path (and the
+// leading slash of a Windows drive path), so dist/ would not be found
+const root = fileURLToPath(new URL("../dist/", import.meta.url));
 
 // The module specifier of `from "..."`, `import "..."`, `import("...")` and `require("...")`
 const SPECIFIER =
