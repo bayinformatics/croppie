@@ -2,7 +2,7 @@ export { calculateBounds, type TransformBounds } from "./bounds.js";
 export { clamp } from "./clamp.js";
 export { debounce } from "./debounce.js";
 export { anchorFromClientPoint, createElement, getTransformValues, setTransform, } from "./dom.js";
-export { readDataUrlOrientation, readJpegOrientation } from "./exif.js";
+export { readBlobOrientation, readDataUrlOrientation, readJpegOrientation, } from "./exif.js";
 export { aspectRatio, calculateContainZoom, calculateInitialZoom, describeUrl, fileToDataUrl, getImageDimensions, loadImage, } from "./image.js";
 export { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, type MinZoomInput, resolveMinZoom, } from "./limits.js";
 export { calculateTransformFromPoints, normalizePoints, type PointsArray, type PointsInput, pointsToArray, } from "./points.js";

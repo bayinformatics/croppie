@@ -15,6 +15,13 @@
  */
 export declare function readJpegOrientation(bytes: Uint8Array): number;
 /**
+ * Read the EXIF Orientation of a JPEG File or Blob, reading only its first 256 KiB.
+ *
+ * @param blob - The file to inspect
+ * @returns The orientation 1-8 (1 when the file is not a JPEG or has no tag)
+ */
+export declare function readBlobOrientation(blob: Blob): Promise<number>;
+/**
  * Read the EXIF Orientation of a base64 JPEG data URL, decoding only its first 256 KiB.
  *
  * @param url - The URL to inspect
