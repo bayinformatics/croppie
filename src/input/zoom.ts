@@ -84,9 +84,15 @@ export function createWheelZoomHandler(
 /**
  * Attaches pinch-to-zoom touch handlers to an element and returns a cleanup function.
  *
- * On a two-finger start the finger distance and the current zoom are captured; every
- * move then proposes `initialZoom * distance / initialDistance`, anchored at the finger
- * midpoint. Like the wheel handler it neither clamps nor emits.
+ * Only fingers that went down on the element count (a touch keeps the `target` it
+ * started on, even after sliding off): a finger resting elsewhere on the page neither
+ * turns a one-finger pan into a pinch nor blocks a pinch on the element.
+ *
+ * When exactly two such fingers are down, their distance and the current zoom are
+ * captured; every move then proposes `initialZoom * distance / initialDistance`, anchored
+ * at their midpoint. A zoom changed by something else mid-pinch (`bind()`, `reset()`,
+ * `setZoom()`) becomes the new starting point instead of being overwritten by the next
+ * move. Like the wheel handler it neither clamps nor emits.
  *
  * @param element - The target HTMLElement to attach touch listeners to.
  * @param getZoom - Function that returns the current zoom level.
@@ -100,20 +106,25 @@ export function createPinchZoomHandler(
 ): () => void {
 	let initialDistance = 0;
 	let initialZoom = 1;
+	/** The zoom this pinch last left; any other zoom at the next move was set elsewhere. */
+	let lastZoom = 1;
 
-	const getDistance = (touches: TouchList): number => {
-		if (touches.length < 2) return 0;
-		const touch1 = touches.item(0);
-		const touch2 = touches.item(1);
+	/** The touches that went down on the element, wherever they are now. */
+	const ownTouches = (e: TouchEvent): Touch[] =>
+		Array.from(e.touches).filter((touch) =>
+			element.contains(touch.target as Node),
+		);
+
+	const getDistance = (touches: Touch[]): number => {
+		const [touch1, touch2] = touches;
 		if (!touch1 || !touch2) return 0;
 		const dx = touch1.clientX - touch2.clientX;
 		const dy = touch1.clientY - touch2.clientY;
 		return Math.sqrt(dx * dx + dy * dy);
 	};
 
-	const getMidpointAnchor = (touches: TouchList): ZoomAnchor => {
-		const touch1 = touches.item(0);
-		const touch2 = touches.item(1);
+	const getMidpointAnchor = (touches: Touch[]): ZoomAnchor => {
+		const [touch1, touch2] = touches;
 		if (!touch1 || !touch2) return { x: 0, y: 0 };
 		return anchorFromClientPoint(
 			element,
@@ -123,21 +134,32 @@ export function createPinchZoomHandler(
 	};
 
 	const handleTouchStart = (e: TouchEvent) => {
-		if (e.touches.length === 2) {
+		const touches = ownTouches(e);
+		if (touches.length === 2) {
 			e.preventDefault();
-			initialDistance = getDistance(e.touches);
+			initialDistance = getDistance(touches);
 			initialZoom = getZoom();
+			lastZoom = initialZoom;
 		}
 	};
 
 	const handleTouchMove = (e: TouchEvent) => {
-		if (e.touches.length === 2 && initialDistance > 0) {
+		const touches = ownTouches(e);
+		if (touches.length === 2 && initialDistance > 0) {
 			e.preventDefault();
 
+			const distance = getDistance(touches);
+			// Zoomed from elsewhere since the last move: carry on from that zoom
+			if (getZoom() !== lastZoom && distance > 0) {
+				initialZoom = getZoom();
+				initialDistance = distance;
+			}
+
 			requestZoom(
-				initialZoom * (getDistance(e.touches) / initialDistance),
-				getMidpointAnchor(e.touches),
+				initialZoom * (distance / initialDistance),
+				getMidpointAnchor(touches),
 			);
+			lastZoom = getZoom();
 		}
 	};
 

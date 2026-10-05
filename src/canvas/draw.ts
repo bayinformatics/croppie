@@ -79,31 +79,35 @@ function downsample(
  * Create a new canvas showing the viewport `frame` of an image, scaled to given dimensions and optionally masked or filled.
  *
  * The frame is the unclamped viewport rectangle in source-image pixels, so it can extend
- * past the image when the user zoomed out (coverage not enforced). The part of the frame
- * that overlaps the image is drawn into the proportional sub-rectangle of the output; the
- * rest stays transparent (or `backgroundColor`). A frame inside the image maps onto the
- * whole output, exactly like drawing the crop rectangle directly, and nothing is ever
- * stretched to fill the empty space.
+ * past the image when the user zoomed out (coverage not enforced). It is scaled by one factor
+ * for both axes and centered in the output: the part that overlaps the image is drawn into the
+ * proportional sub-rectangle, and the rest of the output stays transparent (or
+ * `backgroundColor`). An output of another shape than the frame therefore gets empty bars
+ * instead of a stretched image. An output with the frame's shape up to rounding to whole
+ * pixels (the `'viewport'` and `'original'` result sizes) is filled exactly: a frame inside
+ * the image maps onto the whole output, like drawing the crop rectangle directly, and the
+ * rounding leaves no sub-pixel gap at the edges.
  *
  * ```
- * kx = outW / frameW                     ky = outH / frameH
+ * k = min(outW / frameW, outH / frameH)    (kx = outW / frameW, ky = outH / frameH when filled)
+ * ox = (outW - frameW * k) / 2             (same for y)
  * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (same for y)
- * dx = (sx0 - frame.topLeftX) * kx       dw = (sx1 - sx0) * kx                    (same for y)
+ * dx = ox + (sx0 - frame.topLeftX) * k   dw = (sx1 - sx0) * k                     (same for y)
  * ```
  *
  * With a `rotation` the frame is still given in the NATURAL image frame, while the output
  * canvas is in the displayed orientation: the image is drawn through a context rotated about
- * the output center into a destination box of `swapDims(outW, outH, rotation)` (the output
- * turned back), so `[dw, dh] = swapDims(...)`, `kx = dw / frameW`, `ky = dh / frameH` and the
- * destination offsets are measured from `(-dw/2, -dh/2)`. The background and the circle mask
- * are applied first, in canvas coordinates, so they are not rotated.
+ * the output center into the box `[bw, bh] = swapDims(outW, outH, rotation)` (the output
+ * turned back), which takes the place of `outW` and `outH` above, with the destination
+ * offsets measured from `(-bw/2, -bh/2)`. The background and the circle mask are applied in
+ * canvas coordinates, before the rotation, so they are not rotated.
  *
  * @param image - Source HTMLImageElement to draw from.
  * @param frame - Viewport rectangle in source-image pixels (the natural frame); may extend past the image.
  * @param outputWidth - Width of the resulting canvas in pixels.
  * @param outputHeight - Height of the resulting canvas in pixels.
  * @param options - Optional rendering options.
- * @param options.circle - If true, clip to the ellipse inscribed in the output (a circle for a square output).
+ * @param options.circle - If true, clip to the ellipse inscribed in the drawn frame (a circle for a square viewport); that is the output's inscribed ellipse when the output has the frame's shape.
  * @param options.backgroundColor - If provided, fill the canvas background with this CSS color before drawing the image.
  * @param options.rotation - Clockwise rotation the image is displayed with (default: 0).
  * @returns An HTMLCanvasElement containing the framed image scaled to `outputWidth` x `outputHeight`.
@@ -139,22 +143,6 @@ export function drawCroppedImage(
 		ctx.fillRect(0, 0, outputWidth, outputHeight);
 	}
 
-	// Apply elliptical mask if needed (a circle when the output is square)
-	if (options?.circle) {
-		ctx.beginPath();
-		ctx.ellipse(
-			outputWidth / 2,
-			outputHeight / 2,
-			outputWidth / 2,
-			outputHeight / 2,
-			0,
-			0,
-			Math.PI * 2,
-		);
-		ctx.closePath();
-		ctx.clip();
-	}
-
 	const frameWidth = frame.bottomRightX - frame.topLeftX;
 	const frameHeight = frame.bottomRightY - frame.topLeftY;
 	if (!(frameWidth > 0 && frameHeight > 0)) {
@@ -166,10 +154,38 @@ export function drawCroppedImage(
 	const rotation = options?.rotation ?? 0;
 	const [boxWidth, boxHeight] = swapDims(outputWidth, outputHeight, rotation);
 
-	// Intersect the frame with the image and map the overlap into the box
-	const scaleX = boxWidth / frameWidth;
-	const scaleY = boxHeight / frameHeight;
+	// One scale keeps the image's proportions, with the frame centered in the box; a box that
+	// is the frame's shape rounded to whole pixels is filled exactly instead
+	const fill = isRoundedShape(boxWidth, boxHeight, frameWidth, frameHeight);
+	const scale = Math.min(boxWidth / frameWidth, boxHeight / frameHeight);
+	const scaleX = fill ? boxWidth / frameWidth : scale;
+	const scaleY = fill ? boxHeight / frameHeight : scale;
+	const offsetX = (boxWidth - frameWidth * scaleX) / 2;
+	const offsetY = (boxHeight - frameHeight * scaleY) / 2;
 
+	// Apply elliptical mask if needed: the ellipse inscribed in the scaled frame, in canvas
+	// coordinates (a circle when the frame is square)
+	if (options?.circle) {
+		const [maskWidth, maskHeight] = swapDims(
+			frameWidth * scaleX,
+			frameHeight * scaleY,
+			rotation,
+		);
+		ctx.beginPath();
+		ctx.ellipse(
+			outputWidth / 2,
+			outputHeight / 2,
+			maskWidth / 2,
+			maskHeight / 2,
+			0,
+			0,
+			Math.PI * 2,
+		);
+		ctx.closePath();
+		ctx.clip();
+	}
+
+	// Intersect the frame with the image and map the overlap into the box
 	const sourceLeft = clamp(frame.topLeftX, 0, image.naturalWidth);
 	const sourceRight = clamp(frame.bottomRightX, 0, image.naturalWidth);
 	const sourceTop = clamp(frame.topLeftY, 0, image.naturalHeight);
@@ -183,8 +199,8 @@ export function drawCroppedImage(
 		return canvas;
 	}
 
-	const destinationLeft = (sourceLeft - frame.topLeftX) * scaleX;
-	const destinationTop = (sourceTop - frame.topLeftY) * scaleY;
+	const destinationLeft = offsetX + (sourceLeft - frame.topLeftX) * scaleX;
+	const destinationTop = offsetY + (sourceTop - frame.topLeftY) * scaleY;
 	const destinationWidth = sourceWidth * scaleX;
 	const destinationHeight = sourceHeight * scaleY;
 
@@ -232,6 +248,22 @@ export function drawCroppedImage(
 	}
 
 	return canvas;
+}
+
+/**
+ * Whether a `width` x `height` box is the frame's shape rounded to whole pixels: some scale
+ * of the frame lies within half a pixel of the box on both axes.
+ */
+function isRoundedShape(
+	width: number,
+	height: number,
+	frameWidth: number,
+	frameHeight: number,
+): boolean {
+	return (
+		Math.max((width - 0.5) / frameWidth, (height - 0.5) / frameHeight) <=
+		Math.min((width + 0.5) / frameWidth, (height + 0.5) / frameHeight)
+	);
 }
 
 /**

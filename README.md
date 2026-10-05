@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@bayinformatics/croppie.svg)](https://www.npmjs.com/package/@bayinformatics/croppie)
 [![license](https://img.shields.io/npm/l/@bayinformatics/croppie.svg)](LICENSE)
 [![ci](https://github.com/bayinformatics/croppie/actions/workflows/ci.yml/badge.svg)](https://github.com/bayinformatics/croppie/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/bayinformatics/croppie/graph/badge.svg)](https://codecov.io/gh/bayinformatics/croppie)
+[![codecov](https://codecov.io/gh/bayinformatics/croppie/branch/main/graph/badge.svg)](https://codecov.io/gh/bayinformatics/croppie)
 
 A modern, TypeScript-first image cropper for the web. Fork of [Foliotek/Croppie](https://github.com/Foliotek/Croppie).
 
@@ -128,7 +128,7 @@ await cropper.bind({
 
 `points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`.
 
-`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). If you call `bind()` again before the previous image has loaded, the last call wins and the earlier one resolves without applying anything. A `bind()` that is still loading when you call `destroy()` also resolves silently. `bind()` emits one `update` when it completes.
+`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). If you call `bind()` again before the previous image has loaded, the last call wins and the earlier one resolves without applying anything. The exception is a `bind()` or `bindFile()` rejected for invalid input (an invalid `rotation`, a `points` array without 4 entries, something that is not a File or Blob): it changes nothing and supersedes nothing. A `bind()` that is still loading when you call `destroy()` also resolves silently. `bind()` emits one `update` when it completes.
 
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
@@ -144,7 +144,7 @@ Load an image from a File input.
 const input = document.querySelector('input[type="file"]')
 input.addEventListener('change', async (e) => {
   const file = (e.target as HTMLInputElement).files?.[0]
-  await cropper.bindFile(file)
+  if (file) await cropper.bindFile(file)
 })
 ```
 
@@ -202,7 +202,7 @@ Subscribe to or unsubscribe from [events](#events).
 
 #### `rotate(degrees: number): void`
 
-Rotate the image **clockwise** by `degrees`: any multiple of 90, positive or negative (`-90` turns counter-clockwise); anything else throws a `RangeError`. The image pixel under the viewport center stays there, and the zoom limits are recomputed for the rotated image, so with a non-square viewport a quarter turn can raise the zoom to the new minimum. Emits `rotate`, then `update` (and `zoom` if the zoom changed). Does nothing before an image is bound. `reset()` restores the rotation `bind()` started with. `result()` renders the rotated image.
+Rotate the image **clockwise** by `degrees`: any multiple of 90, positive or negative (`-90` turns counter-clockwise); anything else throws a `RangeError`. The image pixel under the viewport center stays there unless the rotated image would then no longer cover the viewport, in which case the image moves the least needed. The zoom limits are recomputed for the rotated image, so with a non-square viewport a quarter turn can raise the zoom to the new minimum. Emits `rotate`, then `update` (and `zoom` if the zoom changed). Does nothing before an image is bound. `reset()` restores the rotation `bind()` started with. `result()` renders the rotated image.
 
 ```typescript
 cropper.rotate(90)   // clockwise
@@ -221,7 +221,7 @@ Clean up and remove the cropper. It is safe to call more than once. Afterwards `
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `type` | `'blob' \| 'base64' \| 'canvas'` | Required | Output type |
-| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution, rounded to whole pixels |
+| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution, rounded to whole pixels. Zoomed out past the image, `'original'` is scaled down to at most the image part's area or 4096×4096 px, whichever is larger; a size of another shape than the viewport keeps the proportions, with transparent or `backgroundColor` bars |
 | `format` | `'png' \| 'jpeg' \| 'webp'` | `'png'` | Output format for blob/base64 |
 | `quality` | `number` | `0.92` | JPEG/WebP quality (0-1) |
 | `circle` | `boolean` | `viewport.type === 'circle'` | Apply circular mask |
