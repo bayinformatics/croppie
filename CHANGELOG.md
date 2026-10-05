@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - A `./package.json` export.
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
 - `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?) scripts.
+- `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work.
 
 ### Changed
 
@@ -23,12 +24,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Declaration maps are no longer shipped; they pointed at sources that are not part of the package.
 - The package `homepage` is the live demo, and `CHANGELOG.md` is included in the published files.
 - Visual regression baselines are stored per platform (`chromium-linux`, `chromium-darwin`).
+- Zooming (slider, mouse wheel, pinch, `setZoom()`) keeps the point under the viewport centre, the cursor or the finger midpoint fixed, instead of always zooming about the image centre, so the image no longer drifts after a pan.
+- Mouse wheel zoom is multiplicative: ×1.1 per 100px notch, scaled by `deltaY` and `deltaMode` and capped at one notch per event (it was a fixed ±0.1 step).
+- Event contract: `bind()` now emits one `update`; `setZoom()` and `zoom =` emit `zoom`; `reset()` emits `zoom` when the zoom changed; `zoom` and `update` are emitted only when the clamped value actually changed; `update` fires before `zoom`. A drag that the bounds fully absorb no longer emits `update`. See the Events table in the README.
+- A second touch ends an active drag, so a pinch takes over instead of also panning.
 
 ### Fixed
 
 - The transform computed from `bind({ points })` now derives from the zoom after it has been clamped to the zoom limits (#23).
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.
+- `setZoom(NaN)` (or any non-finite value) is ignored instead of corrupting the transform, and every zoom input goes through one code path with one clamp.
+- Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
 
 ### Internal
