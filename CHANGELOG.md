@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- `bind({ points })` is now applied when the image loads, with `points` given as an object or as `[x1, y1, x2, y2]`; `get()` returns the same points back (#19, #23).
+- `bind({ points })` is now applied when the image loads, with `points` given as an object or as `[x1, y1, x2, y2]`; `get()` returns the same points back (#19, #23). Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 - A `default` condition in the package `exports` map, so `require("@bayinformatics/croppie")` works natively on Node 22.12+ (it loads the ES module).
 - A `./package.json` export.
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
@@ -48,7 +48,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Invalid options throw a `RangeError` from the constructor (non-positive or non-finite viewport, boundary or zoom limits, `zoom.min` greater than `zoom.max`).
 - A zoom option given as `undefined` (for example `zoom: { max: props.maxZoom }` with the prop unset) gets its default instead of turning every zoom, point and slider value into `NaN`.
 - `bind()`, `bindFile()` and `result()` on a destroyed instance reject with a clear error, `setZoom()`, `zoom =` and `reset()` do nothing, and `destroy()` is idempotent. Overlapping `bind()` calls resolve to the last one, and a bind that is still loading when the instance is destroyed no longer applies an image to a dead instance. `bindFile()` with something that is not a File or Blob (such as the `undefined` of an empty file input) rejects with a `TypeError` without superseding a bind that is still loading.
-- A `bind()` whose `points` array does not have exactly 4 entries rejects before changing anything, instead of leaving the new image half-applied and cancelling a bind that is still loading.
 - Error messages from failed image loads no longer embed the whole data URL.
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
 - `result()` frees the canvas of a `'blob'` or `'base64'` result as soon as it is encoded instead of leaving its memory to garbage collection (iOS caps canvas memory).

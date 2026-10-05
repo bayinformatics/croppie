@@ -128,9 +128,9 @@ await cropper.bind({
 })
 ```
 
-`points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`.
+`points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`. Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 
-`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). If you call `bind()` again before the previous image has loaded, the last call wins and the earlier one resolves without applying anything. The exception is a `bind()` or `bindFile()` rejected for invalid input (a `points` array without 4 entries, something that is not a File or Blob): it changes nothing and supersedes nothing. A `bind()` that is still loading when you call `destroy()` also resolves silently. `bind()` emits one `update` when it completes.
+`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). If you call `bind()` again before the previous image has loaded, the last call wins and the earlier one resolves without applying anything. The exception is a `bindFile()` rejected because it was given something that is not a File or Blob: it changes nothing and supersedes nothing. Malformed `points` do not make `bind()` fail (see above), so such a bind still wins like any other. A `bind()` that is still loading when you call `destroy()` also resolves silently. `bind()` emits one `update` when it completes.
 
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
