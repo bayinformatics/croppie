@@ -197,10 +197,8 @@ export class Croppie {
 			const wheelCleanup = createWheelZoomHandler(
 				this.boundaryEl,
 				() => this.transform.scale,
-				(zoom) => this.applyZoom(zoom),
-				this.zoomConfig,
-				undefined,
-				requireCtrl,
+				(zoom, anchor) => this.applyZoom(zoom, anchor),
+				{ requireCtrl },
 			);
 			this.cleanupFns.push(wheelCleanup);
 		}
@@ -209,8 +207,7 @@ export class Croppie {
 		const pinchCleanup = createPinchZoomHandler(
 			this.boundaryEl,
 			() => this.transform.scale,
-			(zoom) => this.applyZoom(zoom),
-			this.zoomConfig,
+			(zoom, anchor) => this.applyZoom(zoom, anchor),
 		);
 		this.cleanupFns.push(pinchCleanup);
 	}

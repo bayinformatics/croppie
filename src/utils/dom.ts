@@ -1,3 +1,5 @@
+import type { ZoomAnchor } from "./transform.js";
+
 /**
  * Create an HTML element of the given tag and apply optional class, attributes, and styles.
  *
@@ -93,4 +95,37 @@ export function setTransform(
 	scale: number,
 ): void {
 	element.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+}
+
+/**
+ * Convert a client (viewport) point to an offset from the centre of an element, in the
+ * element's own layout pixels: the anchor used to zoom about a cursor or finger position.
+ *
+ * Works for CSS-scaled elements: the displayed box (`getBoundingClientRect`) is mapped
+ * back to layout pixels through `offsetWidth`/`offsetHeight`. Without a layout box
+ * (detached or `display: none`) it falls back to the centre.
+ *
+ * @param element - The element the offset is relative to
+ * @param clientX - X in viewport coordinates (e.g. `event.clientX`)
+ * @param clientY - Y in viewport coordinates (e.g. `event.clientY`)
+ * @returns The offset from the element centre; `{ x: 0, y: 0 }` when it has no layout box
+ */
+export function anchorFromClientPoint(
+	element: HTMLElement,
+	clientX: number,
+	clientY: number,
+): ZoomAnchor {
+	const rect = element.getBoundingClientRect();
+	if (!(rect.width > 0 && rect.height > 0)) {
+		return { x: 0, y: 0 };
+	}
+
+	const scaleX = element.offsetWidth > 0 ? element.offsetWidth / rect.width : 1;
+	const scaleY =
+		element.offsetHeight > 0 ? element.offsetHeight / rect.height : 1;
+
+	return {
+		x: (clientX - rect.left - rect.width / 2) * scaleX,
+		y: (clientY - rect.top - rect.height / 2) * scaleY,
+	};
 }

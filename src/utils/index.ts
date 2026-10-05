@@ -1,7 +1,12 @@
 export { calculateBounds, type TransformBounds } from "./bounds.js";
 export { clamp } from "./clamp.js";
 export { debounce } from "./debounce.js";
-export { createElement, getTransformValues, setTransform } from "./dom.js";
+export {
+	anchorFromClientPoint,
+	createElement,
+	getTransformValues,
+	setTransform,
+} from "./dom.js";
 export {
 	aspectRatio,
 	calculateInitialZoom,

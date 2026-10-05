@@ -245,14 +245,22 @@ export function createWheelEvent(
 		...options,
 	});
 
-	// Happy-dom doesn't properly set ctrlKey from constructor options,
-	// so we use Object.defineProperty to set it
+	// Happy-dom's WheelEvent drops ctrlKey, clientX and clientY from the constructor
+	// options (deltaY and deltaMode survive), so define them explicitly
 	if (options.ctrlKey !== undefined) {
 		Object.defineProperty(event, "ctrlKey", {
 			value: options.ctrlKey,
 			writable: false,
 		});
 	}
+	Object.defineProperty(event, "clientX", {
+		value: options.clientX ?? 0,
+		writable: false,
+	});
+	Object.defineProperty(event, "clientY", {
+		value: options.clientY ?? 0,
+		writable: false,
+	});
 
 	return event;
 }
