@@ -61,9 +61,22 @@ export declare class Croppie {
      */
     set zoom(value: number);
     /**
-     * Sets the zoom level with clamping
+     * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
+     * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed;
+     * a non-finite value is ignored.
      */
     setZoom(value: number): void;
+    /**
+     * The single path for every zoom change (setZoom, slider, wheel, pinch).
+     *
+     * Clamps the request to the effective limits, zooms about `anchor` so the image point
+     * under it stays put, re-clamps the position, syncs the slider and emits `update`
+     * then `zoom`. Nothing is emitted when the clamped zoom did not change.
+     *
+     * @param requested - Requested zoom level; not clamped by the caller
+     * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
+     */
+    private applyZoom;
     /**
      * Rotates the image by 90 degree increments
      */

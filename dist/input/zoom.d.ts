@@ -1,34 +1,53 @@
-import type { ZoomConfig } from "../types.js";
-export interface ZoomCallbacks {
-    onChange?: (zoom: number, previousZoom: number) => void;
-}
+import type { ZoomAnchor } from "../utils/transform.js";
+/**
+ * Proposes a zoom level and the screen point to zoom about. The receiver (the Croppie
+ * instance) owns clamping, the position constraint and events, so handlers never clamp
+ * or emit.
+ */
+export type ZoomRequest = (zoom: number, anchor: ZoomAnchor) => void;
+/** Zoom factor of one wheel notch (a Chrome mouse notch is 100 CSS px). */
+export declare const WHEEL_FACTOR_PER_NOTCH = 1.1;
+/** Pixel delta that counts as one notch. */
+export declare const WHEEL_NOTCH_PX = 100;
+/** Pixels per line when `deltaMode` is `DOM_DELTA_LINE`. */
+export declare const WHEEL_LINE_PX = 16;
+/** Pixels per page when `deltaMode` is `DOM_DELTA_PAGE`. */
+export declare const WHEEL_PAGE_PX = 800;
+/** Largest delta used from a single wheel event, so a fling cannot jump the zoom. */
+export declare const WHEEL_MAX_PX = 100;
+/**
+ * The zoom factor for one wheel event: multiplicative, scaled by how far the wheel moved.
+ *
+ * The delta is normalised to pixels from `deltaMode`, capped to one notch, and then
+ * `1.1 ** (-px / 100)`: a mouse notch zooms by 1.1 (up) or 1/1.1 (down) and a
+ * trackpad's small deltas zoom smoothly. Scrolling up (negative `deltaY`) zooms in.
+ */
+export declare function wheelZoomFactor(event: Pick<WheelEvent, "deltaY" | "deltaMode">): number;
 /**
  * Create and attach a wheel-based zoom handler to an element.
  *
- * When the user scrolls the wheel over the element this handler adjusts the zoom
- * by steps of 0.1, clamped to the supplied `config` bounds, and invokes the
- * optional `onChange` callback when the zoom changes.
+ * Each wheel event proposes `currentZoom * wheelZoomFactor(event)` anchored at the
+ * cursor. The handler does not clamp or emit anything: that is `requestZoom`'s job.
  *
  * @param element - The HTMLElement to attach the wheel listener to
  * @param getZoom - Function that returns the current zoom level
- * @param setZoom - Function that updates the zoom level
- * @param config - Zoom bounds; `min` and `max` define the allowed zoom range
- * @param callbacks - Optional callbacks; `onChange(newZoom, previousZoom)` is called when zoom changes
- * @param requireCtrl - If true, the handler only responds when the Ctrl key is pressed (default: `false`)
+ * @param requestZoom - Receives the proposed zoom and the cursor anchor
+ * @param options - `requireCtrl`: only respond while Ctrl is held (default: `false`)
  * @returns A cleanup function that removes the attached wheel listener
  */
-export declare function createWheelZoomHandler(element: HTMLElement, getZoom: () => number, setZoom: (zoom: number) => void, config: ZoomConfig, callbacks?: ZoomCallbacks, requireCtrl?: boolean): () => void;
+export declare function createWheelZoomHandler(element: HTMLElement, getZoom: () => number, requestZoom: ZoomRequest, options?: {
+    requireCtrl?: boolean;
+}): () => void;
 /**
  * Attaches pinch-to-zoom touch handlers to an element and returns a cleanup function.
  *
- * Handles two-finger pinch gestures to update zoom between the bounds specified by `config`.
- * When the effective zoom changes, `setZoom` is called and `callbacks.onChange` is invoked with the new and previous zoom values.
+ * On a two-finger start the finger distance and the current zoom are captured; every
+ * move then proposes `initialZoom * distance / initialDistance`, anchored at the finger
+ * midpoint. Like the wheel handler it neither clamps nor emits.
  *
  * @param element - The target HTMLElement to attach touch listeners to.
  * @param getZoom - Function that returns the current zoom level.
- * @param setZoom - Function called with the new zoom level when it changes.
- * @param config - Zoom bounds (`min` and `max`) used to clamp the computed zoom.
- * @param callbacks - Optional callbacks; `onChange(newZoom, previousZoom)` is called when zoom changes.
+ * @param requestZoom - Receives the proposed zoom and the finger-midpoint anchor.
  * @returns A function that removes the attached touch listeners from `element`.
  */
-export declare function createPinchZoomHandler(element: HTMLElement, getZoom: () => number, setZoom: (zoom: number) => void, config: ZoomConfig, callbacks?: ZoomCallbacks): () => void;
+export declare function createPinchZoomHandler(element: HTMLElement, getZoom: () => number, requestZoom: ZoomRequest): () => void;
