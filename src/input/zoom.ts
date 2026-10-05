@@ -13,21 +13,21 @@ export type ZoomRequest = (zoom: number, anchor: ZoomAnchor) => void;
 export const WHEEL_FACTOR_PER_NOTCH = 1.1;
 /** Pixel delta that counts as one notch. */
 export const WHEEL_NOTCH_PX = 100;
-/** Pixels per line when `deltaMode` is `DOM_DELTA_LINE`. */
-export const WHEEL_LINE_PX = 16;
+/**
+ * Pixels per line when `deltaMode` is `DOM_DELTA_LINE`. A line-mode mouse reports one notch
+ * as 3 lines, so 3 lines make one notch.
+ */
+export const WHEEL_LINE_PX = WHEEL_NOTCH_PX / 3;
 /** Pixels per page when `deltaMode` is `DOM_DELTA_PAGE`. */
 export const WHEEL_PAGE_PX = 800;
 /** Largest delta used from a single wheel event, so a fling cannot jump the zoom. */
 export const WHEEL_MAX_PX = 100;
 
 /**
- * The zoom factor for one wheel event: multiplicative, scaled by how far the wheel moved.
- *
- * The delta is normalised to pixels from `deltaMode`, capped to one notch, and then
- * `1.1 ** (-px / 100)`: a mouse notch zooms by 1.1 (up) or 1/1.1 (down) and a
- * trackpad's small deltas zoom smoothly. Scrolling up (negative `deltaY`) zooms in.
+ * The vertical distance of one wheel event in pixels: `deltaY` converted from `deltaMode`
+ * (lines, pages) to pixels, then capped to one notch either way.
  */
-export function wheelZoomFactor(
+export function wheelDeltaPx(
 	event: Pick<WheelEvent, "deltaY" | "deltaMode">,
 ): number {
 	const unit =
@@ -36,9 +36,26 @@ export function wheelZoomFactor(
 			: event.deltaMode === 2
 				? WHEEL_PAGE_PX
 				: 1;
-	const px = clamp(event.deltaY * unit, -WHEEL_MAX_PX, WHEEL_MAX_PX);
+	return clamp(event.deltaY * unit, -WHEEL_MAX_PX, WHEEL_MAX_PX);
+}
 
+/** The zoom factor for a wheel distance in pixels (see {@link wheelDeltaPx}). */
+function zoomFactorForPx(px: number): number {
 	return WHEEL_FACTOR_PER_NOTCH ** (-px / WHEEL_NOTCH_PX);
+}
+
+/**
+ * The zoom factor for one wheel event: multiplicative, scaled by how far the wheel moved.
+ *
+ * The delta is normalized to pixels from `deltaMode`, capped to one notch, and then
+ * `1.1 ** (-px / 100)`: a mouse notch (100px, or 3 lines) zooms by 1.1 (up) or 1/1.1
+ * (down) and a trackpad's small deltas zoom smoothly. Scrolling up (negative `deltaY`)
+ * zooms in.
+ */
+export function wheelZoomFactor(
+	event: Pick<WheelEvent, "deltaY" | "deltaMode">,
+): number {
+	return zoomFactorForPx(wheelDeltaPx(event));
 }
 
 /**
@@ -63,13 +80,14 @@ export function createWheelZoomHandler(
 		// Check for ctrl requirement
 		if (options.requireCtrl && !e.ctrlKey) return;
 
-		// Ignore zero deltaY (no scroll)
-		if (e.deltaY === 0) return;
+		// Convert to pixels first, then ignore an event that does not scroll vertically
+		const px = wheelDeltaPx(e);
+		if (px === 0) return;
 
 		e.preventDefault();
 
 		requestZoom(
-			getZoom() * wheelZoomFactor(e),
+			getZoom() * zoomFactorForPx(px),
 			anchorFromClientPoint(element, e.clientX, e.clientY),
 		);
 	};
