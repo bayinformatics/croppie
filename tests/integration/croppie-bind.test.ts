@@ -326,4 +326,60 @@ describe("Croppie bind", () => {
 			expect(croppie.zoom).toBeCloseTo(0.5, 9);
 		});
 	});
+
+	describe("images without an intrinsic size", () => {
+		// The mock gives unknown sources a 0x0 size, like a broken or SVG-without-size image
+		const NO_SIZE = "data:image/png;base64,NOSIZE";
+
+		it("rejects an image with no intrinsic size", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+
+			await expect(croppie.bind(NO_SIZE)).rejects.toThrow(/intrinsic size/);
+			await expect(croppie.bind(NO_SIZE)).rejects.toThrow(
+				"[@bayinformatics/croppie]",
+			);
+		});
+
+		it("does not leave an infinite zoom range on the slider", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			const slider = container.querySelector(".cr-slider") as HTMLInputElement;
+			const before = slider.min;
+
+			await expect(croppie.bind(NO_SIZE)).rejects.toThrow();
+
+			expect(slider.min).toBe(before);
+			expect(slider.min).not.toBe("Infinity");
+		});
+
+		it("keeps the previously bound image when a bind is rejected", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { max: 100 },
+			});
+			await croppie.bind(SMALL_PNG);
+			const zoomBefore = croppie.zoom;
+
+			await expect(croppie.bind(NO_SIZE)).rejects.toThrow();
+
+			const preview = container.querySelector(".cr-image") as HTMLImageElement;
+			expect(preview.src).toBe(SMALL_PNG);
+			expect(croppie.zoom).toBe(zoomBefore);
+		});
+
+		it("can bind a valid image after a rejected one", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { max: 100 },
+			});
+			await expect(croppie.bind(NO_SIZE)).rejects.toThrow();
+
+			await croppie.bind(SMALL_PNG);
+
+			expect(croppie.zoom).toBe(10);
+		});
+	});
 });
