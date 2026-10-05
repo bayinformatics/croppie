@@ -186,6 +186,43 @@ describe("Croppie rotate", () => {
 			expect(events[1]?.payload).toHaveProperty("points");
 		});
 
+		it("emits one zoom event when an update listener zooms during rotate()", async () => {
+			create(); // square viewport: a quarter turn keeps the zoom of 20
+			await croppie.bind({ url: SMALL_PNG, zoom: 20 });
+			const events = recordEvents();
+			croppie.on("update", (data) => {
+				if (data.zoom === 20) croppie.setZoom(30);
+			});
+
+			croppie.rotate(90);
+
+			expect(croppie.zoom).toBe(30);
+			// rotate() itself did not change the zoom; the listener's setZoom() reported its own
+			expect(events.map((e) => e.name)).toEqual([
+				"rotate",
+				"update",
+				"update",
+				"zoom",
+			]);
+			expect(events[3]?.payload).toEqual({ zoom: 30, previousZoom: 20 });
+		});
+
+		it("reports only the final zoom when a listener zooms after rotate() raised it", async () => {
+			create({ viewport: { width: 100, height: 50, type: "square" } });
+			await croppie.bind({ url: SMALL_PNG, zoom: 5 }); // a quarter turn raises it to 10
+			const zoomEvents: unknown[] = [];
+			croppie.on("zoom", (event) => zoomEvents.push(event));
+			croppie.on("update", (data) => {
+				if (data.zoom === 10) croppie.setZoom(12);
+			});
+
+			croppie.rotate(90);
+
+			expect(croppie.zoom).toBe(12);
+			// Like setZoom(): a zoom an update listener already replaced is not reported
+			expect(zoomEvents).toEqual([{ zoom: 12, previousZoom: 10 }]);
+		});
+
 		it("includes the rotation in the update emitted by bind()", async () => {
 			create();
 			const handler = mock();
