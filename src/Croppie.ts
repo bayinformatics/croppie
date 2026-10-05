@@ -337,8 +337,11 @@ export class Croppie {
 		this.exifOrientation = this.options.enableExif
 			? readDataUrlOrientation(bindOptions.url)
 			: undefined;
+		// Warn only when the turn came from `orientation`: an explicit `rotation` wins over it,
+		// and orientation 1 or an ignored value turns nothing
 		if (
-			bindOptions.orientation !== undefined &&
+			bindOptions.rotation === undefined &&
+			rotation !== 0 &&
 			this.exifOrientation !== undefined &&
 			this.exifOrientation !== 1
 		) {
