@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	expectTypeOf,
+	it,
+	mock,
+} from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { CropPoints, CroppieOptions, Rotation } from "../../src/types.ts";
 import {
@@ -65,6 +73,12 @@ describe("Croppie rotate", () => {
 			croppie.rotate(90);
 
 			expect(croppie.get().rotation).toBe(90);
+		});
+
+		it("types the rotation of get() as always set", () => {
+			create();
+
+			expectTypeOf(croppie.get().rotation).toEqualTypeOf<Rotation>();
 		});
 
 		it("reports rotation 0 before and after bind", async () => {
