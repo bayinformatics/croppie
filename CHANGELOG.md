@@ -56,7 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
 - `result()` frees the canvas of a `'blob'` or `'base64'` result as soon as it is encoded instead of leaving its memory to garbage collection (iOS caps canvas memory).
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, a new press of the same pointer after a lost `pointerup` starts a fresh drag, and pointer capture is guarded so dragging still works where it is missing or throws.
-- Dragging moves the image from where it currently is, so a zoom (wheel, pinch, slider, `setZoom()`) or `reset()` made while the button is held is no longer undone by the next pointer move, and moving back after dragging against an edge moves the image straight away.
+- Dragging moves the image from where it currently is, so a zoom (wheel, pinch, slider, `setZoom()`), `rotate()` or `reset()` made while the button is held is no longer undone by the next pointer move, and moving back after dragging against an edge moves the image straight away.
 - Dragging inside a CSS-scaled ancestor (`transform: scale()`, `zoom`) keeps the image under the pointer instead of lagging behind or overshooting it, as wheel and pinch zoom already did.
 - Pinch zoom only counts fingers that went down on the cropper: a finger resting elsewhere on the page (a thumb, the zoom slider, another cropper) no longer turns a one-finger pan into pan plus zoom, and no longer blocks a two-finger pinch.
 - A `bind()`, `bindFile()`, `reset()` or `setZoom()` that lands during a pinch is no longer overwritten by the next finger move; the pinch carries on from the new zoom.
@@ -65,7 +65,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Internal
 
 - Integration suites for `bind`, `zoom` and `result` (65 tests) are no longer skipped; the image and canvas mocks resolve fixture dimensions and a 2D context, `src/canvas/draw.ts` is covered, and tests are formatted, linted and type-checked.
-- Tests pin `result()`'s quality, circle and `backgroundColor` handling and `loadImage()`'s `crossOrigin` for remote URLs.
+- Tests pin `result()`'s quality, circle and `backgroundColor` handling, `loadImage()`'s `crossOrigin` for remote URLs, and the re-clamp after `rotate()`.
 - CI: a composite setup action, least-privilege `permissions`, `cancel-in-progress`, current major versions of all actions, `check:package` in the build job, and CI runs for pull requests against any base branch.
 - Publishing runs lint, typecheck, tests, build and `check:package` first, verifies that the release tag matches `package.json`, and clears `dist/` before downloading the built artifact.
 - Playwright replaced Lost Pixel for visual regression (#16), with an HTML report, retries and `forbidOnly` on CI.

@@ -253,8 +253,9 @@ export class Croppie {
 	/**
 	 * Loads an image into the cropper.
 	 *
-	 * A `points` array without exactly 4 entries rejects before anything changes, so it
-	 * neither half-applies the new image nor cancels a bind that is still loading.
+	 * A `rotation` that is not a multiple of 90 or a `points` array without exactly 4
+	 * entries rejects before anything changes, so it neither half-applies the new image nor
+	 * cancels a bind that is still loading.
 	 */
 	async bind(options: BindOptions | string): Promise<void> {
 		this.assertNotDestroyed("bind");
@@ -296,10 +297,11 @@ export class Croppie {
 	}
 
 	/**
-	 * Loads and applies an image for a bind that claimed `generation`, with the `points` that
-	 * `bind()` resolved from `bindOptions` before claiming it. If the instance was destroyed
-	 * or a newer bind started meanwhile, resolves without applying or emitting anything, and
-	 * without surfacing a load error nobody is waiting for any more.
+	 * Loads and applies an image for a bind that claimed `generation`, with the `rotation` and
+	 * the (natural-frame) `points` that `bind()` resolved from `bindOptions` before claiming it.
+	 * If the instance was destroyed or a newer bind started meanwhile, resolves without
+	 * applying or emitting anything, and without surfacing a load error nobody is waiting for
+	 * any more.
 	 */
 	private async load(
 		bindOptions: BindOptions,
@@ -622,7 +624,9 @@ export class Croppie {
 
 	/**
 	 * Rotates the image clockwise by `degrees`, any multiple of 90 (negative turns
-	 * counter-clockwise). The image pixel under the viewport centre stays there.
+	 * counter-clockwise). The image pixel under the viewport centre stays there, unless the
+	 * rotated image would then no longer cover the viewport; then the image moves the least
+	 * needed.
 	 *
 	 * Emits `rotate`, then `update`, then `zoom` if the zoom had to change: the zoom limits are
 	 * recomputed for the rotated image, so with a non-square viewport a quarter turn may raise
