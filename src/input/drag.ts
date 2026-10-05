@@ -7,6 +7,15 @@ export interface DragCallbacks {
 	onEnd?: (state: TransformState) => void;
 }
 
+export interface DragOptions {
+	/**
+	 * The element's CSS `touch-action` (default `"none"`: every touch gesture is the
+	 * cropper's). Pass `"pinch-zoom"` when nothing handles a pinch, so the page zooms instead.
+	 * The drag handler is the only writer of this property.
+	 */
+	touchAction?: string;
+}
+
 interface DragState {
 	/** The pointer driving the drag, or null when idle. */
 	pointerId: number | null;
@@ -45,6 +54,7 @@ interface DragState {
  * @param setTransform - Function to update the element's transform coordinates (`x`, `y`, in
  *   the element's layout pixels); it may clamp them, and the next move starts from the result
  * @param callbacks - Optional callbacks invoked on drag start, move, and end
+ * @param options - `touchAction`: the element's CSS `touch-action` (default `"none"`)
  * @returns A cleanup function that removes the installed event listeners
  */
 export function createDragHandler(
@@ -52,6 +62,7 @@ export function createDragHandler(
 	getTransform: () => TransformState,
 	setTransform: (x: number, y: number) => void,
 	callbacks?: DragCallbacks,
+	options: DragOptions = {},
 ): () => void {
 	const state: DragState = {
 		pointerId: null,
@@ -212,7 +223,8 @@ export function createDragHandler(
 	element.addEventListener("lostpointercapture", handleLostPointerCapture);
 
 	element.style.cursor = "grab";
-	element.style.touchAction = "none"; // Prevent browser handling
+	// Keep touch gestures from the browser (all of them by default)
+	element.style.touchAction = options.touchAction ?? "none";
 
 	// Return cleanup function
 	return () => {

@@ -208,15 +208,12 @@ export class Croppie {
 				this.updateTransform();
 				this.emitUpdate();
 			},
+			undefined,
+			// Without zoom there is no pinch handler, so the browser keeps pinch-zoom: a pinch
+			// over the cropper then zooms the page instead of doing nothing
+			{ touchAction: this.options.enableZoom ? "none" : "pinch-zoom" },
 		);
 		this.cleanupFns.push(dragCleanup);
-
-		// The drag handler turns off every browser touch gesture on the boundary. Without
-		// zoom there is no pinch handler, so give pinch-zoom back to the browser: a pinch
-		// over the cropper then zooms the page instead of doing nothing
-		if (!this.options.enableZoom) {
-			this.boundaryEl.style.touchAction = "pinch-zoom";
-		}
 
 		// Wheel zoom handler
 		if (this.options.enableZoom && this.options.mouseWheelZoom) {
