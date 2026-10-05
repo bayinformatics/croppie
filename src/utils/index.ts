@@ -30,6 +30,14 @@ export {
 	pointsToArray,
 } from "./points.js";
 export {
+	exifOrientationToRotation,
+	naturalRectToRotated,
+	normalizeRotation,
+	rotatedRectToNatural,
+	rotateOffset,
+	swapDims,
+} from "./rotation.js";
+export {
 	CENTER_ANCHOR,
 	type ZoomAnchor,
 	zoomAboutAnchor,

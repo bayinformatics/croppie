@@ -20,6 +20,7 @@ export type {
 	OutputFormat,
 	OutputType,
 	ResultOptions,
+	Rotation,
 	Viewport,
 	ViewportType,
 	ZoomConfig,

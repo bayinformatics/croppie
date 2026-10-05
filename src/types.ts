@@ -4,6 +4,11 @@
 export type ViewportType = "circle" | "square";
 
 /**
+ * A quarter-turn rotation of the image, in degrees, clockwise.
+ */
+export type Rotation = 0 | 90 | 180 | 270;
+
+/**
  * Output format for the cropped image
  */
 export type OutputFormat = "png" | "jpeg" | "webp";
