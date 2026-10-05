@@ -41,9 +41,15 @@ export declare function createWheelZoomHandler(element: HTMLElement, getZoom: ()
 /**
  * Attaches pinch-to-zoom touch handlers to an element and returns a cleanup function.
  *
- * On a two-finger start the finger distance and the current zoom are captured; every
- * move then proposes `initialZoom * distance / initialDistance`, anchored at the finger
- * midpoint. Like the wheel handler it neither clamps nor emits.
+ * Only fingers that went down on the element count (a touch keeps the `target` it
+ * started on, even after sliding off): a finger resting elsewhere on the page neither
+ * turns a one-finger pan into a pinch nor blocks a pinch on the element.
+ *
+ * When exactly two such fingers are down, their distance and the current zoom are
+ * captured; every move then proposes `initialZoom * distance / initialDistance`, anchored
+ * at their midpoint. A zoom changed by something else mid-pinch (`bind()`, `reset()`,
+ * `setZoom()`) becomes the new starting point instead of being overwritten by the next
+ * move. Like the wheel handler it neither clamps nor emits.
  *
  * @param element - The target HTMLElement to attach touch listeners to.
  * @param getZoom - Function that returns the current zoom level.

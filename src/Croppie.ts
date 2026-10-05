@@ -19,7 +19,6 @@ import type {
 	ResultOptions,
 	Rotation,
 	TransformState,
-	ZoomConfig,
 } from "./types.js";
 import {
 	createBoundary,
@@ -55,11 +54,6 @@ import {
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./utils/index.js";
-
-const DEFAULT_ZOOM: ZoomConfig = {
-	min: DEFAULT_MIN_ZOOM,
-	max: DEFAULT_MAX_ZOOM,
-};
 
 /**
  * Modern, TypeScript-first image cropper.
@@ -99,9 +93,16 @@ export class Croppie {
 	private initialRotation: Rotation = 0;
 	/** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
 	private exifOrientation: number | undefined;
-	private zoomConfig: ZoomConfig;
-	/** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
-	private configuredMinZoom: number | undefined;
+	/**
+	 * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
+	 * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
+	 * `undefined` counts as unset.
+	 */
+	private readonly zoomConfig: {
+		min: number | undefined;
+		max: number;
+		enforceMinimumCoverage: boolean;
+	};
 	private effectiveMinZoom = DEFAULT_MIN_ZOOM;
 
 	// Event handlers
@@ -136,10 +137,12 @@ export class Croppie {
 			enableZoom: options.enableZoom ?? true,
 		};
 
-		this.configuredMinZoom = options.zoom?.min;
+		// Field by field, not by spreading over defaults: an explicit `undefined` (such as
+		// `zoom: { max: props.maxZoom }`) must get the default, as validateOptions() assumed
 		this.zoomConfig = {
-			...DEFAULT_ZOOM,
-			...options.zoom,
+			min: options.zoom?.min,
+			max: options.zoom?.max ?? DEFAULT_MAX_ZOOM,
+			enforceMinimumCoverage: options.zoom?.enforceMinimumCoverage !== false,
 		};
 
 		this.createElements();
@@ -169,7 +172,7 @@ export class Croppie {
 		if (this.options.enableZoom && this.options.showZoomer) {
 			const sliderWrap = createSliderContainer();
 			this.sliderEl = createZoomSlider(
-				this.configuredMinZoom ?? DEFAULT_MIN_ZOOM,
+				this.zoomConfig.min ?? DEFAULT_MIN_ZOOM,
 				this.zoomConfig.max,
 				this.transform.scale,
 			);
@@ -217,6 +220,13 @@ export class Croppie {
 		);
 		this.cleanupFns.push(dragCleanup);
 
+		// The drag handler turns off every browser touch gesture on the boundary. Without
+		// zoom there is no pinch handler, so give pinch-zoom back to the browser: a pinch
+		// over the cropper then zooms the page instead of doing nothing
+		if (!this.options.enableZoom) {
+			this.boundaryEl.style.touchAction = "pinch-zoom";
+		}
+
 		// Wheel zoom handler
 		if (this.options.enableZoom && this.options.mouseWheelZoom) {
 			const requireCtrl = this.options.mouseWheelZoom === "ctrl";
@@ -241,7 +251,10 @@ export class Croppie {
 	}
 
 	/**
-	 * Loads an image into the cropper
+	 * Loads an image into the cropper.
+	 *
+	 * A `points` array without exactly 4 entries rejects before anything changes, so it
+	 * neither half-applies the new image nor cancels a bind that is still loading.
 	 */
 	async bind(options: BindOptions | string): Promise<void> {
 		this.assertNotDestroyed("bind");
@@ -250,9 +263,13 @@ export class Croppie {
 			typeof options === "string" ? { url: options } : options;
 
 		// Validate before claiming a generation, so a bad call cannot supersede a good bind
+		// or leave a half-applied image behind
 		const rotation = this.resolveBindRotation(bindOptions);
+		const points = bindOptions.points
+			? normalizePoints(bindOptions.points)
+			: undefined;
 
-		await this.load(bindOptions, ++this.bindGeneration, rotation);
+		await this.load(bindOptions, ++this.bindGeneration, rotation, points);
 	}
 
 	/**
@@ -279,14 +296,16 @@ export class Croppie {
 	}
 
 	/**
-	 * Loads and applies an image for a bind that claimed `generation`. If the instance was
-	 * destroyed or a newer bind started meanwhile, resolves without applying or emitting
-	 * anything, and without surfacing a load error nobody is waiting for any more.
+	 * Loads and applies an image for a bind that claimed `generation`, with the `points` that
+	 * `bind()` resolved from `bindOptions` before claiming it. If the instance was destroyed
+	 * or a newer bind started meanwhile, resolves without applying or emitting anything, and
+	 * without surfacing a load error nobody is waiting for any more.
 	 */
 	private async load(
 		bindOptions: BindOptions,
 		generation: number,
 		rotation: Rotation,
+		points?: CropPoints,
 	): Promise<void> {
 		let image: HTMLImageElement;
 		try {
@@ -306,8 +325,10 @@ export class Croppie {
 		this.image = image;
 
 		if (this.previewEl) {
-			// Use the loaded image's src to ensure preview matches the image we crop from
-			// (important for URLs that return different content on each request)
+			// Show the image we crop from. In the loader's CORS mode the browser reuses the image
+			// it already loaded; in any other mode it requests the URL again, which costs a second
+			// download and can return different pixels (e.g. a URL that serves a random image)
+			this.previewEl.crossOrigin = this.image.crossOrigin;
 			this.previewEl.src = this.image.src;
 		}
 
@@ -330,8 +351,13 @@ export class Croppie {
 		this.initialRotation = rotation;
 		const coverageZoom = this.updateZoomLimits(this.image, rotation);
 
-		// Calculate initial zoom
-		const initialZoom = bindOptions.zoom ?? coverageZoom;
+		// Calculate initial zoom. As in setZoom(), a numeric string is converted and a value
+		// that is then not finite (NaN, ±Infinity) is ignored: the coverage zoom applies instead
+		// of a NaN that no later zoom could repair
+		const requestedZoom = Number(bindOptions.zoom ?? coverageZoom);
+		const initialZoom = Number.isFinite(requestedZoom)
+			? requestedZoom
+			: coverageZoom;
 
 		this.transform = {
 			x: 0,
@@ -342,30 +368,27 @@ export class Croppie {
 
 		// Apply initial points if provided. They are in the natural frame; the transform
 		// works in the displayed (rotated) frame, so map the rectangle across first.
-		if (bindOptions.points) {
-			const normalizedPoints = normalizePoints(bindOptions.points);
+		if (points) {
 			const [displayedWidth, displayedHeight] = this.displayedSize(rotation);
-			const pointsTransform = normalizedPoints
-				? calculateTransformFromPoints(
-						naturalRectToRotated(
-							normalizedPoints,
-							this.image.naturalWidth,
-							this.image.naturalHeight,
-							rotation,
-						),
-						displayedWidth,
-						displayedHeight,
-						this.options.viewport.width,
-						this.options.viewport.height,
-						{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
-					)
-				: undefined;
+			const pointsTransform = calculateTransformFromPoints(
+				naturalRectToRotated(
+					points,
+					this.image.naturalWidth,
+					this.image.naturalHeight,
+					rotation,
+				),
+				displayedWidth,
+				displayedHeight,
+				this.options.viewport.width,
+				this.options.viewport.height,
+				{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
+			);
 			if (pointsTransform) {
 				this.transform = { ...pointsTransform, rotation };
 			} else {
 				console.warn(
 					"[@bayinformatics/croppie] Ignoring invalid initial points:",
-					normalizedPoints,
+					points,
 				);
 			}
 		}
@@ -377,10 +400,26 @@ export class Croppie {
 	}
 
 	/**
-	 * Binds a File or Blob to the cropper
+	 * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
+	 * empty file input) rejects with a `TypeError` before anything changes, so it does not
+	 * cancel a bind that is still loading.
 	 */
 	async bindFile(file: File | Blob): Promise<void> {
 		this.assertNotDestroyed("bindFile");
+
+		// Validate before claiming a generation, so a bad call cannot supersede a good bind.
+		// The tag check accepts a File or Blob from another realm (e.g. an iframe), which
+		// fails `instanceof`
+		const tag = Object.prototype.toString.call(file);
+		if (
+			!(file instanceof Blob) &&
+			tag !== "[object Blob]" &&
+			tag !== "[object File]"
+		) {
+			throw new TypeError(
+				`[@bayinformatics/croppie] bindFile() expects a File or Blob (got ${String(file)})`,
+			);
+		}
 
 		// Claim the generation before reading, so a bind() started while the file is
 		// still being read supersedes this one
@@ -401,6 +440,11 @@ export class Croppie {
 	/**
 	 * Gets the current cropped result. The return type follows `options.type`:
 	 * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
+	 *
+	 * The image keeps its proportions at every `size`: a size of another shape than the
+	 * viewport centres the crop and leaves the rest transparent (or `backgroundColor`). With
+	 * `size: "original"`, a crop zoomed out past the image is scaled down to at most the area
+	 * of the image part it shows or 4096x4096 px, whichever is larger.
 	 */
 	result(options: ResultOptions & { type: "blob" }): Promise<Blob>;
 	result(options: ResultOptions & { type: "base64" }): Promise<string>;
@@ -431,15 +475,28 @@ export class Croppie {
 			outputWidth = viewport.width;
 			outputHeight = viewport.height;
 		} else if (options.size === "original") {
-			// The displayed crop at image resolution, at a whole number of pixels
-			outputWidth = Math.max(
+			// The displayed crop at image resolution, at a whole number of pixels. A frame that
+			// extends past the image (zoomed out, coverage not enforced) is scaled down until its
+			// area is at most that of its overlap with the image or 4096x4096, whichever is
+			// larger: the empty margin alone could exceed what browsers allocate for a canvas
+			const { topLeftX, topLeftY, bottomRightX, bottomRightY } = displayedFrame;
+			const [displayedWidth, displayedHeight] = this.displayedSize();
+			const frameWidth = bottomRightX - topLeftX;
+			const frameHeight = bottomRightY - topLeftY;
+			const overlapWidth =
+				Math.min(displayedWidth, bottomRightX) - Math.max(0, topLeftX);
+			const overlapHeight =
+				Math.min(displayedHeight, bottomRightY) - Math.max(0, topLeftY);
+			const overlapArea =
+				Math.max(0, overlapWidth) * Math.max(0, overlapHeight);
+			const shrink = Math.min(
 				1,
-				Math.round(displayedFrame.bottomRightX - displayedFrame.topLeftX),
+				Math.sqrt(
+					Math.max(4096 * 4096, overlapArea) / (frameWidth * frameHeight),
+				),
 			);
-			outputHeight = Math.max(
-				1,
-				Math.round(displayedFrame.bottomRightY - displayedFrame.topLeftY),
-			);
+			outputWidth = Math.max(1, Math.round(frameWidth * shrink));
+			outputHeight = Math.max(1, Math.round(frameHeight * shrink));
 		} else if (options.size) {
 			outputWidth = options.size.width;
 			outputHeight = options.size.height;
@@ -466,15 +523,21 @@ export class Croppie {
 			},
 		);
 
-		switch (options.type) {
-			case "canvas":
-				return canvas;
-			case "base64":
-				return canvasToBase64(canvas, options.format, options.quality);
-			case "blob":
-				return canvasToBlob(canvas, options.format, options.quality);
-			default:
-				throw new Error(`Unknown result type: ${options.type}`);
+		// A "canvas" result belongs to the caller. Any other output canvas is dead once encoded,
+		// so free its pixels now rather than at garbage collection (iOS caps canvas memory)
+		if (options.type === "canvas") return canvas;
+		try {
+			switch (options.type) {
+				case "base64":
+					return canvasToBase64(canvas, options.format, options.quality);
+				case "blob":
+					return await canvasToBlob(canvas, options.format, options.quality);
+				default:
+					throw new Error(`Unknown result type: ${options.type}`);
+			}
+		} finally {
+			canvas.width = 0;
+			canvas.height = 0;
 		}
 	}
 
@@ -500,7 +563,7 @@ export class Croppie {
 	}
 
 	/**
-	 * Sets the zoom level
+	 * Sets the zoom level, exactly like `setZoom()`
 	 */
 	set zoom(value: number) {
 		this.setZoom(value);
@@ -508,11 +571,12 @@ export class Croppie {
 
 	/**
 	 * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
-	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed;
-	 * a non-finite value is ignored.
+	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
+	 * A numeric string (such as a range input's `value`) is converted to a number;
+	 * a value that is then not finite is ignored.
 	 */
 	setZoom(value: number): void {
-		this.applyZoom(value);
+		this.applyZoom(Number(value));
 	}
 
 	/**
@@ -520,7 +584,9 @@ export class Croppie {
 	 *
 	 * Clamps the request to the effective limits, zooms about `anchor` so the image point
 	 * under it stays put, re-clamps the position, syncs the slider and emits `update`
-	 * then `zoom`. Nothing is emitted when the clamped zoom did not change.
+	 * then `zoom`. Nothing is emitted when the clamped zoom did not change. When an `update`
+	 * listener zooms again, that nested call emits the final `zoom` and this one emits none,
+	 * so `zoom` never reports a value that has already been replaced.
 	 *
 	 * @param requested - Requested zoom level; not clamped by the caller
 	 * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
@@ -546,6 +612,8 @@ export class Croppie {
 		if (zoom === previousZoom) return;
 
 		this.emitUpdate();
+		// An update listener zoomed again: its nested call already emitted the final zoom
+		if (this.transform.scale !== zoom) return;
 		this.emitEvent("zoom", { zoom, previousZoom });
 	}
 
@@ -738,7 +806,7 @@ export class Croppie {
 		);
 
 		this.effectiveMinZoom = resolveMinZoom({
-			configuredMin: this.configuredMinZoom,
+			configuredMin: this.zoomConfig.min,
 			max: this.zoomConfig.max,
 			coverage,
 			contain: calculateContainZoom(
@@ -747,7 +815,7 @@ export class Croppie {
 				width,
 				height,
 			),
-			enforceMinimumCoverage: this.zoomConfig.enforceMinimumCoverage !== false,
+			enforceMinimumCoverage: this.zoomConfig.enforceMinimumCoverage,
 		});
 
 		if (this.sliderEl) {

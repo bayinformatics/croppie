@@ -129,12 +129,36 @@ export function anchorFromClientPoint(
 		return { x: 0, y: 0 };
 	}
 
-	const scaleX = element.offsetWidth > 0 ? element.offsetWidth / rect.width : 1;
-	const scaleY =
-		element.offsetHeight > 0 ? element.offsetHeight / rect.height : 1;
+	const scale = clientToLayoutScale(element, rect);
 
 	return {
-		x: (clientX - rect.left - rect.width / 2) * scaleX,
-		y: (clientY - rect.top - rect.height / 2) * scaleY,
+		x: (clientX - rect.left - rect.width / 2) * scale.x,
+		y: (clientY - rect.top - rect.height / 2) * scale.y,
+	};
+}
+
+/**
+ * The factors that turn a distance in client (viewport) pixels into the element's own
+ * layout pixels: 1 for an unscaled element, 2 inside a `transform: scale(0.5)` or
+ * `zoom: 0.5` ancestor. The displayed box (`getBoundingClientRect`) is compared with the
+ * layout size (`offsetWidth`/`offsetHeight`); an axis without a size counts as unscaled.
+ *
+ * @param element - The element whose layout pixels are wanted
+ * @param rect - The element's `getBoundingClientRect()`, when the caller already has it
+ * @returns Layout pixels per client pixel along each axis
+ */
+export function clientToLayoutScale(
+	element: HTMLElement,
+	rect: DOMRect = element.getBoundingClientRect(),
+): { x: number; y: number } {
+	return {
+		x:
+			rect.width > 0 && element.offsetWidth > 0
+				? element.offsetWidth / rect.width
+				: 1,
+		y:
+			rect.height > 0 && element.offsetHeight > 0
+				? element.offsetHeight / rect.height
+				: 1,
 	};
 }

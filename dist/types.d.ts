@@ -49,7 +49,10 @@ export interface ZoomConfig {
     min: number;
     /** Maximum zoom level (default: 10) */
     max: number;
-    /** Initial zoom level */
+    /**
+     * @deprecated No effect: pass `bind({ url, zoom })` to start at a given zoom. Kept so
+     * existing configuration still compiles.
+     */
     initial?: number;
     /**
      * Automatically enforce minimum zoom to ensure image covers viewport.
@@ -161,7 +164,13 @@ export interface BindOptions {
 export interface ResultOptions {
     /** Output type */
     type: OutputType;
-    /** Output dimensions */
+    /**
+     * Output dimensions (default `"viewport"`). The image keeps its proportions: a size of
+     * another shape than the viewport centres the crop and leaves the rest transparent (or
+     * `backgroundColor`). `"original"` is the viewport area at image resolution, rounded to
+     * whole pixels; zoomed out past the image, it is scaled down to at most the area of the
+     * image part it shows or 4096x4096 px, whichever is larger.
+     */
     size?: {
         width: number;
         height: number;

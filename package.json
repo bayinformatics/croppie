@@ -12,8 +12,14 @@
       "import": "./dist/croppie.js",
       "default": "./dist/croppie.js"
     },
-    "./croppie.css": "./dist/croppie.css",
-    "./style.css": "./dist/croppie.css",
+    "./croppie.css": {
+      "types": "./dist/croppie.css.d.ts",
+      "default": "./dist/croppie.css"
+    },
+    "./style.css": {
+      "types": "./dist/croppie.css.d.ts",
+      "default": "./dist/croppie.css"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -30,7 +36,7 @@
     "build": "bun run clean && bun run build:js && bun run build:css && bun run build:types",
     "build:js": "bun build src/index.ts --outdir=dist --entry-naming=croppie.[ext] --minify --sourcemap",
     "build:docs": "bun build src/index.ts --outdir docs --entry-naming croppie.[ext] --minify --sourcemap && cp src/croppie.css docs/croppie.css",
-    "build:css": "cp src/croppie.css dist/croppie.css",
+    "build:css": "cp src/croppie.css dist/croppie.css && echo 'export {};' > dist/croppie.css.d.ts",
     "build:types": "tsc -p tsconfig.json",
     "test": "bun test",
     "test:unit": "bun test tests/unit",
@@ -41,7 +47,7 @@
     "lint": "biome check src tests playwright.config.ts",
     "lint:fix": "biome check --write src tests playwright.config.ts",
     "typecheck": "tsc -p tsconfig.test.json",
-    "check:package": "publint && attw --pack . --profile esm-only --exclude-entrypoints ./croppie.css ./style.css",
+    "check:package": "publint && attw --pack . --profile esm-only",
     "prepublishOnly": "bun run build"
   },
   "keywords": [

@@ -55,3 +55,17 @@ export declare function setTransform(element: HTMLElement, x: number, y: number,
  * @returns The offset from the element centre; `{ x: 0, y: 0 }` when it has no layout box
  */
 export declare function anchorFromClientPoint(element: HTMLElement, clientX: number, clientY: number): ZoomAnchor;
+/**
+ * The factors that turn a distance in client (viewport) pixels into the element's own
+ * layout pixels: 1 for an unscaled element, 2 inside a `transform: scale(0.5)` or
+ * `zoom: 0.5` ancestor. The displayed box (`getBoundingClientRect`) is compared with the
+ * layout size (`offsetWidth`/`offsetHeight`); an axis without a size counts as unscaled.
+ *
+ * @param element - The element whose layout pixels are wanted
+ * @param rect - The element's `getBoundingClientRect()`, when the caller already has it
+ * @returns Layout pixels per client pixel along each axis
+ */
+export declare function clientToLayoutScale(element: HTMLElement, rect?: DOMRect): {
+    x: number;
+    y: number;
+};

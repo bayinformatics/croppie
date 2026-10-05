@@ -5,6 +5,7 @@ import {
 	expect,
 	expectTypeOf,
 	it,
+	mock,
 } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { ResultOptions } from "../../src/types.ts";
@@ -170,6 +171,9 @@ describe("Croppie result", () => {
 		});
 
 		it("applies quality to blob", async () => {
+			const toBlob = mock(HTMLCanvasElement.prototype.toBlob);
+			HTMLCanvasElement.prototype.toBlob = toBlob;
+
 			const blob = await croppie.result({
 				type: "blob",
 				format: "jpeg",
@@ -177,6 +181,17 @@ describe("Croppie result", () => {
 			});
 
 			expect(blob.type).toBe("image/jpeg");
+			expect(toBlob.mock.calls[0]?.[1]).toBe("image/jpeg");
+			expect(toBlob.mock.calls[0]?.[2]).toBe(0.5);
+		});
+
+		it("applies quality to base64", async () => {
+			const toDataURL = mock(HTMLCanvasElement.prototype.toDataURL);
+			HTMLCanvasElement.prototype.toDataURL = toDataURL;
+
+			await croppie.result({ type: "base64", format: "jpeg", quality: 0.5 });
+
+			expect(toDataURL).toHaveBeenCalledWith("image/jpeg", 0.5);
 		});
 	});
 
@@ -187,12 +202,19 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-			});
+			await croppie.result({ type: "canvas" });
 
-			// Circle rendering is applied (we can't easily verify the content in tests)
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			const ctx = getLastMockContext();
+			expect(ctx?.ellipse).toHaveBeenCalledWith(
+				50,
+				50,
+				50,
+				50,
+				0,
+				0,
+				Math.PI * 2,
+			);
+			expect(ctx?.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("uses square output for square viewport by default", async () => {
@@ -201,11 +223,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-			});
+			await croppie.result({ type: "canvas" });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
 		});
 
 		it("can override circle option", async () => {
@@ -214,12 +234,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-				circle: true,
-			});
+			await croppie.result({ type: "canvas", circle: true });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("can force square output on circle viewport", async () => {
@@ -228,12 +245,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-				circle: false,
-			});
+			await croppie.result({ type: "canvas", circle: false });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
 		});
 	});
 
@@ -245,22 +259,27 @@ describe("Croppie result", () => {
 			await croppie.bind(TINY_PNG);
 		});
 
-		it("accepts background color", async () => {
-			const canvas = await croppie.result({
-				type: "canvas",
-				backgroundColor: "#ff0000",
-			});
+		it("fills the output with the background color", async () => {
+			await croppie.result({ type: "canvas", backgroundColor: "#ff0000" });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			const ctx = getLastMockContext();
+			expect(ctx?.fillStyle).toBe("#ff0000");
+			expect(ctx?.fillRect).toHaveBeenCalledWith(0, 0, 100, 100);
 		});
 
 		it("accepts rgba background color", async () => {
-			const canvas = await croppie.result({
+			await croppie.result({
 				type: "canvas",
 				backgroundColor: "rgba(255, 0, 0, 0.5)",
 			});
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.fillStyle).toBe("rgba(255, 0, 0, 0.5)");
+		});
+
+		it("leaves the background transparent by default", async () => {
+			await croppie.result({ type: "canvas" });
+
+			expect(getLastMockContext()?.fillRect).not.toHaveBeenCalled();
 		});
 	});
 
@@ -425,6 +444,206 @@ describe("Croppie result", () => {
 			expectTypeOf(croppie.result(options)).toEqualTypeOf<
 				Promise<Blob | string | HTMLCanvasElement>
 			>();
+		});
+	});
+
+	describe("a size of another shape than the viewport", () => {
+		it("keeps the image's proportions and centres the crop between bars", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 600, height: 400 });
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 100, type: "square" },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 1 });
+
+			const canvas = await croppie.result({
+				type: "canvas",
+				size: { width: 100, height: 100 },
+			});
+
+			// The 200x100 crop at half size is 100x50, with a 25px bar above and below
+			expect([canvas.width, canvas.height]).toEqual([100, 100]);
+			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				200,
+				150,
+				200,
+				100,
+				0,
+				25,
+				100,
+				50,
+			);
+		});
+
+		it("masks a circle viewport with a circle, not an ellipse", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 400, height: 300 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "circle" },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 0.5 });
+
+			await croppie.result({
+				type: "canvas",
+				size: { width: 200, height: 100 },
+			});
+
+			expect(getLastMockContext()?.ellipse).toHaveBeenCalledWith(
+				100,
+				50,
+				50,
+				50,
+				0,
+				0,
+				Math.PI * 2,
+			);
+		});
+	});
+
+	describe("size 'original' zoomed out far past the image", () => {
+		/** Binds an image with coverage not enforced, then zooms out (clamped to the minimum). */
+		async function bindZoomedOut(setup: {
+			image: { width: number; height: number };
+			viewport: { width: number; height: number };
+			minZoom?: number;
+			zoom: number;
+		}): Promise<void> {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock(setup.image);
+			croppie = new Croppie(container, {
+				viewport: { ...setup.viewport, type: "square" },
+				zoom: { min: setup.minZoom, enforceMinimumCoverage: false },
+			});
+			await croppie.bind({ url: TINY_PNG });
+			croppie.setZoom(setup.zoom);
+		}
+
+		it("caps the canvas of a mostly empty frame at 4096x4096", async () => {
+			// A 400x400 viewport at zoom 0.01 spans 40000x40000 image px: 1.6 gigapixels
+			await bindZoomedOut({
+				image: { width: 2000, height: 2000 },
+				viewport: { width: 400, height: 400 },
+				minZoom: 0.01,
+				zoom: 0.01,
+			});
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			expect([canvas.width, canvas.height]).toEqual([4096, 4096]);
+			// Scaled by 4096 / 40000, the image is 204.8 px square in the middle
+			const [, , , , , dx, dy, dw, dh] =
+				getLastMockContext()?.drawImage.mock.calls[0] ?? [];
+			expect(dw).toBeCloseTo(204.8, 6);
+			expect(dh).toBeCloseTo(204.8, 6);
+			expect(dx + dw / 2).toBeCloseTo(2048, 6);
+			expect(dy + dh / 2).toBeCloseTo(2048, 6);
+		});
+
+		it("scales a frame around a large image to the image's area, keeping its shape", async () => {
+			// Zoomed out to fit, a 1000x200 viewport spans 40320x8064 px around the 6048x8064
+			// photo; scaled by sqrt(6048 / 40320) it has as many pixels as the photo
+			await bindZoomedOut({
+				image: { width: 6048, height: 8064 },
+				viewport: { width: 1000, height: 200 },
+				zoom: 0,
+			});
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			// 5:1 like the viewport, 48.8 MP like the photo
+			expect([canvas.width, canvas.height]).toEqual([15616, 3123]);
+		});
+
+		it("keeps the image resolution for a large crop inside the image", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 6000, height: 6000 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 0.02 });
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			// 5000x5000 is above 4096x4096 but has no empty margin, so it is not scaled
+			expect([canvas.width, canvas.height]).toEqual([5000, 5000]);
+		});
+	});
+
+	describe("the output canvas", () => {
+		beforeEach(async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+		});
+
+		/** Records the canvas of every toBlob/toDataURL call, with its size at that moment. */
+		function recordEncodes(): Array<{
+			canvas: HTMLCanvasElement;
+			size: number[];
+		}> {
+			const encodes: Array<{ canvas: HTMLCanvasElement; size: number[] }> = [];
+			const { toBlob, toDataURL } = HTMLCanvasElement.prototype;
+			HTMLCanvasElement.prototype.toBlob = function (
+				this: HTMLCanvasElement,
+				...args: Parameters<HTMLCanvasElement["toBlob"]>
+			) {
+				encodes.push({ canvas: this, size: [this.width, this.height] });
+				toBlob.apply(this, args);
+			};
+			HTMLCanvasElement.prototype.toDataURL = function (
+				this: HTMLCanvasElement,
+				...args: Parameters<HTMLCanvasElement["toDataURL"]>
+			) {
+				encodes.push({ canvas: this, size: [this.width, this.height] });
+				return toDataURL.apply(this, args);
+			};
+			return encodes;
+		}
+
+		it("is freed once a base64 result is encoded", async () => {
+			const encodes = recordEncodes();
+
+			await croppie.result({ type: "base64" });
+
+			// Encoded at full size, emptied afterwards
+			expect(encodes.map((e) => e.size)).toEqual([[100, 100]]);
+			const canvas = encodes[0]?.canvas;
+			expect([canvas?.width, canvas?.height]).toEqual([0, 0]);
+		});
+
+		it("is freed once a blob result is encoded", async () => {
+			const encodes = recordEncodes();
+
+			await croppie.result({ type: "blob" });
+
+			expect(encodes.map((e) => e.size)).toEqual([[100, 100]]);
+			const canvas = encodes[0]?.canvas;
+			expect([canvas?.width, canvas?.height]).toEqual([0, 0]);
+		});
+
+		it("is freed when the blob cannot be encoded", async () => {
+			let encoded: HTMLCanvasElement | undefined;
+			HTMLCanvasElement.prototype.toBlob = function (
+				this: HTMLCanvasElement,
+				callback: BlobCallback,
+			) {
+				encoded = this;
+				callback(null);
+			};
+
+			await expect(croppie.result({ type: "blob" })).rejects.toThrow(
+				"Failed to create blob from canvas",
+			);
+
+			expect([encoded?.width, encoded?.height]).toEqual([0, 0]);
+		});
+
+		it("is left to the caller for a canvas result", async () => {
+			const canvas = await croppie.result({ type: "canvas" });
+
+			expect([canvas.width, canvas.height]).toEqual([100, 100]);
 		});
 	});
 });

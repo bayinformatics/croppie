@@ -5,7 +5,7 @@ Thanks for helping out. This is a short guide to getting a change merged.
 ## Prerequisites
 
 - [Bun](https://bun.sh) at the version pinned in [`.bun-version`](.bun-version) (currently 1.4.2). CI reads that file, and a different Bun version can produce a different bundle, which fails the build-parity check. If you manage runtimes with [mise](https://mise.jdx.dev), `mise use bun@$(cat .bun-version)` is enough. Confirm with `bun --version`: package scripts call `bun` and `bunx` again internally, so the pinned version has to be the first `bun` on your `PATH` (an older global install earlier on the `PATH` silently wins).
-- Node 22 or newer (only needed to try the published package, e.g. `require()` / `import` smoke tests).
+- Node 22 or newer with npm (needed by `bun run check:package`, which runs `npm pack`, and to try the published package, e.g. `require()` / `import` smoke tests).
 - Chromium for the visual tests: `bunx playwright install chromium`.
 
 ```sh
