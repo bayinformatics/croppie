@@ -531,13 +531,11 @@ describe("Croppie result", () => {
 			const canvas = await croppie.result({ type: "canvas", size: "original" });
 
 			expect([canvas.width, canvas.height]).toEqual([4096, 4096]);
-			// Scaled by 4096 / 40000, the image is 204.8 px square in the middle
+			// Scaled by 4096 / 40000, the image is 204.8 px square in the middle, from 1945.6
+			// to 2150.4: drawn on whole pixels, 1946 to 2150
 			const [, , , , , dx, dy, dw, dh] =
 				getLastMockContext()?.drawImage.mock.calls[0] ?? [];
-			expect(dw).toBeCloseTo(204.8, 6);
-			expect(dh).toBeCloseTo(204.8, 6);
-			expect(dx + dw / 2).toBeCloseTo(2048, 6);
-			expect(dy + dh / 2).toBeCloseTo(2048, 6);
+			expect([dx, dy, dw, dh]).toEqual([1946, 1946, 204, 204]);
 		});
 
 		it("scales a frame around a large image down to the canvas cap, keeping its shape", async () => {
