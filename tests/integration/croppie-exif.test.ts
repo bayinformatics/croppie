@@ -1,20 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { CroppieOptions, Rotation } from "../../src/types.ts";
-import { buildJpegHeader } from "../fixtures/exif-jpeg.js";
+import { buildJpegHeader, jpegDataUrl } from "../fixtures/exif-jpeg.js";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
 function jpegBlob(orientation: number): Blob {
 	return new Blob([buildJpegHeader(orientation)], { type: "image/jpeg" });
-}
-
-function jpegDataUrl(orientation: number): string {
-	let binary = "";
-	for (const byte of buildJpegHeader(orientation)) {
-		binary += String.fromCharCode(byte);
-	}
-	return `data:image/jpeg;base64,${btoa(binary)}`;
 }
 
 describe("Croppie EXIF orientation", () => {

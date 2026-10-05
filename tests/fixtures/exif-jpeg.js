@@ -132,3 +132,28 @@ export function injectExifOrientation(jpegBytes, orientation, options = {}) {
 		jpegBytes.subarray(2),
 	]);
 }
+
+/**
+ * A base64 data URL of `bytes`.
+ *
+ * @param {Uint8Array} bytes
+ * @param {string} [mime] - The data URL's media type (default `"image/jpeg"`)
+ */
+export function bytesToDataUrl(bytes, mime = "image/jpeg") {
+	let binary = "";
+	for (const byte of bytes) {
+		binary += String.fromCharCode(byte);
+	}
+	return `data:${mime};base64,${btoa(binary)}`;
+}
+
+/**
+ * A base64 JPEG data URL whose EXIF segment carries `orientation`: the header that
+ * `buildJpegHeader()` builds, enough for a header parser, not a decodable image.
+ *
+ * @param {number} orientation
+ * @param {{ jfifFirst?: boolean, littleEndian?: boolean, type?: number }} [options]
+ */
+export function jpegDataUrl(orientation, options) {
+	return bytesToDataUrl(buildJpegHeader(orientation, options));
+}

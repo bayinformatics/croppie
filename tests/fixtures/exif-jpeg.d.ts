@@ -24,3 +24,10 @@ export function injectExifOrientation(
 	orientation: number,
 	options?: ExifBuildOptions,
 ): Uint8Array<ArrayBuffer>;
+
+export function bytesToDataUrl(bytes: Uint8Array, mime?: string): string;
+
+export function jpegDataUrl(
+	orientation: number,
+	options?: ExifBuildOptions & { jfifFirst?: boolean },
+): string;

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { CropPoints, CroppieOptions } from "../../src/types.ts";
-import { buildJpegHeader } from "../fixtures/exif-jpeg.js";
+import { jpegDataUrl } from "../fixtures/exif-jpeg.js";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 
 const PHOTO = "https://example.com/photo.jpg"; // 400x300
@@ -11,14 +11,6 @@ function dimensions(src: string): { width: number; height: number } {
 	if (src === SLOW) return { width: 600, height: 600 };
 	// PHOTO and every other image (such as the JPEG data URLs below)
 	return { width: 400, height: 300 };
-}
-
-function jpegDataUrl(orientation: number): string {
-	let binary = "";
-	for (const byte of buildJpegHeader(orientation)) {
-		binary += String.fromCharCode(byte);
-	}
-	return `data:image/jpeg;base64,${btoa(binary)}`;
 }
 
 // A 400x300 image in a 100x100 viewport covers it at a zoom of 1/3
