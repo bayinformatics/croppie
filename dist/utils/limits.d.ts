@@ -30,3 +30,25 @@ export interface MinZoomInput {
  * (`min > max`).
  */
 export declare function resolveMinZoom(input: MinZoomInput): number;
+/**
+ * Largest canvas `result()` renders, in pixels: 4096x4096. iOS Safari cannot allocate a
+ * larger canvas (it draws nothing, and `toBlob()` gives `null`).
+ */
+export declare const MAX_CANVAS_AREA = 16777216;
+/** Longest canvas side `result()` renders, in pixels. */
+export declare const MAX_CANVAS_SIDE = 16384;
+/**
+ * The canvas size for an output of `width` x `height` pixels: scaled down, keeping its
+ * shape, until it is at most {@link MAX_CANVAS_AREA} pixels and {@link MAX_CANVAS_SIDE}
+ * pixels a side, then rounded to whole pixels (at least 1). A size within the caps is only
+ * rounded. Rounding never takes the size over a cap: when rounding to the nearest pixel
+ * would, both sides are rounded down instead.
+ *
+ * @param width - Requested width in pixels (positive and finite)
+ * @param height - Requested height in pixels (positive and finite)
+ * @returns The canvas width and height
+ */
+export declare function capCanvasSize(width: number, height: number): {
+    width: number;
+    height: number;
+};

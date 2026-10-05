@@ -10,13 +10,15 @@ import type { CropPoints, OutputFormat } from "../types.js";
  * instead of a stretched image. An output with the frame's shape up to rounding to whole
  * pixels (the `'viewport'` and `'original'` result sizes) is filled exactly: a frame inside
  * the image maps onto the whole output, like drawing the crop rectangle directly, and the
- * rounding leaves no sub-pixel gap at the edges.
+ * rounding leaves no sub-pixel gap at the edges. The image is drawn with its edges on whole
+ * pixels, so a letterboxed image has no blurred half-pixel seam next to the bars.
  *
  * ```
  * k = min(outW / frameW, outH / frameH)    (kx = outW / frameW, ky = outH / frameH when filled)
  * ox = (outW - frameW * k) / 2             (same for y)
- * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (same for y)
- * dx = ox + (sx0 - frame.topLeftX) * k   dw = (sx1 - sx0) * k                     (same for y)
+ * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (intersectFrame)
+ * dx0 = round(ox + (sx0 - frame.topLeftX) * k)   dx1 = round(ox + (sx1 - frame.topLeftX) * k)
+ * dw = dx1 - dx0                                                                  (same for y)
  * ```
  *
  * @param image - Source HTMLImageElement to draw from.
