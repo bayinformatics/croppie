@@ -1,15 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { createWheelEvent } from "../fixtures/mock-helpers.ts";
-import { SMALL_PNG, TINY_PNG } from "../fixtures/test-image-data-url.ts";
+import {
+	createWheelEvent,
+	installImageMock,
+} from "../fixtures/mock-helpers.ts";
+import {
+	fixtureDimensions,
+	SMALL_PNG,
+	TINY_PNG,
+} from "../fixtures/test-image-data-url.ts";
 
-// Note: Most zoom tests are skipped because happy-dom's Image doesn't trigger onload for data URLs
-// These tests would work in a real browser environment
-describe.skip("Croppie zoom", () => {
+describe("Croppie zoom", () => {
 	let container: HTMLDivElement;
 	let croppie: Croppie;
+	let cleanupImageMock: () => void;
 
 	beforeEach(() => {
+		cleanupImageMock = installImageMock(fixtureDimensions);
 		container = document.createElement("div");
 		document.body.appendChild(container);
 	});
@@ -17,12 +24,16 @@ describe.skip("Croppie zoom", () => {
 	afterEach(() => {
 		croppie?.destroy();
 		container.remove();
+		cleanupImageMock();
 	});
 
 	describe("zoom getter", () => {
 		it("returns current zoom level", async () => {
+			// A 1x1 image needs 100x to cover the viewport, so coverage is turned off
+			// and the max raised for the explicit zoom of 2 to be reachable.
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { min: 0.1, max: 100, enforceMinimumCoverage: false },
 			});
 			await croppie.bind({ url: TINY_PNG, zoom: 2 });
 
