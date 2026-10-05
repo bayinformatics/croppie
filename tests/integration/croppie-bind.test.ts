@@ -339,6 +339,21 @@ describe("Croppie bind", () => {
 			expect(croppie.zoom).toBeCloseTo(200 / 4032, 9);
 		});
 
+		it("accepts a lone zoom.max below 0.1 and caps the minimum at it", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+				zoom: { max: 0.05 },
+			});
+			// Before an image is bound, the slider's placeholder minimum is capped at max too
+			expect(sliderMin()).toBeCloseTo(0.05, 9);
+
+			await croppie.bind(TINY_PNG);
+
+			// The coverage zoom (0.066) is above max, so the minimum is max
+			expect(croppie.zoom).toBeCloseTo(0.05, 9);
+			expect(sliderMin()).toBeCloseTo(0.05, 9);
+		});
+
 		it("re-resolves the limits for every image", async () => {
 			croppie = new Croppie(container, {
 				viewport: { width: 200, height: 200, type: "square" },

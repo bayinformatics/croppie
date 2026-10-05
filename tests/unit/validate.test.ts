@@ -168,9 +168,15 @@ describe("validateOptions", () => {
 			);
 		});
 
-		it("compares a lone max against the default min (0.1)", () => {
-			expect(() => validateOptions(options({ zoom: { max: 0.05 } }))).toThrow(
-				RangeError,
+		it("accepts a lone max below the default min (0.1): an unset min is per image", () => {
+			expect(() =>
+				validateOptions(options({ zoom: { max: 0.05 } })),
+			).not.toThrow();
+		});
+
+		it("still requires a lone max to be positive and finite", () => {
+			expect(() => validateOptions(options({ zoom: { max: 0 } }))).toThrow(
+				/zoom\.max/,
 			);
 		});
 	});
