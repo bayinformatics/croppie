@@ -75,6 +75,19 @@ describe("normalizePoints with decimal string coordinates", () => {
 			expect(topLeftX(value)).toBe(expected);
 		});
 	}
+
+	test("rejects a long run of digits followed by junk in linear time", () => {
+		// A regex where the digits can be split between two quantifiers backtracks
+		// quadratically on this input (CodeQL js/polynomial-redos)
+		const hostile = `${"9".repeat(30_000)}x`;
+
+		const start = performance.now();
+		const value = topLeftX(hostile);
+		const elapsed = performance.now() - start;
+
+		expect(value).toBeNaN();
+		expect(elapsed).toBeLessThan(200);
+	});
 });
 
 describe("pointsToArray", () => {
