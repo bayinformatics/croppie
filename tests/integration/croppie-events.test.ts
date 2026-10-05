@@ -5,10 +5,7 @@ import {
 	createWheelEvent,
 	installImageMock,
 } from "../fixtures/mock-helpers.ts";
-import {
-	fixtureDimensions,
-	TINY_PNG,
-} from "../fixtures/test-image-data-url.ts";
+import { TINY_PNG } from "../fixtures/test-image-data-url.ts";
 
 describe("Croppie events", () => {
 	let container: HTMLDivElement;
@@ -16,7 +13,7 @@ describe("Croppie events", () => {
 	let cleanupImageMock: () => void;
 
 	beforeEach(() => {
-		cleanupImageMock = installImageMock(fixtureDimensions);
+		cleanupImageMock = installImageMock({ width: 400, height: 300 });
 		container = document.createElement("div");
 		document.body.appendChild(container);
 	});
@@ -271,6 +268,138 @@ describe("Croppie events", () => {
 			boundary.dispatchEvent(createWheelEvent(-100)); // Zoom in
 
 			expect(handler).toHaveBeenCalled();
+		});
+	});
+
+	describe("event contract", () => {
+		// 400x300 image in a 100x100 viewport: coverage zoom is 1/3
+		async function bindAt(zoom?: number): Promise<void> {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { min: 0.1, max: 10 },
+			});
+			await croppie.bind(
+				zoom === undefined ? TINY_PNG : { url: TINY_PNG, zoom },
+			);
+		}
+
+		function recordEvents(): string[] {
+			const order: string[] = [];
+			croppie.on("update", () => order.push("update"));
+			croppie.on("zoom", () => order.push("zoom"));
+			return order;
+		}
+
+		it("setZoom() emits one zoom event with the previous zoom", async () => {
+			await bindAt(1);
+			const handler = mock();
+			croppie.on("zoom", handler);
+
+			croppie.setZoom(2);
+
+			expect(handler).toHaveBeenCalledTimes(1);
+			expect(handler.mock.calls[0]?.[0]).toEqual({ zoom: 2, previousZoom: 1 });
+		});
+
+		it("the zoom setter emits one zoom event", async () => {
+			await bindAt(1);
+			const handler = mock();
+			croppie.on("zoom", handler);
+
+			croppie.zoom = 3;
+
+			expect(handler).toHaveBeenCalledTimes(1);
+			expect(handler.mock.calls[0]?.[0]).toEqual({ zoom: 3, previousZoom: 1 });
+		});
+
+		it("emits nothing when the clamped zoom did not change", async () => {
+			await bindAt(3);
+			const order = recordEvents();
+
+			croppie.setZoom(3);
+			croppie.setZoom(3);
+			croppie.zoom = 3;
+
+			expect(order).toEqual([]);
+		});
+
+		it("emits nothing when a request is clamped to the current zoom", async () => {
+			await bindAt(10);
+			const order = recordEvents();
+
+			croppie.setZoom(500); // clamped to the max of 10, where it already is
+
+			expect(order).toEqual([]);
+		});
+
+		it("emits nothing for a slider input with an unchanged value", async () => {
+			await bindAt(1);
+			const order = recordEvents();
+			const slider = container.querySelector(".cr-slider") as HTMLInputElement;
+
+			slider.value = "1";
+			slider.dispatchEvent(new Event("input"));
+
+			expect(order).toEqual([]);
+		});
+
+		it("emits update then zoom for one zoom change", async () => {
+			await bindAt(1);
+			const order = recordEvents();
+
+			croppie.setZoom(2);
+
+			expect(order).toEqual(["update", "zoom"]);
+		});
+
+		it("reset() after a zoom change emits update then zoom with the previous zoom", async () => {
+			await bindAt(1);
+			croppie.setZoom(2);
+			const order = recordEvents();
+			const zoomHandler = mock();
+			croppie.on("zoom", zoomHandler);
+
+			croppie.reset();
+
+			expect(order).toEqual(["update", "zoom"]);
+			expect(zoomHandler.mock.calls[0]?.[0].previousZoom).toBe(2);
+			expect(zoomHandler.mock.calls[0]?.[0].zoom).toBeCloseTo(1 / 3, 9);
+		});
+
+		it("reset() without a zoom change emits update only", async () => {
+			await bindAt(); // starts at the coverage zoom, which reset() returns to
+			const order = recordEvents();
+
+			croppie.reset();
+
+			expect(order).toEqual(["update"]);
+		});
+
+		it("bind() emits exactly one update to a handler registered before it", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			const handler = mock();
+			const zoomHandler = mock();
+			croppie.on("update", handler);
+			croppie.on("zoom", zoomHandler);
+
+			await croppie.bind({ url: TINY_PNG });
+
+			expect(handler).toHaveBeenCalledTimes(1);
+			expect(handler.mock.calls[0]?.[0]).toHaveProperty("points");
+			expect(handler.mock.calls[0]?.[0]).toHaveProperty("zoom");
+			expect(zoomHandler).not.toHaveBeenCalled();
+		});
+
+		it("setZoom(NaN) is a no-op", async () => {
+			await bindAt(2);
+			const order = recordEvents();
+
+			croppie.setZoom(Number.NaN);
+
+			expect(croppie.zoom).toBe(2);
+			expect(order).toEqual([]);
 		});
 	});
 });

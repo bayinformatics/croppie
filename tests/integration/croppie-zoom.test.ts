@@ -3,6 +3,7 @@ import { Croppie } from "../../src/Croppie.ts";
 import {
 	createWheelEvent,
 	installImageMock,
+	simulateDrag,
 } from "../fixtures/mock-helpers.ts";
 import {
 	fixtureDimensions,
@@ -414,6 +415,83 @@ describe("Croppie zoom", () => {
 				expect.stringContaining("Rotation not yet implemented"),
 				90,
 			);
+		});
+	});
+
+	describe("zoom anchoring", () => {
+		// 400x300 image, 100x100 viewport centred in a 300x300 boundary
+		let cleanupWideImageMock: () => void;
+
+		beforeEach(() => {
+			cleanupWideImageMock = installImageMock({ width: 400, height: 300 });
+		});
+
+		afterEach(() => {
+			cleanupWideImageMock();
+		});
+
+		async function bindWide(zoom: number): Promise<HTMLElement> {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				boundary: { width: 300, height: 300 },
+				zoom: { min: 0.1, max: 10 },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom });
+			return container.querySelector(".cr-boundary") as HTMLElement;
+		}
+
+		function cropCentreX(): number {
+			const { points } = croppie.get();
+			return (points.topLeftX + points.bottomRightX) / 2;
+		}
+
+		it("keeps the crop centre fixed when zooming in after a pan", async () => {
+			const boundary = await bindWide(1);
+
+			simulateDrag(boundary, 100, 100, 150, 100); // pan x to 50
+
+			expect(cropCentreX()).toBeCloseTo(150, 6);
+
+			croppie.setZoom(2);
+
+			expect(cropCentreX()).toBeCloseTo(150, 6);
+		});
+
+		it("keeps the crop centre fixed when zooming out after a pan", async () => {
+			const boundary = await bindWide(2);
+
+			simulateDrag(boundary, 100, 100, 160, 100); // pan x to 60
+			const before = cropCentreX();
+
+			croppie.setZoom(1);
+
+			expect(cropCentreX()).toBeCloseTo(before, 6);
+		});
+
+		it("keeps the crop centre fixed when zooming with the slider", async () => {
+			const boundary = await bindWide(1);
+			simulateDrag(boundary, 100, 100, 150, 100);
+			const slider = container.querySelector(".cr-slider") as HTMLInputElement;
+
+			slider.value = "2";
+			slider.dispatchEvent(new Event("input"));
+
+			expect(croppie.zoom).toBe(2);
+			expect(cropCentreX()).toBeCloseTo(150, 6);
+		});
+
+		it("re-clamps after zooming out so the viewport stays covered", async () => {
+			const boundary = await bindWide(1);
+
+			simulateDrag(boundary, 100, 100, 250, 100); // pan x to the limit (150)
+			croppie.setZoom(0.5);
+
+			const { points } = croppie.get();
+			expect(points.topLeftX).toBeGreaterThanOrEqual(0);
+			expect(points.bottomRightX).toBeLessThanOrEqual(400);
+			// The full 100px viewport still maps onto the image (200px at zoom 0.5);
+			// a gap would show up as a shortened crop after clamping to the image.
+			expect(points.bottomRightX - points.topLeftX).toBeCloseTo(200, 6);
 		});
 	});
 });
