@@ -63,6 +63,56 @@ describe("Croppie bind and zoom inputs", () => {
 		cleanupImageMock();
 	});
 
+	describe("bind({ zoom }) that is not a finite number", () => {
+		const nonFinite = [
+			Number.NaN,
+			Number.POSITIVE_INFINITY,
+			Number.NEGATIVE_INFINITY,
+		];
+
+		for (const zoom of nonFinite) {
+			it(`ignores zoom ${zoom} and starts at the coverage zoom`, async () => {
+				// Coverage not enforced, so the coverage zoom is neither the min (0.1) nor the max
+				const { croppie, root } = mount({
+					zoom: { enforceMinimumCoverage: false },
+				});
+
+				await croppie.bind({ url: PHOTO, zoom });
+
+				expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
+				const { points } = croppie.get();
+				expect(points.topLeftX).toBeCloseTo(50, 9);
+				expect(points.topLeftY).toBeCloseTo(0, 9);
+				expect(points.bottomRightX).toBeCloseTo(350, 9);
+				expect(points.bottomRightY).toBeCloseTo(300, 9);
+				expect(preview(root).style.transform).not.toContain("NaN");
+			});
+		}
+
+		it("stays usable after bind({ zoom: NaN }): setZoom() and the points work", async () => {
+			const { croppie, root } = mount();
+			await croppie.bind({ url: PHOTO, zoom: Number.NaN });
+
+			croppie.setZoom(2);
+
+			expect(croppie.zoom).toBe(2);
+			const { points } = croppie.get();
+			expect(points.topLeftX).toBeCloseTo(175, 9);
+			expect(points.topLeftY).toBeCloseTo(125, 9);
+			expect(points.bottomRightX).toBeCloseTo(225, 9);
+			expect(points.bottomRightY).toBeCloseTo(175, 9);
+			expect(preview(root).style.transform).not.toContain("NaN");
+		});
+
+		it("still converts a numeric string zoom, like setZoom()", async () => {
+			const { croppie } = mount();
+
+			await croppie.bind({ url: PHOTO, zoom: "2" as unknown as number });
+
+			expect(croppie.zoom).toBe(2);
+		});
+	});
+
 	describe("numeric strings for setZoom() and zoom =", () => {
 		it("converts a numeric string passed to setZoom(), such as a range input's value", async () => {
 			const { croppie, root } = mount();
