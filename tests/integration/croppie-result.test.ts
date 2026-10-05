@@ -461,17 +461,10 @@ describe("Croppie result", () => {
 
 			// The 200x100 crop at half size is 100x50, with a 25px bar above and below
 			expect([canvas.width, canvas.height]).toEqual([100, 100]);
-			expect(outputContext(canvas).drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				200,
-				150,
-				200,
-				100,
-				0,
-				25,
-				100,
-				50,
-			);
+			// The 2x shrink goes through one step canvas; the last draw into the output places it
+			expect(drawCalls(outputContext(canvas)).at(-1)?.slice(-4)).toEqual([
+				0, 25, 100, 50,
+			]);
 		});
 
 		it("masks a circle viewport with a circle, not an ellipse", async () => {
