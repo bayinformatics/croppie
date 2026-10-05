@@ -965,7 +965,7 @@ export class Croppie {
 	 * The `<img>` keeps its natural size with transform-origin 0 0, so the transform is
 	 * `translate(tx, ty) scale(s) rotate(r)`. The rotation is about the displayed image's
 	 * centre, which sits at `(x, y)` from the boundary centre, so
-	 * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`, written out per rotation.
+	 * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`, with `R` from `rotateOffset()`.
 	 */
 	private updateTransform(): void {
 		if (this.previewEl) {
@@ -977,25 +977,15 @@ export class Croppie {
 			const scaledWidth = (this.image?.naturalWidth ?? 0) * scale;
 			const scaledHeight = (this.image?.naturalHeight ?? 0) * scale;
 
-			let translateX: number;
-			let translateY: number;
-			switch (rotation) {
-				case 90:
-					translateX = (boundaryWidth + scaledHeight) / 2 + x;
-					translateY = (boundaryHeight - scaledWidth) / 2 + y;
-					break;
-				case 180:
-					translateX = (boundaryWidth + scaledWidth) / 2 + x;
-					translateY = (boundaryHeight + scaledHeight) / 2 + y;
-					break;
-				case 270:
-					translateX = (boundaryWidth - scaledHeight) / 2 + x;
-					translateY = (boundaryHeight + scaledWidth) / 2 + y;
-					break;
-				default:
-					translateX = (boundaryWidth - scaledWidth) / 2 + x;
-					translateY = (boundaryHeight - scaledHeight) / 2 + y;
-			}
+			// s * R(r)(W/2, H/2): the image center's offset from the top-left corner the
+			// transform origin pins, turned with the image
+			const [centerX, centerY] = rotateOffset(
+				scaledWidth / 2,
+				scaledHeight / 2,
+				rotation,
+			);
+			const translateX = boundaryWidth / 2 - centerX + x;
+			const translateY = boundaryHeight / 2 - centerY + y;
 
 			setTransform(this.previewEl, translateX, translateY, scale, rotation);
 		}
