@@ -112,6 +112,11 @@ export class Croppie {
 	 * before that, the configured or default minimum, capped at `zoom.max`.
 	 */
 	private effectiveMinZoom: number;
+	/**
+	 * The zoom at which the bound image just covers the viewport, stored with the zoom limits
+	 * by `updateZoomLimits()`: where `bind()` starts by default and `reset()` returns to.
+	 */
+	private coverage = 1;
 
 	// Event handlers
 	private eventHandlers: Map<
@@ -640,10 +645,10 @@ export class Croppie {
 	reset(): void {
 		if (this.destroyed || !this.image) return;
 
-		// Resolve the zoom limits again, like bind(), and go to the coverage zoom
+		// Back to the coverage zoom stored with the zoom limits on bind
 		this.transform.x = 0;
 		this.transform.y = 0;
-		if (this.applyZoom(this.updateZoomLimits(this.image))) return;
+		if (this.applyZoom(this.coverage)) return;
 
 		// Same zoom: only the position changed, and applyZoom() emitted nothing
 		this.constrainPosition();
@@ -722,8 +727,9 @@ export class Croppie {
 	}
 
 	/**
-	 * Resolves the effective minimum zoom for an image (see `resolveMinZoom`) and syncs
-	 * the slider's `min`, so the slider range is never inverted.
+	 * Resolves the effective minimum zoom for an image (see `resolveMinZoom`), stores it with
+	 * the image's coverage zoom (the one place both are computed), and syncs the slider's
+	 * `min`, so the slider range is never inverted.
 	 *
 	 * @returns The zoom at which the image covers the viewport
 	 */
@@ -731,6 +737,7 @@ export class Croppie {
 		const { naturalWidth, naturalHeight } = image;
 		const { width, height } = this.options.viewport;
 		const coverage = this.coverageZoom(image);
+		this.coverage = coverage;
 
 		this.effectiveMinZoom = resolveMinZoom({
 			configuredMin: this.zoomConfig.min,
@@ -748,8 +755,8 @@ export class Croppie {
 	}
 
 	/**
-	 * The smallest zoom at which `image` covers the viewport: where `bind()` starts by default
-	 * and `reset()` returns to.
+	 * The smallest zoom at which `image` covers the viewport (computed for
+	 * `updateZoomLimits()`, which stores it as `coverage`).
 	 */
 	private coverageZoom(image: HTMLImageElement): number {
 		return calculateInitialZoom(
