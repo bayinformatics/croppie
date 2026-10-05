@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- `bind({ points })` is now applied when the image loads, with `points` given as an object or as `[x1, y1, x2, y2]`; `get()` returns the same points back (#19, #23).
+- `bind({ points })` is now applied when the image loads, with `points` given as an object or as `[x1, y1, x2, y2]`; `get()` returns the same points back (#19, #23). Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 - A `default` condition in the package `exports` map, so `require("@bayinformatics/croppie")` works natively on Node 22.12+ (it loads the ES module).
 - A `./package.json` export.
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.

@@ -46,6 +46,18 @@ const DEFAULT_ZOOM: ZoomConfig = {
 };
 
 /**
+ * `normalizePoints()` for `bind()`: an array without exactly 4 entries gives `undefined`, so
+ * `bind()` warns about it and ignores it like any other malformed points, instead of throwing.
+ */
+function readPoints(points: BindOptions["points"]): CropPoints | undefined {
+	try {
+		return normalizePoints(points);
+	} catch {
+		return undefined;
+	}
+}
+
+/**
  * Modern, TypeScript-first image cropper.
  *
  * @example
@@ -229,11 +241,19 @@ export class Croppie {
 	}
 
 	/**
-	 * Loads an image into the cropper
+	 * Loads an image into the cropper.
+	 *
+	 * Malformed `points` (an array without exactly 4 entries, a coordinate that is not a
+	 * number, a rect without width or height) are ignored with a console warning, and the
+	 * image gets its default framing.
 	 */
 	async bind(options: BindOptions | string): Promise<void> {
 		const bindOptions: BindOptions =
 			typeof options === "string" ? { url: options } : options;
+
+		// Read the points before anything changes. An array without exactly 4 entries is
+		// malformed like a NaN coordinate, and is ignored with the same warning below
+		const points = readPoints(bindOptions.points);
 
 		this.image = await loadImage(bindOptions.url);
 
@@ -276,10 +296,9 @@ export class Croppie {
 
 		// Apply initial points if provided
 		if (bindOptions.points) {
-			const normalizedPoints = normalizePoints(bindOptions.points);
-			const pointsTransform = normalizedPoints
+			const pointsTransform = points
 				? calculateTransformFromPoints(
-						normalizedPoints,
+						points,
 						this.image.naturalWidth,
 						this.image.naturalHeight,
 						this.options.viewport.width,
@@ -292,7 +311,7 @@ export class Croppie {
 			} else {
 				console.warn(
 					"[@bayinformatics/croppie] Ignoring invalid initial points:",
-					normalizedPoints,
+					bindOptions.points,
 				);
 			}
 		}

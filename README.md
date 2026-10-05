@@ -125,7 +125,7 @@ await cropper.bind({
 })
 ```
 
-`points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`.
+`points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`. Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
