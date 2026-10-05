@@ -39,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Integration suites for `bind`, `zoom` and `result` (65 tests) are no longer skipped; the image and canvas mocks resolve fixture dimensions and a 2D context, `src/canvas/draw.ts` is covered, and tests are formatted, linted and type-checked.
 - Tests pin `result()`'s quality, circle and `backgroundColor` handling and `loadImage()`'s `crossOrigin` for remote URLs.
 - CI: a composite setup action, least-privilege `permissions`, `cancel-in-progress`, current major versions of all actions, `check:package` in the build job, and CI runs for pull requests against any base branch.
-- Publishing runs lint, typecheck, tests, build and `check:package` first, verifies that the release tag matches `package.json`, and clears `dist/` before downloading the built artifact.
+- Publishing runs lint, typecheck, tests, build and `check:package` first, and clears `dist/` before downloading the built artifact. Every run first verifies the tag against `package.json`: a release must be tagged `v<version>`, and a manual run must be started on that tag.
 - Playwright replaced Lost Pixel for visual regression (#16), with an HTML report, retries and `forbidOnly` on CI.
 - Committed `dist/` and `docs/` bundles are checked for parity with a fresh build in CI, under the pinned Bun version.
 - Dependabot for the `bun` and `github-actions` ecosystems (#18, #22).
