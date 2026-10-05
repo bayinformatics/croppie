@@ -35,13 +35,14 @@ describe("wheelZoomFactor", () => {
 		);
 	});
 
-	it("treats a line delta as 16px per line", () => {
-		expect(wheelZoomFactor({ deltaY: -3, deltaMode: 1 })).toBeCloseTo(
-			1.0468,
-			4,
+	it("treats three lines (a line-mode mouse notch) as one notch", () => {
+		expect(wheelZoomFactor({ deltaY: -3, deltaMode: 1 })).toBeCloseTo(1.1, 9);
+		expect(wheelZoomFactor({ deltaY: 3, deltaMode: 1 })).toBeCloseTo(
+			1 / 1.1,
+			9,
 		);
-		expect(wheelZoomFactor({ deltaY: -3, deltaMode: 1 })).toBeCloseTo(
-			1.1 ** 0.48,
+		expect(wheelZoomFactor({ deltaY: -1, deltaMode: 1 })).toBeCloseTo(
+			1.1 ** (1 / 3),
 			9,
 		);
 	});
@@ -126,12 +127,12 @@ describe("Wheel Zoom Handler", () => {
 			expect(lastRequest().zoom).toBeCloseTo(1.04881, 5);
 		});
 
-		it("reads line-mode deltas", () => {
+		it("reads line-mode deltas: three lines zoom like one pixel-mode notch", () => {
 			createWheelZoomHandler(element, getZoom, requestZoom);
 
 			element.dispatchEvent(createWheelEvent(-3, { deltaMode: 1 }));
 
-			expect(lastRequest().zoom).toBeCloseTo(1.0468, 4);
+			expect(lastRequest().zoom).toBeCloseTo(1.1, 9);
 		});
 
 		it("caps a large delta at one notch", () => {

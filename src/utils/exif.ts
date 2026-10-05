@@ -5,13 +5,17 @@ const MAX_SCAN_BASE64_CHARS = Math.ceil(MAX_SCAN_BYTES / 3) * 4;
 
 const EXIF_HEADER = [0x45, 0x78, 0x69, 0x66, 0x00, 0x00]; // "Exif\0\0"
 const ORIENTATION_TAG = 0x0112;
+/** TIFF entry types the Orientation value can be stored as. */
+const TYPE_SHORT = 3;
+const TYPE_LONG = 4;
 
 /**
  * Read the EXIF Orientation tag (1-8) from the start of a JPEG.
  *
  * A small, dependency-free parser: it walks the marker segments up to the first
  * start-of-scan, finds the APP1 segment that starts with `Exif\0\0`, and reads tag 0x0112 from
- * IFD0 of the embedded TIFF structure (either byte order). Every read is bounded by the
+ * IFD0 of the embedded TIFF structure (either byte order), stored as a SHORT or a LONG (an
+ * entry of any other type is ignored). Every read is bounded by the
  * segment and by the first 256 KiB, so hostile input cannot make it read far or throw.
  *
  * Browsers already display JPEGs upright according to this tag; Croppie reports it but never
@@ -85,7 +89,14 @@ function readExifSegment(
 		const entry = ifd + 2 + i * 12;
 		if (entry + 12 > end) return 1;
 		if (view.getUint16(entry, little) === ORIENTATION_TAG) {
-			const value = view.getUint16(entry + 8, little);
+			// The value sits at the start of the 4-byte value field, as wide as its type
+			const type = view.getUint16(entry + 2, little);
+			const value =
+				type === TYPE_SHORT
+					? view.getUint16(entry + 8, little)
+					: type === TYPE_LONG
+						? view.getUint32(entry + 8, little)
+						: 0;
 			return value >= 1 && value <= 8 ? value : 1;
 		}
 	}

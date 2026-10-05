@@ -93,12 +93,18 @@ describe("Croppie bindFile object URLs", () => {
 		create();
 		const created = spyOn(URL, "createObjectURL");
 
-		const file = croppie.bindFile(photo());
+		// Observed at once: the superseded bind rejects as soon as the later bind starts
+		const file = croppie.bindFile(photo()).then(
+			() => undefined,
+			(caught: unknown) => caught,
+		);
 		const later = croppie.bind(TINY_PNG);
-		await Promise.all([file, later]);
+		await later;
+		const error = await file;
 
 		const url = created.mock.results[0]?.value as string;
 		created.mockRestore();
+		expect((error as DOMException).name).toBe("AbortError");
 		expect(revoke).toHaveBeenCalledWith(url);
 		expect(preview().src).toBe(TINY_PNG);
 	});

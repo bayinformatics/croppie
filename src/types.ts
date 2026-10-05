@@ -138,8 +138,8 @@ export interface CroppieData {
 	points: CropPoints;
 	/** Current zoom level */
 	zoom: number;
-	/** Current clockwise rotation (always set by `get()`) */
-	rotation?: Rotation;
+	/** Current clockwise rotation */
+	rotation: Rotation;
 	/**
 	 * The EXIF Orientation tag (1-8) of the bound image when read via `enableExif`.
 	 * Informational: it is never derived from `rotation` and never changed by `rotate()`.
@@ -171,6 +171,12 @@ export interface BindOptions {
 }
 
 /**
+ * Options for `bindFile(file, options)`: those of `bind()` without `url`, since the file is
+ * the image.
+ */
+export type BindFileOptions = Omit<BindOptions, "url">;
+
+/**
  * Result options - for exporting the cropped image
  */
 export interface ResultOptions {
@@ -179,9 +185,9 @@ export interface ResultOptions {
 	/**
 	 * Output dimensions (default `"viewport"`). The image keeps its proportions: a size of
 	 * another shape than the viewport centers the crop and leaves the rest transparent (or
-	 * `backgroundColor`). `"original"` is the viewport area at image resolution, rounded to
-	 * whole pixels; zoomed out past the image, it is scaled down to at most the area of the
-	 * image part it shows or 4096x4096 px, whichever is larger.
+	 * `backgroundColor`). `"original"` is the viewport area at image resolution. An
+	 * `"original"` or custom size is scaled down, keeping its shape, to at most 16,777,216 px
+	 * (4096x4096) and 16,384 px a side, then rounded to whole pixels.
 	 */
 	size?: { width: number; height: number } | "viewport" | "original";
 	/** Output format (for base64/blob) */

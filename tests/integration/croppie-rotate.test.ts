@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	expectTypeOf,
+	it,
+	mock,
+} from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { CropPoints, CroppieOptions, Rotation } from "../../src/types.ts";
 import {
@@ -65,6 +73,12 @@ describe("Croppie rotate", () => {
 			croppie.rotate(90);
 
 			expect(croppie.get().rotation).toBe(90);
+		});
+
+		it("types the rotation of get() as always set", () => {
+			create();
+
+			expectTypeOf(croppie.get().rotation).toEqualTypeOf<Rotation>();
 		});
 
 		it("reports rotation 0 before and after bind", async () => {
@@ -184,6 +198,43 @@ describe("Croppie rotate", () => {
 			expect(events.map((e) => e.name)).toEqual(["rotate", "update"]);
 			expect(events[1]?.payload).toHaveProperty("rotation", 90);
 			expect(events[1]?.payload).toHaveProperty("points");
+		});
+
+		it("emits one zoom event when an update listener zooms during rotate()", async () => {
+			create(); // square viewport: a quarter turn keeps the zoom of 20
+			await croppie.bind({ url: SMALL_PNG, zoom: 20 });
+			const events = recordEvents();
+			croppie.on("update", (data) => {
+				if (data.zoom === 20) croppie.setZoom(30);
+			});
+
+			croppie.rotate(90);
+
+			expect(croppie.zoom).toBe(30);
+			// rotate() itself did not change the zoom; the listener's setZoom() reported its own
+			expect(events.map((e) => e.name)).toEqual([
+				"rotate",
+				"update",
+				"update",
+				"zoom",
+			]);
+			expect(events[3]?.payload).toEqual({ zoom: 30, previousZoom: 20 });
+		});
+
+		it("reports only the final zoom when a listener zooms after rotate() raised it", async () => {
+			create({ viewport: { width: 100, height: 50, type: "square" } });
+			await croppie.bind({ url: SMALL_PNG, zoom: 5 }); // a quarter turn raises it to 10
+			const zoomEvents: unknown[] = [];
+			croppie.on("zoom", (event) => zoomEvents.push(event));
+			croppie.on("update", (data) => {
+				if (data.zoom === 10) croppie.setZoom(12);
+			});
+
+			croppie.rotate(90);
+
+			expect(croppie.zoom).toBe(12);
+			// Like setZoom(): a zoom an update listener already replaced is not reported
+			expect(zoomEvents).toEqual([{ zoom: 12, previousZoom: 10 }]);
 		});
 
 		it("includes the rotation in the update emitted by bind()", async () => {
@@ -430,6 +481,92 @@ describe("Croppie rotate", () => {
 			).rejects.toThrow(RangeError);
 
 			expect(croppie.get().rotation).toBe(90);
+		});
+	});
+
+	describe("bindFile(file, options)", () => {
+		// Any file loads as the mocked 20x10 image
+		const file = () => new Blob(["x"], { type: "image/png" });
+		const natural: CropPoints = {
+			topLeftX: 2,
+			topLeftY: 3,
+			bottomRightX: 7,
+			bottomRightY: 8,
+		};
+
+		it("applies the rotation, points and zoom like bind()", async () => {
+			create();
+
+			await croppie.bindFile(file(), { points: natural, rotation: 90 });
+
+			const data = croppie.get();
+			expectPoints(data.points, natural);
+			expect(data.rotation).toBe(90);
+			expect(data.zoom).toBeCloseTo(20, 9);
+		});
+
+		it("applies a zoom", async () => {
+			create();
+
+			await croppie.bindFile(file(), { zoom: 30 });
+
+			expect(croppie.zoom).toBe(30);
+		});
+
+		it("maps an orientation to a rotation", async () => {
+			create();
+
+			await croppie.bindFile(file(), { orientation: 6 });
+
+			expect(croppie.get().rotation).toBe(90);
+		});
+
+		it("makes reset() return to the bind-time rotation", async () => {
+			create();
+			await croppie.bindFile(file(), { rotation: 90 });
+
+			croppie.rotate(90);
+			croppie.reset();
+
+			expect(croppie.get().rotation).toBe(90);
+		});
+
+		it("rejects an invalid rotation with a RangeError before superseding a bind still loading", async () => {
+			create();
+			const good = croppie.bind({ url: SMALL_PNG, zoom: 40 }).then(
+				() => "fulfilled",
+				(caught: unknown) => caught,
+			);
+
+			const error = await croppie.bindFile(file(), { rotation: 45 }).then(
+				() => undefined,
+				(caught: unknown) => caught,
+			);
+
+			expect(error).toBeInstanceOf(RangeError);
+			expect(await good).toBe("fulfilled");
+			expect(croppie.zoom).toBe(40);
+		});
+
+		it("ignores malformed points with a warning, like bind()", async () => {
+			const originalWarn = console.warn;
+			const warn = mock();
+			console.warn = warn;
+			try {
+				create();
+
+				await croppie.bindFile(file(), {
+					points: [1, 2, 3] as unknown as CropPoints,
+				});
+
+				expect(warn).toHaveBeenCalledTimes(1);
+				expect(String(warn.mock.calls[0]?.[0])).toContain(
+					"invalid initial points",
+				);
+				expect(croppie.zoom).toBeCloseTo(10, 9); // the coverage zoom
+			} finally {
+				console.warn = originalWarn;
+			}
 		});
 	});
 

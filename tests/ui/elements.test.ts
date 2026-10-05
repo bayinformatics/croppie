@@ -291,6 +291,17 @@ describe("UI Elements", () => {
 			expect(preview.tagName).toBe("IMG");
 		});
 
+		it("honors the EXIF orientation inline, next to its transform origin", () => {
+			// Not only in croppie.css: a host CSS reset or a missing stylesheet must not show
+			// the preview in another orientation than the one the geometry assumes
+			const preview = createPreview();
+
+			expect(preview.style.getPropertyValue("image-orientation")).toBe(
+				"from-image",
+			);
+			expect(preview.style.transformOrigin).toBe("0 0");
+		});
+
 		it("has cr-image class", () => {
 			const preview = createPreview();
 			expect(preview.classList.contains("cr-image")).toBe(true);
@@ -334,6 +345,16 @@ describe("UI Elements", () => {
 			const slider = createZoomSlider(0.5, 2, 1);
 
 			expect(slider.getAttribute("aria-label")).toBe("Zoom");
+		});
+
+		it("describes its initial value as a percentage", () => {
+			// Otherwise a screen reader announces the raw value ("1") until the first bind
+			expect(createZoomSlider(0.5, 2, 1).getAttribute("aria-valuetext")).toBe(
+				"100%",
+			);
+			expect(
+				createZoomSlider(0.1, 10, 0.333).getAttribute("aria-valuetext"),
+			).toBe("33%");
 		});
 
 		it("creates an input element", () => {

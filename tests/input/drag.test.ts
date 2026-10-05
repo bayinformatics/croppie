@@ -40,6 +40,14 @@ describe("Drag Handler", () => {
 			expect(element.style.touchAction).toBe("none");
 		});
 
+		it("sets the touch-action it is given", () => {
+			// Without a pinch handler the browser keeps pinch-zoom
+			createDragHandler(element, getTransform, setTransform, undefined, {
+				touchAction: "pinch-zoom",
+			});
+			expect(element.style.touchAction).toBe("pinch-zoom");
+		});
+
 		it("returns a cleanup function", () => {
 			const cleanup = createDragHandler(element, getTransform, setTransform);
 			expect(typeof cleanup).toBe("function");

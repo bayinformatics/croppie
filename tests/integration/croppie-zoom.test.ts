@@ -687,6 +687,20 @@ describe("Croppie zoom", () => {
 			expect(slider().getAttribute("aria-valuetext")).toBe("100%");
 		});
 
+		it("describes the zoom as a percentage before the first bind", () => {
+			const other = document.createElement("div");
+			const unbound = new Croppie(other, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+
+			const value = other
+				.querySelector(".cr-slider")
+				?.getAttribute("aria-valuetext");
+			unbound.destroy();
+
+			expect(value).toBe("100%");
+		});
+
 		it("updates aria-valuetext when the zoom changes", () => {
 			croppie.setZoom(1.5);
 

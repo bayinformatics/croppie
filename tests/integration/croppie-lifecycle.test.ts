@@ -37,6 +37,28 @@ describe("Croppie lifecycle", () => {
 		cleanupImageMock();
 	});
 
+	/** The DOMException messages of a bind that will not apply its image. */
+	const SUPERSEDED = "bind() was superseded by a later bind() call";
+	const DESTROYED = "instance destroyed during bind()";
+
+	/**
+	 * Settles `pending` and checks that it rejected with an AbortError carrying `message`.
+	 * Call it as soon as the bind starts: a superseded bind rejects right away, and an
+	 * unobserved rejection fails the test.
+	 */
+	async function expectAbort(
+		pending: Promise<void>,
+		message: string,
+	): Promise<void> {
+		const error = await pending.then(
+			() => "fulfilled",
+			(caught: unknown) => caught,
+		);
+		expect(error).toBeInstanceOf(DOMException);
+		expect((error as DOMException).name).toBe("AbortError");
+		expect((error as DOMException).message).toBe(message);
+	}
+
 	describe("after destroy()", () => {
 		it("rejects bind() with a clear error", async () => {
 			create().destroy();
@@ -89,6 +111,16 @@ describe("Croppie lifecycle", () => {
 			expect(handler).not.toHaveBeenCalled();
 		});
 
+		it("reports the initial zoom of 1 next to the zeroed points, not the last zoom", async () => {
+			create();
+			await croppie.bind({ url: SMALL_PNG, zoom: 2 });
+
+			croppie.destroy();
+
+			expect(croppie.get().zoom).toBe(1);
+			expect(croppie.zoom).toBe(1);
+		});
+
 		it("can be called twice", () => {
 			create();
 
@@ -116,7 +148,7 @@ describe("Croppie lifecycle", () => {
 	});
 
 	describe("destroy() while a bind is in flight", () => {
-		it("resolves without applying the image", async () => {
+		it("rejects with an AbortError without applying the image", async () => {
 			create();
 			const handler = mock();
 			croppie.on("update", handler);
@@ -124,7 +156,7 @@ describe("Croppie lifecycle", () => {
 			const pending = croppie.bind(SMALL_PNG);
 			croppie.destroy();
 
-			await expect(pending).resolves.toBeUndefined();
+			await expectAbort(pending, DESTROYED);
 			expect(container.querySelector(".croppie-container")).toBeNull();
 			expect(croppie.get().points).toEqual({
 				topLeftX: 0,
@@ -135,7 +167,7 @@ describe("Croppie lifecycle", () => {
 			expect(handler).not.toHaveBeenCalled();
 		});
 
-		it("does not surface a load error of an abandoned bind", async () => {
+		it("rejects with an AbortError, not the load error, when the abandoned load fails", async () => {
 			cleanupImageMock();
 			cleanupImageMock = installImageMock(fixtureDimensions, { delay: 10 });
 			create();
@@ -144,16 +176,16 @@ describe("Croppie lifecycle", () => {
 			const pending = croppie.bind("not-a-valid-source");
 			croppie.destroy();
 
-			await expect(pending).resolves.toBeUndefined();
+			await expectAbort(pending, DESTROYED);
 		});
 
-		it("resolves bindFile() silently when destroyed while the file is read", async () => {
+		it("rejects bindFile() with an AbortError when destroyed while the file is read", async () => {
 			create();
 
 			const pending = croppie.bindFile(new Blob(["x"], { type: "image/png" }));
 			croppie.destroy();
 
-			await expect(pending).resolves.toBeUndefined();
+			await expectAbort(pending, DESTROYED);
 		});
 	});
 
@@ -165,8 +197,10 @@ describe("Croppie lifecycle", () => {
 
 			// A is slow (20ms) and started first; B is instant and started second
 			const a = croppie.bind({ url: SMALL_PNG, zoom: 2 });
+			const aborted = expectAbort(a, SUPERSEDED);
 			const b = croppie.bind({ url: TINY_PNG, zoom: 3 });
-			await Promise.all([a, b]);
+			await b;
+			await aborted;
 
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;
 			expect(croppie.zoom).toBe(3);
@@ -175,14 +209,30 @@ describe("Croppie lifecycle", () => {
 			expect(handler).toHaveBeenCalledTimes(1);
 		});
 
-		it("resolves the superseded bind silently instead of rejecting", async () => {
+		it("rejects the superseded bind with an AbortError; only the newest fulfills", async () => {
 			create();
 
 			const a = croppie.bind({ url: SMALL_PNG, zoom: 2 });
+			const aborted = expectAbort(a, SUPERSEDED);
 			const b = croppie.bind({ url: TINY_PNG, zoom: 3 });
 
-			await expect(a).resolves.toBeUndefined();
+			await aborted;
 			await expect(b).resolves.toBeUndefined();
+		});
+
+		it("rejects an earlier bind with an AbortError when the later one fails to load", async () => {
+			create();
+			const handler = mock();
+			croppie.on("update", handler);
+
+			const a = croppie.bind({ url: SMALL_PNG, zoom: 2 });
+			const aborted = expectAbort(a, SUPERSEDED);
+			// Not a data: or http URL, so the mock fires onerror
+			const b = croppie.bind("not-a-valid-source");
+
+			await expect(b).rejects.toThrow();
+			await aborted;
+			expect(handler).not.toHaveBeenCalled();
 		});
 
 		it("applies sequential binds one after the other", async () => {
@@ -203,8 +253,10 @@ describe("Croppie lifecycle", () => {
 			create();
 
 			const file = croppie.bindFile(new Blob(["x"], { type: "image/png" }));
+			const aborted = expectAbort(file, SUPERSEDED);
 			const later = croppie.bind({ url: TINY_PNG, zoom: 3 });
-			await Promise.all([file, later]);
+			await later;
+			await aborted;
 
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;
 			expect(preview.src).toBe(TINY_PNG);

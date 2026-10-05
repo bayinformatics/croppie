@@ -106,7 +106,7 @@ new Croppie(element: HTMLElement, options: CroppieOptions)
 | `enableResize` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
 | `enableOrientation` | `boolean` | `false` | Deprecated, no effect: `rotate()` is always available |
 
-Invalid options throw a `RangeError` from the constructor: a viewport or boundary dimension, `zoom.min` or `zoom.max` that is not a positive finite number, or `zoom.min` greater than `zoom.max`. A boundary smaller than the viewport only logs a warning.
+A viewport or boundary dimension, `zoom.min` and `zoom.max` may also be numeric strings (such as data attribute values: `"200"`); they are converted to numbers. Invalid options throw a `RangeError` from the constructor: a viewport or boundary dimension, `zoom.min` or `zoom.max` that is not a positive finite number (a blank or non-numeric string is not), or a configured `zoom.min` greater than `zoom.max` (or than the default max of 10). A lone `zoom.max` below 0.1 is fine: the minimum is then per image and capped at `zoom.max`. A boundary smaller than the viewport only logs a warning.
 
 ### Methods
 
@@ -128,7 +128,16 @@ await cropper.bind({
 
 `points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`. Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 
-`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). If you call `bind()` again before the previous image has loaded, the last call wins and the earlier one resolves without applying anything. The exception is a `bind()` or `bindFile()` rejected for invalid input (an invalid `rotation`, something that is not a File or Blob): it changes nothing and supersedes nothing. Malformed `points` do not make `bind()` fail (see above), so such a bind still wins like any other. A `bind()` that is still loading when you call `destroy()` also resolves silently. `bind()` emits one `update` when it completes.
+`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). Only the newest bind applies its image and fulfills: if you call `bind()` or `bindFile()` again before the previous image has loaded, the earlier call rejects with a `DOMException` named `AbortError` (message `bind() was superseded by a later bind() call`) without applying anything, also when the later call then fails to load. A bind that is still loading when you call `destroy()` rejects the same way (`instance destroyed during bind()`). A call rejected before it starts loading changes nothing and supersedes nothing: `bind()` with an invalid `rotation` (a `RangeError`), `bindFile()` given something that is not a File or Blob (a `TypeError`), and `bind()` or `bindFile()` on a destroyed instance. Malformed `points` do not make `bind()` fail (see above), so such a bind still wins like any other. `bind()` emits one `update` when it completes.
+
+```typescript
+try {
+  await cropper.bind(url)
+} catch (error) {
+  // A later bind replaced this one, or the cropper was destroyed: nothing to report
+  if ((error as Error).name !== 'AbortError') throw error
+}
+```
 
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
@@ -136,9 +145,9 @@ through `get()` while the derived zoom stays within `zoom.min`/`zoom.max`;
 mismatched-aspect points are cover-fit and center-preserved at the applied
 (clamped) zoom.
 
-#### `bindFile(file: File | Blob): Promise<void>`
+#### `bindFile(file: File | Blob, options?: BindFileOptions): Promise<void>`
 
-Load an image from a File input.
+Load an image from a File input. `options` are those of `bind()` without `url` (`rotation`, `orientation`, `points`, `zoom`), validated and applied the same way, so a file can be bound again with what `get()` returned: `await cropper.bindFile(file, { points, zoom, rotation })`.
 
 ```typescript
 const input = document.querySelector('input[type="file"]')
@@ -186,7 +195,7 @@ To reproduce the crop on a server, auto-orient the original (sharp `.rotate()`, 
 
 #### `setZoom(value: number): void`
 
-Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport center; non-finite values are ignored. Emits `update` and `zoom` when the clamped zoom changed.
+Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport center; a numeric string is converted, and a non-finite value or a blank or non-numeric string is ignored. Emits `update` and `zoom` when the clamped zoom changed.
 
 #### `zoom: number`
 
@@ -214,14 +223,14 @@ cropper.get().rotation // 0 | 90 | 180 | 270
 
 #### `destroy(): void`
 
-Clean up and remove the cropper. It is safe to call more than once. Afterwards `bind()`, `bindFile()` and `result()` reject with a `... called on a destroyed instance` error, and `setZoom()`, `zoom =` and `reset()` do nothing.
+Clean up and remove the cropper. It is safe to call more than once. Afterwards `bind()`, `bindFile()` and `result()` reject with a `... called on a destroyed instance` error, `setZoom()`, `zoom =` and `reset()` do nothing, and `get()` returns zeroed points with the initial zoom of 1.
 
 ### Result Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `type` | `'blob' \| 'base64' \| 'canvas'` | Required | Output type |
-| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution, rounded to whole pixels. Zoomed out past the image, `'original'` is scaled down to at most the image part's area or 4096×4096 px, whichever is larger; a size of another shape than the viewport keeps the proportions, with transparent or `backgroundColor` bars |
+| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution. An `'original'` or custom size is scaled down, keeping its shape, to at most 16,777,216 px (4096×4096) and 16,384 px a side, so the canvas stays within what browsers can allocate (iOS Safari draws nothing on a larger one), then rounded to whole pixels; a custom width or height that is not a positive finite number rejects with a `RangeError`. A size of another shape than the viewport keeps the proportions, with transparent or `backgroundColor` bars |
 | `format` | `'png' \| 'jpeg' \| 'webp'` | `'png'` | Output format for blob/base64 |
 | `quality` | `number` | `0.92` | JPEG/WebP quality (0-1) |
 | `circle` | `boolean` | `viewport.type === 'circle'` | Apply circular mask |
@@ -237,22 +246,29 @@ cropper.on('update', (data) => {
 cropper.on('zoom', ({ zoom, previousZoom }) => {
   console.log(`Zoom: ${previousZoom} → ${zoom}`)
 })
+
+cropper.on('rotate', ({ rotation, previousRotation }) => {
+  console.log(`Rotation: ${previousRotation}° → ${rotation}°`)
+})
 ```
 
 `update` carries the same data as `get()`; `zoom` carries `{ zoom, previousZoom }`; `rotate` carries `{ rotation, previousRotation }` and fires from `rotate()` and from `reset()` when it restores a different rotation. Within one change `rotate` fires first, then `update`, then `zoom`. Nothing is emitted when nothing changed (for example a zoom request that is clamped to the current zoom, or a drag the bounds absorb entirely).
 
-| Source | `update` | `zoom` |
-|--------|----------|--------|
-| `bind()` completes | once, with the initial data | no |
-| Dragging the image | only when the (clamped) position changed | no |
-| Slider, mouse wheel, pinch, `setZoom()`, `zoom =` | only when the clamped zoom changed | only when the clamped zoom changed |
-| `reset()` | always | only when the zoom changed |
+| Source | `rotate` | `update` | `zoom` |
+|--------|----------|----------|--------|
+| `bind()` completes | no | once, with the initial data | no |
+| Dragging the image | no | only when the (clamped) position changed | no |
+| Slider, mouse wheel, pinch, `setZoom()`, `zoom =` | no | only when the clamped zoom changed | only when the clamped zoom changed |
+| `rotate()` | always | always | only when the zoom changed (a quarter turn can raise it to the new minimum) |
+| `reset()` | only when the bind-time rotation differs from the current one | always | only when the zoom changed |
 
-Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport center (slider, `setZoom()`) fixed. One mouse-wheel notch (100px) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan.
+`rotate()` with 0 or a full turn, before an image is bound or after `destroy()` does nothing and emits nothing. When an `update` listener zooms again, its own `zoom` event reports the final zoom and the change that caused the `update` emits none, so `zoom` never reports a value that was already replaced.
+
+Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport center (slider, `setZoom()`) fixed. One mouse-wheel notch (100px, or 3 lines for a mouse that scrolls by lines) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan; when the fingers of a pinch lift until one is left, that finger pans again.
 
 ### Zoom and accessibility
 
-- The zoom slider has the accessible name "Zoom" and announces its value as a percentage (`aria-valuetext`, for example "150%"). Keyboard focus shows a visible ring in every browser.
+- The zoom slider has the accessible name "Zoom" and announces its value as a percentage (`aria-valuetext`, for example "150%"), also before the first image is bound. Keyboard focus shows a visible ring in every browser.
 - If the image is zoomed out so far that it no longer covers the viewport (`enforceMinimumCoverage: false`), `result()` keeps the image's proportions: the image is drawn at its true scale, and the rest of the output is transparent or `backgroundColor`. `get().points` stays clamped to the image.
 - A `'circle'` viewport that is not square is an ellipse, in the overlay and in the output mask.
 
@@ -289,7 +305,7 @@ Dark mode: `--croppie-boundary-bg` switches to `#0f0f1a` under `@media (prefers-
 | `enforceBoundary` | `zoom: { enforceMinimumCoverage }` |
 | `minZoom` / `maxZoom` | `zoom: { min, max }` |
 | `enableOrientation: true` | not needed: `rotate()` is always available |
-| `croppie.rotate(90)` | `cropper.rotate(-90)`: v2 turned counter-clockwise, v3 turns **clockwise** |
+| `croppie.rotate(90)` | `cropper.rotate(-90)`: v2 turned counter-clockwise ([Foliotek/Croppie#543](https://github.com/Foliotek/Croppie/issues/543)), v3 turns **clockwise** |
 | `bind({ url, orientation })` | prefer `bind({ url, rotation })`; `get().orientation` is informational only |
 | `croppie.result({...}).then(cb)` | `const result = await croppie.result({...})` |
 | `$el.on('update', cb)` | `croppie.on('update', cb)` |
@@ -299,7 +315,7 @@ Dark mode: `--croppie-boundary-bg` switches to `#0f0f1a` under `@media (prefers-
 
 - v2 shipped UMD (AMD/CommonJS/global); v3 is ESM-only.
 - v2 `bind()` points/relative points are fully supported; v3 applies points on bind with cover-fit + center preservation within `zoomConfig` bounds (v2's width-only-scale/top-left-anchor quirk, [Foliotek/Croppie#767](https://github.com/Foliotek/Croppie/issues/767), is intentionally not replicated).
-- v2 rotation needed `enableOrientation`; in v3 `rotate()` is always available and rotates clockwise (v2's `rotate(90)` turned counter-clockwise: negate the argument if you depended on it). `points` stay in the natural (EXIF-oriented) frame and `get().rotation` carries the turn.
+- v2 rotation needed `enableOrientation`; in v3 `rotate()` is always available and rotates clockwise (v2's `rotate(90)` turned counter-clockwise, see [Foliotek/Croppie#543](https://github.com/Foliotek/Croppie/issues/543): negate the argument if you depended on it). `points` stay in the natural (EXIF-oriented) frame and `get().rotation` carries the turn.
 - v2 supported `<script>` tag usage; v3 requires a bundler.
 
 ### Detailed Changes
@@ -345,7 +361,13 @@ export default class extends Controller {
 
   async selectFile(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) await this.croppie?.bindFile(file)
+    if (!file) return
+    try {
+      await this.croppie?.bindFile(file)
+    } catch (error) {
+      // Another file was chosen, or the controller disconnected, before this one loaded
+      if ((error as Error).name !== 'AbortError') throw error
+    }
   }
 
   async crop() {
@@ -373,7 +395,10 @@ function ImageCropper({ src, onCrop }) {
       croppieRef.current = new Croppie(containerRef.current, {
         viewport: { width: 200, height: 200, type: 'circle' }
       })
-      croppieRef.current.bind(src)
+      croppieRef.current.bind(src).catch((error) => {
+        // The effect was cleaned up (src changed, or unmount) before the image loaded
+        if (error.name !== 'AbortError') console.error(error)
+      })
     }
     return () => croppieRef.current?.destroy()
   }, [src])

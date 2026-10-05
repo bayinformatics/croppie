@@ -51,18 +51,50 @@ export function normalizePoints(
 }
 
 /**
- * A plain decimal number, optionally signed and with an exponent, with surrounding
- * whitespace: "12.50", "-3", ".5", "5.", "1e2". Not "50px", "0x10", "1,5", "Infinity" or "".
+ * A plain decimal number, optionally signed and with an exponent: "12.50", "-3", ".5",
+ * "5.", "1e2". Not "50px", "0x10", "1,5", "Infinity" or "". Callers trim the string first.
+ *
+ * Every alternative is unambiguous (a digit run can only be matched one way), so the match
+ * is linear in the input length: no catastrophic backtracking on hostile strings such as
+ * thousands of digits followed by junk.
  */
-const DECIMAL = /^\s*[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?\s*$/;
+const DECIMAL = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
 
 /**
- * A coordinate as a number. A string (v2's `get()` format) must be a plain decimal number;
- * any other string becomes `NaN`. (`Number()` alone would read "0x10" as 16 and "" as 0.)
+ * A coordinate as a number. A string (v2's `get()` format) must be a plain decimal number,
+ * surrounding whitespace allowed; any other string becomes `NaN`. (`Number()` alone would
+ * read "0x10" as 16 and "" as 0.)
  */
 function toCoordinate(value: unknown): number {
 	if (typeof value !== "string") return value as number;
-	return DECIMAL.test(value) ? Number(value) : Number.NaN;
+	const trimmed = value.trim();
+	return DECIMAL.test(trimmed) ? Number(trimmed) : Number.NaN;
+}
+
+/**
+ * The part of `frame` that lies inside the image: each coordinate clamped to the image.
+ *
+ * `frame` is a rectangle in image pixels that may extend past the image (the viewport
+ * zoomed out further than the image covers). The result is what `get()` reports as the
+ * points and what `result()` draws from; a frame that misses the image gives a rectangle
+ * without area.
+ *
+ * @param frame - Rectangle in image pixels
+ * @param imageWidth - Width of the image
+ * @param imageHeight - Height of the image
+ * @returns The intersection of `frame` and the image
+ */
+export function intersectFrame(
+	frame: CropPoints,
+	imageWidth: number,
+	imageHeight: number,
+): CropPoints {
+	return {
+		topLeftX: clamp(frame.topLeftX, 0, imageWidth),
+		topLeftY: clamp(frame.topLeftY, 0, imageHeight),
+		bottomRightX: clamp(frame.bottomRightX, 0, imageWidth),
+		bottomRightY: clamp(frame.bottomRightY, 0, imageHeight),
+	};
 }
 
 /**

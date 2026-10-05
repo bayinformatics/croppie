@@ -3,7 +3,8 @@
  *
  * A small, dependency-free parser: it walks the marker segments up to the first
  * start-of-scan, finds the APP1 segment that starts with `Exif\0\0`, and reads tag 0x0112 from
- * IFD0 of the embedded TIFF structure (either byte order). Every read is bounded by the
+ * IFD0 of the embedded TIFF structure (either byte order), stored as a SHORT or a LONG (an
+ * entry of any other type is ignored). Every read is bounded by the
  * segment and by the first 256 KiB, so hostile input cannot make it read far or throw.
  *
  * Browsers already display JPEGs upright according to this tag; Croppie reports it but never
