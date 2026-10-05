@@ -47,7 +47,7 @@
     "lint": "biome check src tests playwright.config.ts",
     "lint:fix": "biome check --write src tests playwright.config.ts",
     "typecheck": "tsc -p tsconfig.test.json",
-    "check:package": "publint && attw --pack . --profile esm-only",
+    "check:package": "node scripts/check-dts-specifiers.mjs && publint && attw --pack . --profile esm-only",
     "prepublishOnly": "bun run build"
   },
   "keywords": [

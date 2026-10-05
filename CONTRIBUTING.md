@@ -26,7 +26,7 @@ Use `--frozen-lockfile` so you never change `bun.lock` by accident. Change depen
 | `bun run typecheck` | Type-checks `src`, `tests` and the Playwright config (`tsconfig.test.json`) |
 | `bun run build` | Cleans `dist/`, then builds the bundle, CSS and type declarations |
 | `bun run build:docs` | Builds the demo bundle in `docs/` |
-| `bun run check:package` | `publint` + `attw` against the packed tarball |
+| `bun run check:package` | Checks that the type declarations in `dist/` import with `.js` specifiers, then `publint` + `attw` against the packed tarball |
 | `bun run dev` | Watch build into `dist/` (run `bun run build` before committing) |
 
 Before you commit, run `bun run lint && bun run typecheck && bun run test`.

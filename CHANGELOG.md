@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - A `./package.json` export.
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
 - Type declarations for the `./croppie.css` and `./style.css` exports, so `import '@bayinformatics/croppie/croppie.css'` type-checks under TypeScript 7, whose default `noUncheckedSideEffectImports` rejected it (TS2882).
-- `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?) scripts.
+- `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?, plus a check that every relative import in the type declarations has a `.js` extension) scripts.
 
 ### Changed
 
