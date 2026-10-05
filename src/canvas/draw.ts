@@ -12,13 +12,15 @@ import { clamp } from "../utils/clamp.js";
  * instead of a stretched image. An output with the frame's shape up to rounding to whole
  * pixels (the `'viewport'` and `'original'` result sizes) is filled exactly: a frame inside
  * the image maps onto the whole output, like drawing the crop rectangle directly, and the
- * rounding leaves no sub-pixel gap at the edges.
+ * rounding leaves no sub-pixel gap at the edges. The image is drawn with its edges on whole
+ * pixels, so a letterboxed image has no blurred half-pixel seam next to the bars.
  *
  * ```
  * k = min(outW / frameW, outH / frameH)    (kx = outW / frameW, ky = outH / frameH when filled)
  * ox = (outW - frameW * k) / 2             (same for y)
  * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (same for y)
- * dx = ox + (sx0 - frame.topLeftX) * k   dw = (sx1 - sx0) * k                     (same for y)
+ * dx0 = round(ox + (sx0 - frame.topLeftX) * k)   dx1 = round(ox + (sx1 - frame.topLeftX) * k)
+ * dw = dx1 - dx0                                                                  (same for y)
  * ```
  *
  * @param image - Source HTMLImageElement to draw from.
@@ -110,16 +112,24 @@ export function drawCroppedImage(
 
 	// A frame that misses the image entirely leaves only the background
 	if (sourceWidth > 0 && sourceHeight > 0) {
+		// Each edge on a whole pixel: a half-pixel edge blurs the seam between the image and
+		// a letterbox bar. An output the frame fills exactly is already 0..outW, 0..outH
+		const left = Math.round(offsetX + (sourceLeft - frame.topLeftX) * scaleX);
+		const right = Math.round(offsetX + (sourceRight - frame.topLeftX) * scaleX);
+		const top = Math.round(offsetY + (sourceTop - frame.topLeftY) * scaleY);
+		const bottom = Math.round(
+			offsetY + (sourceBottom - frame.topLeftY) * scaleY,
+		);
 		ctx.drawImage(
 			image,
 			sourceLeft,
 			sourceTop,
 			sourceWidth,
 			sourceHeight,
-			offsetX + (sourceLeft - frame.topLeftX) * scaleX,
-			offsetY + (sourceTop - frame.topLeftY) * scaleY,
-			sourceWidth * scaleX,
-			sourceHeight * scaleY,
+			left,
+			top,
+			right - left,
+			bottom - top,
 		);
 	}
 
