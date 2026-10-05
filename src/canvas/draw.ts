@@ -24,10 +24,10 @@ import { swapDims } from "../utils/rotation.js";
  *
  * With a `rotation` the frame is still given in the NATURAL image frame, while the output
  * canvas is in the displayed orientation: the image is drawn through a context rotated about
- * the output centre into a destination box of `swapDims(outW, outH, rotation)` (the output
- * turned back), so `[dw, dh] = swapDims(...)`, `kx = dw / frameW`, `ky = dh / frameH` and the
- * destination offsets are measured from `(-dw/2, -dh/2)`. The background and the circle mask
- * are applied first, in canvas coordinates, so they are not rotated.
+ * the output centre into the box `[bw, bh] = swapDims(outW, outH, rotation)` (the output
+ * turned back), which takes the place of `outW` and `outH` above, with the destination
+ * offsets measured from `(-bw/2, -bh/2)`. The background and the circle mask are applied in
+ * canvas coordinates, before the rotation, so they are not rotated.
  *
  * @param image - Source HTMLImageElement to draw from.
  * @param frame - Viewport rectangle in source-image pixels (the natural frame); may extend past the image.
@@ -90,11 +90,14 @@ export function drawCroppedImage(
 	const offsetX = (boxWidth - frameWidth * scaleX) / 2;
 	const offsetY = (boxHeight - frameHeight * scaleY) / 2;
 
-	// Apply elliptical mask if needed: the ellipse inscribed in the scaled frame (a circle
-	// when the frame is square)
+	// Apply elliptical mask if needed: the ellipse inscribed in the scaled frame, in canvas
+	// coordinates (a circle when the frame is square)
 	if (options?.circle) {
-		const maskWidth = frameWidth * scaleX;
-		const maskHeight = frameHeight * scaleY;
+		const [maskWidth, maskHeight] = swapDims(
+			frameWidth * scaleX,
+			frameHeight * scaleY,
+			rotation,
+		);
 		ctx.beginPath();
 		ctx.ellipse(
 			outputWidth / 2,
