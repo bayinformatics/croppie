@@ -1,6 +1,6 @@
 {
   "name": "@bayinformatics/croppie",
-  "version": "3.2.0",
+  "version": "3.1.0",
   "description": "A modern, TypeScript-first image cropper. Fork of Foliotek/Croppie.",
   "type": "module",
   "main": "./dist/croppie.js",
@@ -47,7 +47,7 @@
     "lint": "biome check src tests playwright.config.ts",
     "lint:fix": "biome check --write src tests playwright.config.ts",
     "typecheck": "tsc -p tsconfig.test.json",
-    "check:package": "publint && attw --pack . --profile esm-only",
+    "check:package": "node scripts/check-dts-specifiers.mjs && publint && attw --pack . --profile esm-only",
     "prepublishOnly": "bun run build"
   },
   "keywords": [
@@ -79,7 +79,7 @@
     "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public"

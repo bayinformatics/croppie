@@ -52,9 +52,11 @@ export declare class Croppie {
     /**
      * Loads an image into the cropper.
      *
-     * A `rotation` that is not a multiple of 90 or a `points` array without exactly 4
-     * entries rejects before anything changes, so it neither half-applies the new image nor
-     * cancels a bind that is still loading.
+     * A `rotation` that is not a multiple of 90 rejects before anything changes, so it
+     * neither half-applies the new image nor cancels a bind that is still loading.
+     * Malformed `points` (an array without exactly 4 entries, a coordinate that is not a
+     * number, a rect without width or height) are ignored with a console warning, and the
+     * image gets its default framing.
      */
     bind(options: BindOptions | string): Promise<void>;
     /**
@@ -67,10 +69,10 @@ export declare class Croppie {
     private resolveBindRotation;
     /**
      * Loads and applies an image for a bind that claimed `generation`, with the `rotation` and
-     * the (natural-frame) `points` that `bind()` resolved from `bindOptions` before claiming it.
-     * If the instance was destroyed or a newer bind started meanwhile, resolves without
-     * applying or emitting anything, and without surfacing a load error nobody is waiting for
-     * any more.
+     * the (natural-frame) `points` that `bind()` resolved from `bindOptions` before claiming it
+     * (`points` is `undefined` when malformed). If the instance was destroyed or a newer bind
+     * started meanwhile, resolves without applying or emitting anything, and without surfacing
+     * a load error nobody is waiting for any more.
      */
     private load;
     /**

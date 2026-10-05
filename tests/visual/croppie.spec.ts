@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
+import type { Croppie } from "../../src/Croppie.ts";
 
 const BASE = "/tests/visual/fixtures/test-page.html";
+
+/** The test page exposes its cropper as `window.croppie`. */
+type TestPageWindow = Window & { croppie: Croppie };
 
 function ready(page: import("@playwright/test").Page) {
 	return page.waitForSelector('body[data-ready="true"]', { timeout: 10_000 });
@@ -54,7 +58,7 @@ async function resultPixels(
 	points: Array<[number, number]>,
 ): Promise<Rgba[]> {
 	return page.evaluate(async (at) => {
-		const croppie = (window as any).croppie;
+		const croppie = (window as unknown as TestPageWindow).croppie;
 		const canvas: HTMLCanvasElement = await croppie.result({ type: "canvas" });
 		const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 		return at.map(([x, y]) => Array.from(ctx.getImageData(x, y, 1, 1).data));
@@ -110,7 +114,7 @@ test("EXIF orientation 6 is reported, not applied a second time", async ({
 	await ready(page);
 
 	const state = await page.evaluate(() => {
-		const data = (window as any).croppie.get();
+		const data = (window as unknown as TestPageWindow).croppie.get();
 		const preview = document.querySelector(".cr-image") as HTMLImageElement;
 		return {
 			orientation: data.orientation,
