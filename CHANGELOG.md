@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.
 - `setZoom(NaN)` (or any non-finite value; a numeric string, such as a range input's `value`, is still converted) is ignored instead of corrupting the transform, and every zoom input goes through one code path with one clamp.
+- `bind({ zoom })` with a non-finite zoom (`NaN`, `±Infinity`) starts at the coverage zoom instead of leaving a `NaN` transform that no later zoom could repair.
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.

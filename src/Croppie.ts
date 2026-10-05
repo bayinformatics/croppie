@@ -253,8 +253,13 @@ export class Croppie {
 			this.effectiveMinZoom = this.zoomConfig.min;
 		}
 
-		// Calculate initial zoom
-		const initialZoom = bindOptions.zoom ?? coverageZoom;
+		// Calculate initial zoom. As in setZoom(), a numeric string is converted and a value
+		// that is then not finite (NaN, ±Infinity) is ignored: the coverage zoom applies instead
+		// of a NaN that no later zoom could repair
+		const requestedZoom = Number(bindOptions.zoom ?? coverageZoom);
+		const initialZoom = Number.isFinite(requestedZoom)
+			? requestedZoom
+			: coverageZoom;
 
 		this.transform = {
 			x: 0,
