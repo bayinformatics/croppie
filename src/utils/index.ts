@@ -16,3 +16,8 @@ export {
 	type PointsInput,
 	pointsToArray,
 } from "./points.js";
+export {
+	CENTER_ANCHOR,
+	type ZoomAnchor,
+	zoomAboutAnchor,
+} from "./transform.js";

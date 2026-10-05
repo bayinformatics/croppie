@@ -30,6 +30,7 @@ import {
 	createZoomSlider,
 } from "./ui/index.js";
 import {
+	CENTER_ANCHOR,
 	calculateBounds,
 	calculateInitialZoom,
 	calculateTransformFromPoints,
@@ -38,6 +39,8 @@ import {
 	loadImage,
 	normalizePoints,
 	setTransform,
+	type ZoomAnchor,
+	zoomAboutAnchor,
 } from "./utils/index.js";
 
 const DEFAULT_ZOOM: ZoomConfig = {
@@ -156,9 +159,7 @@ export class Croppie {
 			// Slider input handler
 			const handleSliderInput = () => {
 				if (this.sliderEl) {
-					const previousZoom = this.transform.scale;
-					this.setZoom(Number.parseFloat(this.sliderEl.value));
-					this.emitEvent("zoom", { zoom: this.transform.scale, previousZoom });
+					this.applyZoom(Number.parseFloat(this.sliderEl.value));
 				}
 			};
 			this.sliderEl.addEventListener("input", handleSliderInput);
@@ -196,17 +197,9 @@ export class Croppie {
 			const wheelCleanup = createWheelZoomHandler(
 				this.boundaryEl,
 				() => this.transform.scale,
-				(zoom) => this.setZoom(zoom),
+				(zoom) => this.applyZoom(zoom),
 				this.zoomConfig,
-				{
-					onChange: (_zoom, previousZoom) => {
-						// Emit the actual clamped zoom value (setZoom clamps to effectiveMinZoom)
-						this.emitEvent("zoom", {
-							zoom: this.transform.scale,
-							previousZoom,
-						});
-					},
-				},
+				undefined,
 				requireCtrl,
 			);
 			this.cleanupFns.push(wheelCleanup);
@@ -216,14 +209,8 @@ export class Croppie {
 		const pinchCleanup = createPinchZoomHandler(
 			this.boundaryEl,
 			() => this.transform.scale,
-			(zoom) => this.setZoom(zoom),
+			(zoom) => this.applyZoom(zoom),
 			this.zoomConfig,
-			{
-				onChange: (_zoom, previousZoom) => {
-					// Emit the actual clamped zoom value (setZoom clamps to effectiveMinZoom)
-					this.emitEvent("zoom", { zoom: this.transform.scale, previousZoom });
-				},
-			},
 		);
 		this.cleanupFns.push(pinchCleanup);
 	}
@@ -298,6 +285,7 @@ export class Croppie {
 		this.constrainPosition();
 		this.updateTransform();
 		this.updateSlider();
+		this.emitUpdate();
 	}
 
 	/**
@@ -387,22 +375,46 @@ export class Croppie {
 	}
 
 	/**
-	 * Sets the zoom level with clamping
+	 * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
+	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed;
+	 * a non-finite value is ignored.
 	 */
 	setZoom(value: number): void {
+		this.applyZoom(value);
+	}
+
+	/**
+	 * The single path for every zoom change (setZoom, slider, wheel, pinch).
+	 *
+	 * Clamps the request to the effective limits, zooms about `anchor` so the image point
+	 * under it stays put, re-clamps the position, syncs the slider and emits `update`
+	 * then `zoom`. Nothing is emitted when the clamped zoom did not change.
+	 *
+	 * @param requested - Requested zoom level; not clamped by the caller
+	 * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
+	 */
+	private applyZoom(
+		requested: number,
+		anchor: ZoomAnchor = CENTER_ANCHOR,
+	): void {
+		if (!Number.isFinite(requested)) return;
+
 		const previousZoom = this.transform.scale;
-		this.transform.scale = clamp(
-			value,
-			this.effectiveMinZoom,
-			this.zoomConfig.max,
-		);
-		this.constrainPosition();
-		this.updateTransform();
+		const zoom = clamp(requested, this.effectiveMinZoom, this.zoomConfig.max);
+
+		if (zoom !== previousZoom) {
+			this.transform = zoomAboutAnchor(this.transform, zoom, anchor);
+			this.constrainPosition();
+			this.updateTransform();
+		}
+
+		// Always sync, so a slider drag the clamp rejected snaps back
 		this.updateSlider();
 
-		if (previousZoom !== this.transform.scale) {
-			this.emitUpdate();
-		}
+		if (zoom === previousZoom) return;
+
+		this.emitUpdate();
+		this.emitEvent("zoom", { zoom, previousZoom });
 	}
 
 	/**
@@ -418,6 +430,7 @@ export class Croppie {
 	 */
 	reset(): void {
 		if (this.image) {
+			const previousZoom = this.transform.scale;
 			const coverageZoom = calculateInitialZoom(
 				this.image.naturalWidth,
 				this.image.naturalHeight,
@@ -437,6 +450,13 @@ export class Croppie {
 			this.updateTransform();
 			this.updateSlider();
 			this.emitUpdate();
+
+			if (previousZoom !== this.transform.scale) {
+				this.emitEvent("zoom", {
+					zoom: this.transform.scale,
+					previousZoom,
+				});
+			}
 		}
 	}
 
