@@ -1,3 +1,4 @@
+import type { Rotation } from "../types.js";
 import type { ZoomAnchor } from "./transform.js";
 
 /**
@@ -81,20 +82,28 @@ export function getTransformValues(element: HTMLElement): {
 }
 
 /**
- * Set an element's CSS transform to a translation (in pixels) and a uniform scale.
+ * Set an element's CSS transform to a translation (in pixels), a uniform scale and an optional
+ * clockwise quarter-turn rotation.
+ *
+ * With transform-origin `0 0` the rotation is applied first, then the scale, then the
+ * translation. The `rotate()` term is omitted for rotation 0, so the string is identical to
+ * the one produced before rotation existed.
  *
  * @param element - The target HTMLElement to transform
  * @param x - Horizontal translation in pixels
  * @param y - Vertical translation in pixels
  * @param scale - Uniform scale factor (1 = no scale)
+ * @param rotation - Clockwise rotation in degrees (default: 0)
  */
 export function setTransform(
 	element: HTMLElement,
 	x: number,
 	y: number,
 	scale: number,
+	rotation: Rotation = 0,
 ): void {
-	element.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+	const rotate = rotation === 0 ? "" : ` rotate(${rotation}deg)`;
+	element.style.transform = `translate(${x}px, ${y}px) scale(${scale})${rotate}`;
 }
 
 /**
