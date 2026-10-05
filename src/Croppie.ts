@@ -34,6 +34,7 @@ import {
 	calculateContainZoom,
 	calculateInitialZoom,
 	calculateTransformFromPoints,
+	capCanvasSize,
 	clamp,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
@@ -402,9 +403,10 @@ export class Croppie {
 	 * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
 	 *
 	 * The image keeps its proportions at every `size`: a size of another shape than the
-	 * viewport centres the crop and leaves the rest transparent (or `backgroundColor`). With
-	 * `size: "original"`, a crop zoomed out past the image is scaled down to at most the area
-	 * of the image part it shows or 4096x4096 px, whichever is larger.
+	 * viewport centers the crop and leaves the rest transparent (or `backgroundColor`). An
+	 * `"original"` or custom size is scaled down, keeping its shape, to at most 16,777,216 px
+	 * (4096x4096) and 16,384 px a side, so the canvas stays within what browsers can allocate
+	 * (iOS Safari draws nothing on a larger one), and rounded to whole pixels.
 	 */
 	result(options: ResultOptions & { type: "blob" }): Promise<Blob>;
 	result(options: ResultOptions & { type: "base64" }): Promise<string>;
@@ -424,39 +426,21 @@ export class Croppie {
 		const frame = this.getViewportRect();
 		const viewport = this.options.viewport;
 
-		// Determine output size
+		// Determine output size. 'original' (the frame at image resolution) and a custom size
+		// are capped to a canvas browsers can allocate, keeping their shape
 		let outputWidth: number;
 		let outputHeight: number;
 
-		if (options.size === "viewport") {
-			outputWidth = viewport.width;
-			outputHeight = viewport.height;
-		} else if (options.size === "original") {
-			// The frame at image resolution, at a whole number of pixels. A frame that
-			// extends past the image (zoomed out, coverage not enforced) is scaled down until its
-			// area is at most that of its overlap with the image or 4096x4096, whichever is
-			// larger: the empty margin alone could exceed what browsers allocate for a canvas
-			const { topLeftX, topLeftY, bottomRightX, bottomRightY } = frame;
-			const { naturalWidth, naturalHeight } = this.image;
-			const frameWidth = bottomRightX - topLeftX;
-			const frameHeight = bottomRightY - topLeftY;
-			const overlapWidth =
-				Math.min(naturalWidth, bottomRightX) - Math.max(0, topLeftX);
-			const overlapHeight =
-				Math.min(naturalHeight, bottomRightY) - Math.max(0, topLeftY);
-			const overlapArea =
-				Math.max(0, overlapWidth) * Math.max(0, overlapHeight);
-			const shrink = Math.min(
-				1,
-				Math.sqrt(
-					Math.max(4096 * 4096, overlapArea) / (frameWidth * frameHeight),
-				),
-			);
-			outputWidth = Math.max(1, Math.round(frameWidth * shrink));
-			outputHeight = Math.max(1, Math.round(frameHeight * shrink));
-		} else if (options.size) {
-			outputWidth = options.size.width;
-			outputHeight = options.size.height;
+		if (options.size === "original") {
+			({ width: outputWidth, height: outputHeight } = capCanvasSize(
+				frame.bottomRightX - frame.topLeftX,
+				frame.bottomRightY - frame.topLeftY,
+			));
+		} else if (options.size && options.size !== "viewport") {
+			({ width: outputWidth, height: outputHeight } = capCanvasSize(
+				options.size.width,
+				options.size.height,
+			));
 		} else {
 			outputWidth = viewport.width;
 			outputHeight = viewport.height;

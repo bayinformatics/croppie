@@ -150,10 +150,10 @@ export interface ResultOptions {
 	type: OutputType;
 	/**
 	 * Output dimensions (default `"viewport"`). The image keeps its proportions: a size of
-	 * another shape than the viewport centres the crop and leaves the rest transparent (or
-	 * `backgroundColor`). `"original"` is the viewport area at image resolution, rounded to
-	 * whole pixels; zoomed out past the image, it is scaled down to at most the area of the
-	 * image part it shows or 4096x4096 px, whichever is larger.
+	 * another shape than the viewport centers the crop and leaves the rest transparent (or
+	 * `backgroundColor`). `"original"` is the viewport area at image resolution. An
+	 * `"original"` or custom size is scaled down, keeping its shape, to at most 16,777,216 px
+	 * (4096x4096) and 16,384 px a side, then rounded to whole pixels.
 	 */
 	size?: { width: number; height: number } | "viewport" | "original";
 	/** Output format (for base64/blob) */

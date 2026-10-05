@@ -18,8 +18,11 @@ export {
 	loadImage,
 } from "./image.js";
 export {
+	capCanvasSize,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
+	MAX_CANVAS_AREA,
+	MAX_CANVAS_SIDE,
 	type MinZoomInput,
 	resolveMinZoom,
 } from "./limits.js";
