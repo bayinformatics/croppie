@@ -161,4 +161,3 @@ export interface TransformState {
     /** Current scale/zoom */
     scale: number;
 }
-//# sourceMappingURL=types.d.ts.map

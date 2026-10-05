@@ -47,4 +47,3 @@ export declare function calculateTransformFromPoints(points: CropPoints, imageWi
     min: number;
     max: number;
 }): TransformState | undefined;
-//# sourceMappingURL=points.d.ts.map

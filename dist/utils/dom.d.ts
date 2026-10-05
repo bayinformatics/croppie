@@ -33,4 +33,3 @@ export declare function getTransformValues(element: HTMLElement): {
  * @param scale - Uniform scale factor (1 = no scale)
  */
 export declare function setTransform(element: HTMLElement, x: number, y: number, scale: number): void;
-//# sourceMappingURL=dom.d.ts.map

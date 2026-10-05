@@ -1,4 +1,4 @@
-import type { Boundary, Viewport } from "../types.ts";
+import type { Boundary, Viewport } from "../types.js";
 /**
  * Create the croppie container element.
  *
@@ -52,4 +52,3 @@ export declare function createZoomSlider(min: number, max: number, value: number
  * @returns The created div element with class "cr-slider-wrap".
  */
 export declare function createSliderContainer(): HTMLDivElement;
-//# sourceMappingURL=elements.d.ts.map

@@ -18,4 +18,3 @@ export interface TransformBounds {
  * @returns Bounds object with minX, maxX, minY, maxY
  */
 export declare function calculateBounds(imageWidth: number, imageHeight: number, scale: number, viewportWidth: number, viewportHeight: number): TransformBounds;
-//# sourceMappingURL=bounds.d.ts.map

@@ -1,4 +1,4 @@
-import type { ZoomConfig } from "../types.ts";
+import type { ZoomConfig } from "../types.js";
 export interface ZoomCallbacks {
     onChange?: (zoom: number, previousZoom: number) => void;
 }
@@ -32,4 +32,3 @@ export declare function createWheelZoomHandler(element: HTMLElement, getZoom: ()
  * @returns A function that removes the attached touch listeners from `element`.
  */
 export declare function createPinchZoomHandler(element: HTMLElement, getZoom: () => number, setZoom: (zoom: number) => void, config: ZoomConfig, callbacks?: ZoomCallbacks): () => void;
-//# sourceMappingURL=zoom.d.ts.map

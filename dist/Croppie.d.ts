@@ -1,4 +1,4 @@
-import type { BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from "./types.ts";
+import type { BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from "./types.js";
 /**
  * Modern, TypeScript-first image cropper.
  *
@@ -109,4 +109,3 @@ export declare class Croppie {
      */
     private emitEvent;
 }
-//# sourceMappingURL=Croppie.d.ts.map

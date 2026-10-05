@@ -1,4 +1,4 @@
-import type { CropPoints, OutputFormat } from "../types.ts";
+import type { CropPoints, OutputFormat } from "../types.js";
 /**
  * Create a new canvas containing the specified rectangular region of an image, scaled to given dimensions and optionally masked or filled.
  *
@@ -33,4 +33,3 @@ export declare function canvasToBlob(canvas: HTMLCanvasElement, format?: OutputF
  * @returns A data URL (base64) containing the encoded image in the specified format.
  */
 export declare function canvasToBase64(canvas: HTMLCanvasElement, format?: OutputFormat, quality?: number): string;
-//# sourceMappingURL=draw.d.ts.map

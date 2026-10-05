@@ -1,4 +1,4 @@
-import type { TransformState } from "../types.ts";
+import type { TransformState } from "../types.js";
 export interface DragCallbacks {
     onStart?: (state: TransformState) => void;
     onMove?: (state: TransformState) => void;
@@ -17,4 +17,3 @@ export interface DragCallbacks {
  * @returns A cleanup function that removes the installed event listeners
  */
 export declare function createDragHandler(element: HTMLElement, getTransform: () => TransformState, setTransform: (x: number, y: number) => void, callbacks?: DragCallbacks): () => void;
-//# sourceMappingURL=drag.d.ts.map
