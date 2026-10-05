@@ -7,8 +7,8 @@ function state(x: number, y: number, scale: number): TransformState {
 }
 
 describe("zoomAboutAnchor", () => {
-	describe("about the centre", () => {
-		it("keeps a centred image centred", () => {
+	describe("about the center", () => {
+		it("keeps a centered image centered", () => {
 			const result = zoomAboutAnchor(state(0, 0, 1), 2, CENTER_ANCHOR);
 
 			expect(result.x).toBe(0);
@@ -16,13 +16,13 @@ describe("zoomAboutAnchor", () => {
 			expect(result.scale).toBe(2);
 		});
 
-		it("uses the centre as the default anchor", () => {
+		it("uses the center as the default anchor", () => {
 			expect(zoomAboutAnchor(state(50, -20, 1), 2)).toEqual(
 				zoomAboutAnchor(state(50, -20, 1), 2, CENTER_ANCHOR),
 			);
 		});
 
-		it("scales the offset from the centre by the zoom ratio", () => {
+		it("scales the offset from the center by the zoom ratio", () => {
 			const result = zoomAboutAnchor(state(50, -20, 1), 2, CENTER_ANCHOR);
 
 			expect(result.x).toBeCloseTo(100, 9);
@@ -31,7 +31,7 @@ describe("zoomAboutAnchor", () => {
 		});
 	});
 
-	describe("about an off-centre anchor", () => {
+	describe("about an off-center anchor", () => {
 		it("moves the image toward the anchor when zooming in", () => {
 			const result = zoomAboutAnchor(state(0, 0, 1), 1.1, { x: 50, y: 0 });
 
@@ -53,7 +53,7 @@ describe("zoomAboutAnchor", () => {
 					for (const scale of scales) {
 						const after = zoomAboutAnchor(before, scale, anchor);
 
-						// Image coordinate (from the image centre) under the anchor
+						// Image coordinate (from the image center) under the anchor
 						expect((anchor.x - after.x) / after.scale).toBeCloseTo(
 							(anchor.x - before.x) / before.scale,
 							9,
