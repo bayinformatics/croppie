@@ -179,7 +179,7 @@ describe("Drag Handler gestures", () => {
 			expect(setTransform).toHaveBeenLastCalledWith(25, 0);
 		});
 
-		it("stops counting a finger that was cancelled or lost its capture", () => {
+		it("stops counting a finger that was canceled or lost its capture", () => {
 			createDragHandler(element, getTransform, setTransform);
 			restThumbElsewhere();
 

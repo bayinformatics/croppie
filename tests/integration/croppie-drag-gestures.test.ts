@@ -11,7 +11,7 @@ import {
 import { TINY_PNG } from "../fixtures/test-image-data-url.ts";
 
 describe("Croppie drag gestures", () => {
-	// 400x300 image at zoom 1, 100x100 viewport centred in a 300x300 boundary
+	// 400x300 image at zoom 1, 100x100 viewport centered in a 300x300 boundary
 	let container: HTMLDivElement;
 	let croppie: Croppie;
 	let boundary: HTMLElement;
@@ -69,12 +69,12 @@ describe("Croppie drag gestures", () => {
 			pointer("pointerdown", 100, 150);
 			pointer("pointermove", 120, 150);
 			croppie.setZoom(2);
-			const centre = imageXUnder(150);
+			const center = imageXUnder(150);
 
 			pointer("pointermove", 121, 150);
 
 			// One more client pixel at zoom 2 is half an image pixel
-			expect(imageXUnder(150)).toBeCloseTo(centre - 0.5, 6);
+			expect(imageXUnder(150)).toBeCloseTo(center - 0.5, 6);
 		});
 
 		it("keeps a slider zoom made during a drag", () => {
@@ -83,11 +83,11 @@ describe("Croppie drag gestures", () => {
 			const slider = container.querySelector(".cr-slider") as HTMLInputElement;
 			slider.value = "2";
 			slider.dispatchEvent(new Event("input"));
-			const centre = imageXUnder(150);
+			const center = imageXUnder(150);
 
 			pointer("pointermove", 121, 150);
 
-			expect(imageXUnder(150)).toBeCloseTo(centre - 0.5, 6);
+			expect(imageXUnder(150)).toBeCloseTo(center - 0.5, 6);
 		});
 	});
 

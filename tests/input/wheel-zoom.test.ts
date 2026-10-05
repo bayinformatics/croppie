@@ -177,7 +177,7 @@ describe("Wheel Zoom Handler", () => {
 	});
 
 	describe("anchor", () => {
-		it("passes the cursor position as an offset from the element centre", () => {
+		it("passes the cursor position as an offset from the element center", () => {
 			mockElementRect(element, { left: 0, top: 0, width: 300, height: 300 });
 			createWheelZoomHandler(element, getZoom, requestZoom);
 
@@ -199,7 +199,7 @@ describe("Wheel Zoom Handler", () => {
 			expect(lastRequest().anchor).toEqual({ x: 0, y: -50 });
 		});
 
-		it("falls back to the centre when the element has no layout box", () => {
+		it("falls back to the center when the element has no layout box", () => {
 			createWheelZoomHandler(element, getZoom, requestZoom);
 
 			element.dispatchEvent(

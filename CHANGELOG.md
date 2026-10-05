@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Declaration maps are no longer shipped; they pointed at sources that are not part of the package.
 - The package `homepage` is the live demo, and `CHANGELOG.md` is included in the published files.
 - Visual regression baselines are stored per platform (`chromium-linux`, `chromium-darwin`).
-- Zooming (slider, mouse wheel, pinch, `setZoom()`) keeps the point under the viewport centre, the cursor or the finger midpoint fixed, instead of always zooming about the image centre, so the image no longer drifts after a pan.
+- Zooming (slider, mouse wheel, pinch, `setZoom()`) keeps the point under the viewport center, the cursor or the finger midpoint fixed, instead of always zooming about the image center, so the image no longer drifts after a pan.
 - Mouse wheel zoom is multiplicative: ×1.1 per notch (100px, or 3 lines for a mouse that scrolls by lines), scaled by `deltaY` and `deltaMode` and capped at one notch per event (it was a fixed ±0.1 step).
 - Event contract: `bind()` now emits one `update`; `setZoom()` and `zoom =` emit `zoom`; `reset()` emits `zoom` when the zoom changed; `zoom` and `update` are emitted only when the clamped value actually changed; `update` fires before `zoom`. A drag that the bounds fully absorb no longer emits `update`. A `zoom` event is never emitted for a zoom that an `update` listener already replaced: only the final change is reported. See the Events table in the README.
 - `zoom.initial` is deprecated: it never had an effect (use `bind({ url, zoom })`).

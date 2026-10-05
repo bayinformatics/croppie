@@ -70,7 +70,7 @@ describe("pinch: only fingers that went down on the element count", () => {
 
 		const [zoom, anchor] = requestZoom.mock.calls.at(-1) ?? [];
 		expect(zoom).toBeCloseTo(2, 9);
-		// Midpoint (220, 150) is 70px right of the element centre (150, 150)
+		// Midpoint (220, 150) is 70px right of the element center (150, 150)
 		expect(anchor).toEqual({ x: 70, y: 0 });
 	});
 
@@ -119,7 +119,7 @@ describe("pinch: a zoom change mid-gesture is kept, not overwritten", () => {
 	let boundary: HTMLElement;
 	let cleanupImageMock: () => void;
 
-	/** Two fingers `spread` px apart about the boundary centre. */
+	/** Two fingers `spread` px apart about the boundary center. */
 	function pinch(type: string, spread: number): void {
 		boundary.dispatchEvent(
 			createTouchEvent(type, [
