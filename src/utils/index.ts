@@ -28,6 +28,7 @@ export {
 } from "./limits.js";
 export {
 	calculateTransformFromPoints,
+	intersectFrame,
 	normalizePoints,
 	type PointsArray,
 	type PointsInput,

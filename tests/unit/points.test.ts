@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import type { PointsArray } from "../../src/types.ts";
 import {
 	calculateTransformFromPoints,
+	intersectFrame,
 	normalizePoints,
 	pointsToArray,
 } from "../../src/utils/points.ts";
@@ -225,5 +226,48 @@ describe("calculateTransformFromPoints", () => {
 		expect(t?.scale).toBeCloseTo(20, 9);
 		expect(t?.x).toBeCloseTo(20, 9);
 		expect(t?.y).toBeCloseTo(-10, 9);
+	});
+});
+
+describe("intersectFrame", () => {
+	test("leaves a frame inside the image unchanged", () => {
+		const frame = {
+			topLeftX: 10,
+			topLeftY: 20,
+			bottomRightX: 60,
+			bottomRightY: 70,
+		};
+
+		expect(intersectFrame(frame, 400, 300)).toEqual(frame);
+	});
+
+	test("clamps a frame that extends past the image on every side", () => {
+		expect(
+			intersectFrame(
+				{
+					topLeftX: -300,
+					topLeftY: -350,
+					bottomRightX: 700,
+					bottomRightY: 650,
+				},
+				400,
+				300,
+			),
+		).toEqual({
+			topLeftX: 0,
+			topLeftY: 0,
+			bottomRightX: 400,
+			bottomRightY: 300,
+		});
+	});
+
+	test("gives a rectangle without area for a frame that misses the image", () => {
+		const inside = intersectFrame(
+			{ topLeftX: 500, topLeftY: 0, bottomRightX: 600, bottomRightY: 100 },
+			400,
+			300,
+		);
+
+		expect(inside.bottomRightX - inside.topLeftX).toBe(0);
 	});
 });

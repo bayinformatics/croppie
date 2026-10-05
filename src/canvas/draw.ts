@@ -1,5 +1,5 @@
 import type { CropPoints, OutputFormat } from "../types.js";
-import { clamp } from "../utils/clamp.js";
+import { intersectFrame } from "../utils/points.js";
 
 /**
  * Create a new canvas showing the viewport `frame` of an image, scaled to given dimensions and optionally masked or filled.
@@ -18,7 +18,7 @@ import { clamp } from "../utils/clamp.js";
  * ```
  * k = min(outW / frameW, outH / frameH)    (kx = outW / frameW, ky = outH / frameH when filled)
  * ox = (outW - frameW * k) / 2             (same for y)
- * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (same for y)
+ * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (intersectFrame)
  * dx0 = round(ox + (sx0 - frame.topLeftX) * k)   dx1 = round(ox + (sx1 - frame.topLeftX) * k)
  * dw = dx1 - dx0                                                                  (same for y)
  * ```
@@ -102,10 +102,12 @@ export function drawCroppedImage(
 	}
 
 	// Intersect the frame with the image and map the overlap into the output
-	const sourceLeft = clamp(frame.topLeftX, 0, image.naturalWidth);
-	const sourceRight = clamp(frame.bottomRightX, 0, image.naturalWidth);
-	const sourceTop = clamp(frame.topLeftY, 0, image.naturalHeight);
-	const sourceBottom = clamp(frame.bottomRightY, 0, image.naturalHeight);
+	const {
+		topLeftX: sourceLeft,
+		topLeftY: sourceTop,
+		bottomRightX: sourceRight,
+		bottomRightY: sourceBottom,
+	} = intersectFrame(frame, image.naturalWidth, image.naturalHeight);
 
 	const sourceWidth = sourceRight - sourceLeft;
 	const sourceHeight = sourceBottom - sourceTop;

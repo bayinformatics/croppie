@@ -39,6 +39,7 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	fileToDataUrl,
+	intersectFrame,
 	loadImage,
 	normalizePoints,
 	positiveFinite,
@@ -819,14 +820,11 @@ export class Croppie {
 			return { topLeftX: 0, topLeftY: 0, bottomRightX: 0, bottomRightY: 0 };
 		}
 
-		const rect = this.getViewportRect();
-
-		return {
-			topLeftX: Math.max(0, rect.topLeftX),
-			topLeftY: Math.max(0, rect.topLeftY),
-			bottomRightX: Math.min(this.image.naturalWidth, rect.bottomRightX),
-			bottomRightY: Math.min(this.image.naturalHeight, rect.bottomRightY),
-		};
+		return intersectFrame(
+			this.getViewportRect(),
+			this.image.naturalWidth,
+			this.image.naturalHeight,
+		);
 	}
 
 	/**
