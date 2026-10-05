@@ -167,9 +167,7 @@ describe("Croppie bind", () => {
 	});
 
 	describe("slider update", () => {
-		// TODO(phase-b): bind() sets slider.min to the uncapped coverage zoom ("100")
-		// even though zoom.max is 10; PR 3 caps the effective minimum at zoom.max.
-		it.skip("updates slider min to effective minimum zoom", async () => {
+		it("updates slider min to effective minimum zoom", async () => {
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
 				zoom: { min: 0.1, max: 10 },
@@ -179,8 +177,10 @@ describe("Croppie bind", () => {
 			await croppie.bind(TINY_PNG);
 
 			const slider = container.querySelector(".cr-slider") as HTMLInputElement;
-			// Slider min should be the effective minimum (coverage zoom, clamped to max)
+			// A 1x1 image needs 100x to cover the viewport; the effective minimum is
+			// capped at zoom.max, so the slider range is [10, 10] and never inverted
 			expect(slider.min).toBe("10");
+			expect(slider.max).toBe("10");
 		});
 
 		it("updates slider value to match zoom", async () => {
@@ -253,6 +253,77 @@ describe("Croppie bind", () => {
 			// 10x10 image needs 10x zoom
 			await croppie.bind(SMALL_PNG);
 			expect(croppie.zoom).toBe(10);
+		});
+	});
+
+	describe("default minimum zoom", () => {
+		// 4032x3024 photo in a 200x200 viewport: coverage 0.06614, contain 0.0496
+		let cleanupPhotoMock: () => void;
+
+		beforeEach(() => {
+			cleanupPhotoMock = installImageMock({ width: 4032, height: 3024 });
+		});
+
+		afterEach(() => {
+			cleanupPhotoMock();
+		});
+
+		function sliderMin(): number {
+			const slider = container.querySelector(".cr-slider") as HTMLInputElement;
+			return Number(slider.min);
+		}
+
+		it("lets a large photo start at its coverage zoom instead of an unreachable 0.1", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+			});
+
+			await croppie.bind(TINY_PNG);
+
+			expect(croppie.zoom).toBeCloseTo(0.06614, 5);
+			expect(sliderMin()).toBeCloseTo(croppie.zoom, 9);
+		});
+
+		it("keeps an explicitly configured min of 0.1 as the floor", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+				zoom: { min: 0.1 },
+			});
+
+			await croppie.bind(TINY_PNG);
+
+			expect(croppie.zoom).toBeCloseTo(0.1, 9);
+			expect(sliderMin()).toBeCloseTo(0.1, 9);
+		});
+
+		it("zooms out to fit the whole image when coverage is not enforced and min is unset", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+				zoom: { enforceMinimumCoverage: false },
+			});
+			await croppie.bind(TINY_PNG);
+
+			croppie.setZoom(0.05);
+
+			expect(croppie.zoom).toBeCloseTo(0.05, 9);
+			// ...but not past the contain zoom (0.0496)
+			croppie.setZoom(0.01);
+			expect(croppie.zoom).toBeCloseTo(200 / 4032, 9);
+		});
+
+		it("re-resolves the limits for every image", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+			expect(sliderMin()).toBeCloseTo(200 / 3024, 9);
+
+			cleanupPhotoMock();
+			cleanupPhotoMock = installImageMock({ width: 400, height: 400 });
+			await croppie.bind(SMALL_PNG);
+
+			expect(sliderMin()).toBeCloseTo(0.5, 9);
+			expect(croppie.zoom).toBeCloseTo(0.5, 9);
 		});
 	});
 });

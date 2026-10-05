@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { clamp } from "../../src/utils/clamp.ts";
 import { debounce } from "../../src/utils/debounce.ts";
-import { aspectRatio, calculateInitialZoom } from "../../src/utils/image.ts";
+import {
+	aspectRatio,
+	calculateContainZoom,
+	calculateInitialZoom,
+} from "../../src/utils/image.ts";
 
 describe("clamp", () => {
 	test("returns value when within range", () => {
@@ -109,5 +113,36 @@ describe("calculateInitialZoom", () => {
 		// 2000x2000 image, 200x200 viewport → needs 0.1x zoom
 		const zoom = calculateInitialZoom(2000, 2000, 200, 200);
 		expect(zoom).toBe(0.1);
+	});
+});
+
+describe("calculateContainZoom", () => {
+	test("returns the scale that fits the whole image inside the viewport", () => {
+		expect(calculateContainZoom(400, 400, 200, 200)).toBe(0.5);
+	});
+
+	test("returns a scale above 1 for an image smaller than the viewport", () => {
+		expect(calculateContainZoom(100, 100, 200, 200)).toBe(2);
+	});
+
+	test("uses the smaller ratio for a wide image", () => {
+		// 400x200 in 100x100: width ratio 0.25, height ratio 0.5
+		expect(calculateContainZoom(400, 200, 100, 100)).toBe(0.25);
+	});
+
+	test("is never above the coverage zoom", () => {
+		for (const [iw, ih, vw, vh] of [
+			[4032, 3024, 200, 200],
+			[100, 400, 300, 120],
+			[1, 1, 100, 100],
+		] as const) {
+			expect(calculateContainZoom(iw, ih, vw, vh)).toBeLessThanOrEqual(
+				calculateInitialZoom(iw, ih, vw, vh),
+			);
+		}
+	});
+
+	test("matches the 4032x3024 photo in a 200x200 viewport", () => {
+		expect(calculateContainZoom(4032, 3024, 200, 200)).toBeCloseTo(0.0496, 4);
 	});
 });
