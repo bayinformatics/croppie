@@ -238,9 +238,24 @@ describe("UI Elements", () => {
 		});
 
 		it("sets webkit mask image for compatibility", () => {
-			const overlay = createOverlay(boundary, viewport);
+			// happy-dom >= 20.14 does not implement -webkit-mask-image and silently drops
+			// the assignment, so record it through a temporary accessor on the prototype.
+			const proto = Object.getPrototypeOf(document.createElement("div").style) as object;
+			let assigned: unknown;
+			Object.defineProperty(proto, "webkitMaskImage", {
+				configurable: true,
+				get: () => assigned,
+				set: (value: unknown) => {
+					assigned = value;
+				},
+			});
 
-			expect(overlay.style.webkitMaskImage).toBeTruthy();
+			try {
+				createOverlay(boundary, viewport);
+				expect(assigned).toBeTruthy();
+			} finally {
+				Reflect.deleteProperty(proto, "webkitMaskImage");
+			}
 		});
 	});
 
