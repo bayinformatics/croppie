@@ -42,6 +42,7 @@ import {
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./utils/index.js";
+import { toNumber } from "./utils/number.js";
 
 const DEFAULT_ZOOM: ZoomConfig = {
 	min: 0.1,
@@ -277,9 +278,9 @@ export class Croppie {
 		}
 
 		// Calculate initial zoom. As in setZoom(), a numeric string is converted and a value
-		// that is then not finite (NaN, ±Infinity) is ignored: the coverage zoom applies instead
-		// of a NaN that no later zoom could repair
-		const requestedZoom = Number(bindOptions.zoom ?? coverageZoom);
+		// that is then not finite (NaN, ±Infinity, a blank or non-numeric string) is ignored:
+		// the coverage zoom applies instead of a NaN that no later zoom could repair
+		const requestedZoom = toNumber(bindOptions.zoom ?? coverageZoom);
 		const initialZoom = Number.isFinite(requestedZoom)
 			? requestedZoom
 			: coverageZoom;
@@ -413,10 +414,10 @@ export class Croppie {
 	 * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
 	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
 	 * A numeric string (such as a range input's `value`) is converted to a number;
-	 * a value that is then not finite is ignored.
+	 * a value that is then not finite, a blank string included, is ignored.
 	 */
 	setZoom(value: number): void {
-		this.applyZoom(Number(value));
+		this.applyZoom(toNumber(value));
 	}
 
 	/**

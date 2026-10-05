@@ -173,7 +173,7 @@ Get current crop data (points and zoom).
 
 #### `setZoom(value: number): void`
 
-Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport centre; non-finite values are ignored. Emits `update` and `zoom` when the clamped zoom changed.
+Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport center; a numeric string is converted, and a non-finite value or a blank or non-numeric string is ignored. Emits `update` and `zoom` when the clamped zoom changed.
 
 #### `zoom: number`
 
