@@ -181,7 +181,7 @@ Getter and setter for the current zoom level. Setting it clamps to the zoom limi
 
 #### `reset(): void`
 
-Re-centres the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
+Re-centers the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
 
 #### `on(event, handler): void` / `off(event, handler): void`
 
@@ -231,7 +231,7 @@ Zooming keeps the point under the cursor (mouse wheel), between the fingers (pin
 
 ## Theming
 
-The colours are CSS custom properties, set on `:root` by `croppie.css`. Override them anywhere in your own stylesheet:
+The colors are CSS custom properties, set on `:root` by `croppie.css`. Override them anywhere in your own stylesheet:
 
 ```css
 .my-cropper {
