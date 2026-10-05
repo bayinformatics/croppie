@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import type { CropPoints, CroppieOptions } from "../../src/types.ts";
+import type { CropPoints, CroppieOptions, Rotation } from "../../src/types.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
@@ -384,7 +384,7 @@ describe("Croppie rotate", () => {
 		});
 
 		it("round-trips for every rotation, and re-binding get() reproduces the data", async () => {
-			for (const rotation of [0, 90, 180, 270]) {
+			for (const rotation of [0, 90, 180, 270] as Rotation[]) {
 				create();
 				await croppie.bind({ url: SMALL_PNG, points: natural, rotation });
 				const first = croppie.get();

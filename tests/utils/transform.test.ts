@@ -1,9 +1,14 @@
 import { describe, expect, it } from "bun:test";
-import type { TransformState } from "../../src/types.ts";
+import type { Rotation, TransformState } from "../../src/types.ts";
 import { CENTER_ANCHOR, zoomAboutAnchor } from "../../src/utils/transform.ts";
 
-function state(x: number, y: number, scale: number): TransformState {
-	return { x, y, scale };
+function state(
+	x: number,
+	y: number,
+	scale: number,
+	rotation: Rotation = 0,
+): TransformState {
+	return { x, y, scale, rotation };
 }
 
 describe("zoomAboutAnchor", () => {
@@ -92,11 +97,22 @@ describe("zoomAboutAnchor", () => {
 		});
 	});
 
+	it("keeps the rotation untouched", () => {
+		for (const rotation of [0, 90, 180, 270] as const) {
+			const result = zoomAboutAnchor(state(10, 20, 1, rotation), 2, {
+				x: 5,
+				y: 5,
+			});
+
+			expect(result.rotation).toBe(rotation);
+		}
+	});
+
 	it("does not mutate its input", () => {
 		const before = state(10, 20, 1);
 
 		zoomAboutAnchor(before, 3, { x: 5, y: 5 });
 
-		expect(before).toEqual({ x: 10, y: 20, scale: 1 });
+		expect(before).toEqual({ x: 10, y: 20, scale: 1, rotation: 0 });
 	});
 });

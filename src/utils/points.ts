@@ -1,4 +1,4 @@
-import type { CropPoints, PointsArray, TransformState } from "../types";
+import type { CropPoints, PointsArray, TransformState } from "../types.js";
 import { clamp } from "./clamp.js";
 
 // Re-export for convenience
@@ -86,7 +86,7 @@ export function calculateTransformFromPoints(
 	viewportWidth: number,
 	viewportHeight: number,
 	scaleBounds?: { min: number; max: number },
-): TransformState | undefined {
+): Pick<TransformState, "x" | "y" | "scale"> | undefined {
 	const { topLeftX, topLeftY, bottomRightX, bottomRightY } = points;
 	if (
 		![topLeftX, topLeftY, bottomRightX, bottomRightY].every(Number.isFinite)
