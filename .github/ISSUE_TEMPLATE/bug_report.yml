@@ -1,0 +1,40 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. A minimal reproduction makes a fix much faster.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Steps, or a link to a minimal example (CodeSandbox, StackBlitz, a gist).
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Croppie version
+      placeholder: e.g. 3.2.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and OS
+      placeholder: e.g. Safari 19 on iOS 19, Chrome 150 on macOS
+  - type: textarea
+    id: options
+    attributes:
+      label: Options used
+      description: The options passed to `new Croppie(...)` and `bind(...)`.
+      render: typescript
