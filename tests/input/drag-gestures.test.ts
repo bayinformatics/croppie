@@ -207,6 +207,40 @@ describe("Drag Handler gestures", () => {
 			expect(setTransform).toHaveBeenLastCalledWith(40, 0);
 		});
 
+		it("pans with a new first finger after the panning finger's pointerup was lost", () => {
+			const onStart = mock();
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, {
+				onStart,
+				onEnd,
+			});
+
+			touch("pointerdown", 2, 100, true);
+			touch("pointermove", 2, 110, true); // x = 10
+			// Finger 2's pointerup was lost: no finger is down, so the next one is primary
+			touch("pointerdown", 3, 200, true);
+			touch("pointermove", 3, 230, true);
+
+			expect(setTransform).toHaveBeenLastCalledWith(40, 0);
+			expect(onEnd).toHaveBeenCalledTimes(1);
+			expect(onStart).toHaveBeenCalledTimes(2);
+		});
+
+		it("pans with a first touch after a mouse drag whose pointerup was lost", () => {
+			// Without pointer capture a mouseup outside the element never reaches it
+			element.setPointerCapture = mock(() => {
+				throw new Error("capture unavailable");
+			});
+			createDragHandler(element, getTransform, setTransform);
+
+			pointer("pointerdown", { clientX: 100, clientY: 100 }); // the mouse
+			pointer("pointermove", { clientX: 110, clientY: 100 }); // x = 10
+			touch("pointerdown", 2, 200, true);
+			touch("pointermove", 2, 230, true);
+
+			expect(setTransform).toHaveBeenLastCalledWith(40, 0);
+		});
+
 		it("does not pan with a finger put down while another is down on the element, but pans with the next touch", () => {
 			const onStart = mock();
 			createDragHandler(element, getTransform, setTransform, { onStart });
@@ -229,6 +263,37 @@ describe("Drag Handler gestures", () => {
 
 			expect(setTransform).toHaveBeenCalledTimes(1);
 			expect(setTransform).toHaveBeenLastCalledWith(30, 0);
+		});
+
+		it("resumes the pan with the first finger when the second finger lifts", () => {
+			const onStart = mock();
+			createDragHandler(element, getTransform, setTransform, { onStart });
+
+			touch("pointerdown", 2, 100, true); // A pans
+			touch("pointermove", 2, 110, true); // x = 10
+			touch("pointerdown", 3, 200, false); // B lands: a pinch, the pan ends
+			touch("pointermove", 2, 150, true); // a pinch move does not pan
+			touch("pointerup", 3, 200, false); // B lifts, A is the only finger left
+
+			// A's next move is the new starting point: the image does not jump
+			touch("pointermove", 2, 160, true);
+			expect(transformState.x).toBe(10);
+
+			touch("pointermove", 2, 175, true);
+			expect(transformState.x).toBe(25);
+			expect(onStart).toHaveBeenCalledTimes(2);
+		});
+
+		it("resumes the pan with the second finger when the first finger lifts", () => {
+			createDragHandler(element, getTransform, setTransform);
+
+			touch("pointerdown", 2, 100, true);
+			touch("pointerdown", 3, 200, false);
+			touch("pointerup", 2, 100, true);
+			touch("pointermove", 3, 210, false); // the new starting point
+			touch("pointermove", 3, 230, false);
+
+			expect(setTransform).toHaveBeenLastCalledWith(20, 0);
 		});
 
 		it("does not pan when the first finger of a pinch is lifted and replaced", () => {

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { CropPoints, CroppieOptions } from "../../src/types.ts";
-import { buildJpegHeader } from "../fixtures/exif-jpeg.js";
+import { jpegDataUrl } from "../fixtures/exif-jpeg.js";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 
 const PHOTO = "https://example.com/photo.jpg"; // 400x300
@@ -11,14 +11,6 @@ function dimensions(src: string): { width: number; height: number } {
 	if (src === SLOW) return { width: 600, height: 600 };
 	// PHOTO and every other image (such as the JPEG data URLs below)
 	return { width: 400, height: 300 };
-}
-
-function jpegDataUrl(orientation: number): string {
-	let binary = "";
-	for (const byte of buildJpegHeader(orientation)) {
-		binary += String.fromCharCode(byte);
-	}
-	return `data:image/jpeg;base64,${btoa(binary)}`;
 }
 
 // A 400x300 image in a 100x100 viewport covers it at a zoom of 1/3
@@ -298,6 +290,50 @@ describe("Croppie bind and zoom inputs", () => {
 				);
 				expect(preview(root).src).toBe(SLOW);
 				expect(croppie.zoom).toBe(2);
+			});
+		}
+	});
+
+	describe("string zoom values: blank and non-numeric strings are ignored", () => {
+		// [value, zoom after setZoom()/zoom = from 2, zoom after bind()]. A blank string is not
+		// a number, although Number("") and Number(" ") are 0
+		const CASES: Array<[string, number, number]> = [
+			["", 2, COVERAGE_ZOOM],
+			[" ", 2, COVERAGE_ZOOM],
+			["abc", 2, COVERAGE_ZOOM],
+			["1.5", 1.5, 1.5],
+		];
+
+		for (const [value, afterSet, afterBind] of CASES) {
+			const label = JSON.stringify(value);
+			const bindStart =
+				afterBind === COVERAGE_ZOOM ? "the coverage zoom" : afterBind;
+
+			it(`setZoom(${label}) leaves the zoom at ${afterSet}`, async () => {
+				const { croppie } = mount();
+				await croppie.bind({ url: PHOTO, zoom: 2 });
+
+				croppie.setZoom(value as unknown as number);
+
+				expect(croppie.zoom).toBe(afterSet);
+			});
+
+			it(`zoom = ${label} leaves the zoom at ${afterSet}`, async () => {
+				const { croppie } = mount();
+				await croppie.bind({ url: PHOTO, zoom: 2 });
+
+				croppie.zoom = value as unknown as number;
+
+				expect(croppie.zoom).toBe(afterSet);
+			});
+
+			it(`bind({ zoom: ${label} }) starts at ${bindStart}`, async () => {
+				// Coverage not enforced, so the coverage zoom is not the minimum zoom that 0 clamps to
+				const { croppie } = mount({ zoom: { enforceMinimumCoverage: false } });
+
+				await croppie.bind({ url: PHOTO, zoom: value as unknown as number });
+
+				expect(croppie.zoom).toBeCloseTo(afterBind, 9);
 			});
 		}
 	});

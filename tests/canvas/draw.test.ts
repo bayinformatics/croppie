@@ -766,18 +766,11 @@ describe("canvas draw", () => {
 			});
 
 			const ctx = lastContext();
-			// In the 50x100 box centred on the origin, the 50x25 frame is centred vertically
-			expect(ctx.drawImage).toHaveBeenCalledWith(
-				image,
-				10,
-				20,
-				50,
-				25,
-				-25,
-				-12.5,
-				50,
-				25,
-			);
+			// In the 50x100 box centered on the origin, the 50x25 frame is centered vertically,
+			// on whole pixels of the box: its top edge at 37.5 rounds to 38, i.e. -12
+			expect(ctx.drawImage.mock.calls[0]?.slice(1)).toEqual([
+				10, 20, 50, 25, -25, -12, 50, 25,
+			]);
 			// The mask is the turned frame, in canvas coordinates
 			expect(ctx.ellipse).toHaveBeenCalledWith(
 				50,
@@ -809,6 +802,51 @@ describe("canvas draw", () => {
 			// placement
 			expect(drawCalls(contextOf(canvas)).at(-1)?.slice(-4)).toEqual([
 				80, 35, 40, 30,
+			]);
+		});
+
+		it("draws a letterboxed frame on whole pixels, not across a half-pixel seam", () => {
+			// Scale 1 in a 101x50 output: the 50x50 frame would start at x = 25.5
+			drawCroppedImage(image, square, 101, 50);
+
+			const [, , , , , dx, dy, dw, dh] =
+				lastContext().drawImage.mock.calls[0] ?? [];
+			expect([dx, dy, dw, dh]).toEqual([26, 0, 50, 50]);
+		});
+
+		it("draws an image letterboxed inside a larger frame on whole pixels", () => {
+			// The 1000x1000 frame at scale 0.101 is 101x101 at x = 27 in the 155x101 output; the
+			// 400x300 image would be drawn at (57.3, 35.35), 40.4 x 30.3
+			const canvas = drawCroppedImage(
+				image,
+				{
+					topLeftX: -300,
+					topLeftY: -350,
+					bottomRightX: 700,
+					bottomRightY: 650,
+				},
+				155,
+				101,
+			);
+
+			// The ~10x downscale goes through step canvases; the last draw into the output is the
+			// placement. Each edge rounded: 57.3 -> 57 and 97.7 -> 98, 35.35 -> 35 and 65.65 -> 66
+			expect(drawCalls(contextOf(canvas)).at(-1)?.slice(-4)).toEqual([
+				57, 35, 41, 31,
+			]);
+		});
+
+		it("keeps the circle mask centered on the output", () => {
+			drawCroppedImage(image, square, 101, 50, { circle: true });
+
+			expect(lastContext().ellipse.mock.calls[0]).toEqual([
+				50.5,
+				25,
+				25,
+				25,
+				0,
+				0,
+				Math.PI * 2,
 			]);
 		});
 

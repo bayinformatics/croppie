@@ -124,7 +124,9 @@ function createMaskImage(boundary: Boundary, viewport: Viewport): string {
  * Create the image element used as the crop preview.
  *
  * The element is configured with alt text, non-draggable behavior, absolute positioning,
- * origin at the top-left, and no maximum width/height so it can be transformed freely.
+ * origin at the top-left, no maximum width/height so it can be transformed freely, and an
+ * inline `image-orientation: from-image` (also in croppie.css) so it shows the EXIF-oriented
+ * pixels the geometry assumes, whatever the host's CSS.
  *
  * @returns The configured HTMLImageElement used to display the source image inside the cropper.
  */
@@ -144,11 +146,16 @@ export function createPreview(): HTMLImageElement {
 			maxHeight: "none",
 		},
 	});
+	// The geometry assumes the EXIF-oriented pixels (naturalWidth/Height, drawImage). Set it
+	// inline as well as in croppie.css, so a host CSS reset or a missing stylesheet cannot
+	// show the preview in another orientation
+	element.style.setProperty("image-orientation", "from-image");
 	return element;
 }
 
 /**
- * Creates a range input element configured as the zoom slider.
+ * Creates a range input element configured as the zoom slider, named "Zoom" and with its
+ * value spoken as a percentage (`aria-valuetext`) from the start.
  *
  * @param min - Minimum slider value
  * @param max - Maximum slider value
@@ -169,6 +176,8 @@ export function createZoomSlider(
 			step: "0.01",
 			value: String(value),
 			"aria-label": "Zoom",
+			// Spoken as a percentage from the start, not as the raw value until the first bind
+			"aria-valuetext": `${Math.round(value * 100)}%`,
 		},
 	});
 	return element;

@@ -9,17 +9,11 @@ import {
 	buildJfifApp0,
 	buildJpegHeader,
 	buildXmpApp1,
+	bytesToDataUrl,
 	injectExifOrientation,
+	jpegDataUrl,
 } from "../fixtures/exif-jpeg.js";
 import { SMALL_PNG, TINY_PNG } from "../fixtures/test-image-data-url.ts";
-
-function toDataUrl(bytes: Uint8Array, mime = "image/jpeg"): string {
-	let binary = "";
-	for (const byte of bytes) {
-		binary += String.fromCharCode(byte);
-	}
-	return `data:${mime};base64,${btoa(binary)}`;
-}
 
 function concat(...parts: Uint8Array[]): Uint8Array {
 	const result = new Uint8Array(parts.reduce((sum, p) => sum + p.length, 0));
@@ -57,6 +51,35 @@ describe("readJpegOrientation", () => {
 				expect(readJpegOrientation(buildJpegHeader(orientation))).toBe(
 					orientation,
 				);
+			});
+		}
+
+		for (const littleEndian of [false, true]) {
+			const order = littleEndian ? "little-endian (II)" : "big-endian (MM)";
+
+			for (const orientation of [3, 6, 8]) {
+				it(`reads ${orientation} stored as a LONG in ${order} EXIF`, () => {
+					expect(
+						readJpegOrientation(
+							buildJpegHeader(orientation, { littleEndian, type: 4 }),
+						),
+					).toBe(orientation);
+				});
+			}
+
+			it(`ignores an Orientation of another type (BYTE) in ${order} EXIF`, () => {
+				expect(
+					readJpegOrientation(buildJpegHeader(6, { littleEndian, type: 1 })),
+				).toBe(1);
+			});
+
+			it(`returns 1 for a LONG outside 1-8 in ${order} EXIF`, () => {
+				// 0x10006 has 6 in its low half
+				expect(
+					readJpegOrientation(
+						buildJpegHeader(0x10006, { littleEndian, type: 4 }),
+					),
+				).toBe(1);
 			});
 		}
 
@@ -292,12 +315,10 @@ describe("readJpegOrientation", () => {
 
 describe("readDataUrlOrientation", () => {
 	it("reads the orientation of a base64 JPEG data URL", () => {
-		expect(readDataUrlOrientation(toDataUrl(buildJpegHeader(6)))).toBe(6);
-		expect(
-			readDataUrlOrientation(
-				toDataUrl(buildJpegHeader(8, { littleEndian: true })),
-			),
-		).toBe(8);
+		expect(readDataUrlOrientation(jpegDataUrl(6))).toBe(6);
+		expect(readDataUrlOrientation(jpegDataUrl(8, { littleEndian: true }))).toBe(
+			8,
+		);
 	});
 
 	it("returns 1 for a PNG data URL (not a JPEG, so nothing to read)", () => {
@@ -333,7 +354,9 @@ describe("readDataUrlOrientation", () => {
 	it("only decodes a prefix of a very large data URL", () => {
 		// 42 bytes encode to 56 base64 characters without "=" padding, so more base64
 		// can follow without breaking the stream
-		const header = toDataUrl(concat(buildJpegHeader(6), new Uint8Array(2)));
+		const header = bytesToDataUrl(
+			concat(buildJpegHeader(6), new Uint8Array(2)),
+		);
 		const huge = `${header}${"A".repeat(5 * 1024 * 1024)}`;
 		const started = performance.now();
 

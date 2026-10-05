@@ -1,9 +1,7 @@
 import type { CropPoints, OutputFormat, Rotation } from "../types.js";
-import { clamp } from "../utils/clamp.js";
+import { MAX_CANVAS_AREA } from "../utils/limits.js";
+import { intersectFrame } from "../utils/points.js";
 import { swapDims } from "../utils/rotation.js";
-
-/** The largest canvas iOS Safari will draw into (4096 x 4096); a bigger one stays blank. */
-const MAX_STEP_PIXELS = 16_777_216;
 
 /** A source for drawImage and the rectangle of it to draw. */
 interface SourceRect {
@@ -21,7 +19,8 @@ interface SourceRect {
  * A single drawImage that shrinks by much more than 2x samples too few source pixels in
  * WebKit (even at imageSmoothingQuality "high"), so a 48 MP photo cropped to an avatar came
  * out jagged and speckled. Each halving stays within the 2x that bilinear filtering handles
- * well. A step is never larger than MAX_STEP_PIXELS, so the first one may shrink by more.
+ * well. A step is never larger than MAX_CANVAS_AREA (the canvas size iOS Safari will still
+ * draw into), so the first one may shrink by more.
  *
  * @param rect - The image and the rectangle of it to draw
  * @param targetWidth - The width the result will be drawn at
@@ -41,7 +40,7 @@ function downsample(
 	) {
 		const scale = Math.min(
 			0.5,
-			Math.sqrt(MAX_STEP_PIXELS / (current.width * current.height)),
+			Math.sqrt(MAX_CANVAS_AREA / (current.width * current.height)),
 		);
 		const step = document.createElement("canvas");
 		step.width = Math.max(1, Math.round(current.width * scale));
@@ -86,13 +85,15 @@ function downsample(
  * instead of a stretched image. An output with the frame's shape up to rounding to whole
  * pixels (the `'viewport'` and `'original'` result sizes) is filled exactly: a frame inside
  * the image maps onto the whole output, like drawing the crop rectangle directly, and the
- * rounding leaves no sub-pixel gap at the edges.
+ * rounding leaves no sub-pixel gap at the edges. The image is drawn with its edges on whole
+ * pixels, so a letterboxed image has no blurred half-pixel seam next to the bars.
  *
  * ```
  * k = min(outW / frameW, outH / frameH)    (kx = outW / frameW, ky = outH / frameH when filled)
  * ox = (outW - frameW * k) / 2             (same for y)
- * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (same for y)
- * dx = ox + (sx0 - frame.topLeftX) * k   dw = (sx1 - sx0) * k                     (same for y)
+ * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (intersectFrame)
+ * dx0 = round(ox + (sx0 - frame.topLeftX) * k)   dx1 = round(ox + (sx1 - frame.topLeftX) * k)
+ * dw = dx1 - dx0                                                                  (same for y)
  * ```
  *
  * With a `rotation` the frame is still given in the NATURAL image frame, while the output
@@ -186,10 +187,12 @@ export function drawCroppedImage(
 	}
 
 	// Intersect the frame with the image and map the overlap into the box
-	const sourceLeft = clamp(frame.topLeftX, 0, image.naturalWidth);
-	const sourceRight = clamp(frame.bottomRightX, 0, image.naturalWidth);
-	const sourceTop = clamp(frame.topLeftY, 0, image.naturalHeight);
-	const sourceBottom = clamp(frame.bottomRightY, 0, image.naturalHeight);
+	const {
+		topLeftX: sourceLeft,
+		topLeftY: sourceTop,
+		bottomRightX: sourceRight,
+		bottomRightY: sourceBottom,
+	} = intersectFrame(frame, image.naturalWidth, image.naturalHeight);
 
 	const sourceWidth = sourceRight - sourceLeft;
 	const sourceHeight = sourceBottom - sourceTop;
@@ -199,10 +202,16 @@ export function drawCroppedImage(
 		return canvas;
 	}
 
-	const destinationLeft = offsetX + (sourceLeft - frame.topLeftX) * scaleX;
-	const destinationTop = offsetY + (sourceTop - frame.topLeftY) * scaleY;
-	const destinationWidth = sourceWidth * scaleX;
-	const destinationHeight = sourceHeight * scaleY;
+	// Each edge on a whole pixel of the box: a half-pixel edge blurs the seam between the
+	// image and a letterbox bar. The box's corners are the output's corners whatever the
+	// rotation, so whole pixels of the box are whole pixels of the output. A box the frame
+	// fills exactly is already 0..boxWidth, 0..boxHeight
+	const left = Math.round(offsetX + (sourceLeft - frame.topLeftX) * scaleX);
+	const right = Math.round(offsetX + (sourceRight - frame.topLeftX) * scaleX);
+	const top = Math.round(offsetY + (sourceTop - frame.topLeftY) * scaleY);
+	const bottom = Math.round(offsetY + (sourceBottom - frame.topLeftY) * scaleY);
+	const destinationWidth = right - left;
+	const destinationHeight = bottom - top;
 
 	// The box is in the image's own orientation, so the steps are the same for any rotation
 	const { source, x, y, width, height } = downsample(
@@ -224,8 +233,8 @@ export function drawCroppedImage(
 			y,
 			width,
 			height,
-			destinationLeft,
-			destinationTop,
+			left,
+			top,
 			destinationWidth,
 			destinationHeight,
 		);
@@ -239,8 +248,8 @@ export function drawCroppedImage(
 			y,
 			width,
 			height,
-			destinationLeft - boxWidth / 2,
-			destinationTop - boxHeight / 2,
+			left - boxWidth / 2,
+			top - boxHeight / 2,
 			destinationWidth,
 			destinationHeight,
 		);
