@@ -42,6 +42,19 @@ describe("Croppie bind and zoom inputs", () => {
 		return root.querySelector(".cr-slider") as HTMLInputElement;
 	}
 
+	/** Everything a user can observe: the data, the rendered transform and the slider. */
+	function observe({ croppie, root }: { croppie: Croppie; root: HTMLElement }) {
+		return {
+			data: croppie.get(),
+			transform: preview(root).style.transform,
+			slider: {
+				min: slider(root).min,
+				max: slider(root).max,
+				value: slider(root).value,
+			},
+		};
+	}
+
 	function expectFinitePoints(points: CropPoints): void {
 		expect(Object.values(points).every(Number.isFinite)).toBe(true);
 	}
@@ -61,6 +74,49 @@ describe("Croppie bind and zoom inputs", () => {
 			root.remove();
 		}
 		cleanupImageMock();
+	});
+
+	describe("zoom options given as undefined", () => {
+		it("treats zoom: { max: undefined } as the default max of 10", async () => {
+			// A wrapper forwarding an optional prop: zoom: { max: props.maxZoom }
+			const { croppie, root } = mount({ zoom: { max: undefined } });
+			expect(slider(root).max).toBe("10");
+
+			await croppie.bind(PHOTO);
+
+			expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
+			expectFinitePoints(croppie.get().points);
+			croppie.setZoom(50);
+			expect(croppie.zoom).toBe(10);
+			expect(preview(root).style.transform).not.toContain("NaN");
+		});
+
+		it("behaves exactly like unset options when every field is undefined", async () => {
+			const unset = mount();
+			const undefinedFields = mount({
+				zoom: {
+					min: undefined,
+					max: undefined,
+					enforceMinimumCoverage: undefined,
+				},
+			});
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+
+			for (const { croppie } of [unset, undefinedFields]) {
+				await croppie.bind(PHOTO);
+			}
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+
+			for (const { croppie } of [unset, undefinedFields]) {
+				croppie.setZoom(50);
+			}
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+
+			for (const { croppie } of [unset, undefinedFields]) {
+				croppie.setZoom(0.01);
+			}
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+		});
 	});
 
 	describe("bind({ zoom }) that is not a finite number", () => {
