@@ -256,4 +256,22 @@ describe("Croppie bind and zoom inputs", () => {
 			expect(slider(root).value).toBe("2");
 		});
 	});
+
+	describe("touch-action of the boundary", () => {
+		function boundary(root: HTMLElement): HTMLElement {
+			return root.querySelector(".cr-boundary") as HTMLElement;
+		}
+
+		it("leaves pinch-zoom to the browser when enableZoom is false", () => {
+			const { root } = mount({ enableZoom: false });
+
+			expect(boundary(root).style.touchAction).toBe("pinch-zoom");
+		});
+
+		it("keeps every touch gesture for the cropper by default", () => {
+			const { root } = mount();
+
+			expect(boundary(root).style.touchAction).toBe("none");
+		});
+	});
 });
