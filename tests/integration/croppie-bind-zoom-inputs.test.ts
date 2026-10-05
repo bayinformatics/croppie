@@ -42,6 +42,10 @@ describe("Croppie bind and zoom inputs", () => {
 		return root.querySelector(".cr-slider") as HTMLInputElement;
 	}
 
+	function expectFinitePoints(points: CropPoints): void {
+		expect(Object.values(points).every(Number.isFinite)).toBe(true);
+	}
+
 	beforeEach(() => {
 		mounted = [];
 		cleanupImageMock = installImageMock(DIMENSIONS);
@@ -57,6 +61,44 @@ describe("Croppie bind and zoom inputs", () => {
 			root.remove();
 		}
 		cleanupImageMock();
+	});
+
+	describe("numeric strings for setZoom() and zoom =", () => {
+		it("converts a numeric string passed to setZoom(), such as a range input's value", async () => {
+			const { croppie, root } = mount();
+			await croppie.bind(PHOTO);
+			const onZoom = mock();
+			croppie.on("zoom", onZoom);
+
+			croppie.setZoom("1.5" as unknown as number);
+
+			expect(croppie.zoom).toBe(1.5);
+			expect(onZoom).toHaveBeenCalledTimes(1);
+			expect(slider(root).value).toBe("1.5");
+		});
+
+		it("converts a numeric string assigned to the zoom property", async () => {
+			const { croppie } = mount();
+			await croppie.bind(PHOTO);
+
+			croppie.zoom = "2" as unknown as number;
+
+			expect(croppie.zoom).toBe(2);
+		});
+
+		it("still ignores a string that is not a number", async () => {
+			const { croppie } = mount();
+			await croppie.bind(PHOTO);
+			const onUpdate = mock();
+			croppie.on("update", onUpdate);
+
+			croppie.setZoom("abc" as unknown as number);
+			croppie.zoom = "1.5x" as unknown as number;
+
+			expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
+			expectFinitePoints(croppie.get().points);
+			expect(onUpdate).not.toHaveBeenCalled();
+		});
 	});
 
 	describe("bind({ points })", () => {
