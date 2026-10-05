@@ -38,6 +38,10 @@ describe("Croppie bind and zoom inputs", () => {
 		return root.querySelector(".cr-image") as HTMLImageElement;
 	}
 
+	function slider(root: HTMLElement): HTMLInputElement {
+		return root.querySelector(".cr-slider") as HTMLInputElement;
+	}
+
 	beforeEach(() => {
 		mounted = [];
 		cleanupImageMock = installImageMock(DIMENSIONS);
@@ -120,6 +124,44 @@ describe("Croppie bind and zoom inputs", () => {
 			await croppie.bind(SMALL_PNG);
 
 			expect(preview(root).crossOrigin).toBeNull();
+		});
+	});
+
+	describe("zoom events when an update listener zooms again", () => {
+		/** Caps the zoom at 2 from an update listener and records the zoom events. */
+		async function mountCapped() {
+			const instance = mount();
+			const { croppie } = instance;
+			await croppie.bind(PHOTO);
+			croppie.setZoom(1.95);
+			const zoomEvents: Array<{ zoom: number; previousZoom: number }> = [];
+			croppie.on("zoom", (event) => zoomEvents.push(event));
+			croppie.on("update", (data) => {
+				if (data.zoom > 2) croppie.setZoom(2);
+			});
+			return { ...instance, zoomEvents };
+		}
+
+		it("emits one zoom event, ending at the zoom the listener settled on", async () => {
+			const { croppie, zoomEvents } = await mountCapped();
+
+			croppie.setZoom(3);
+
+			expect(croppie.zoom).toBe(2);
+			expect(zoomEvents).toHaveLength(1);
+			expect(zoomEvents[0]?.zoom).toBe(2);
+		});
+
+		it("does the same for the slider", async () => {
+			const { croppie, root, zoomEvents } = await mountCapped();
+
+			slider(root).value = "3";
+			slider(root).dispatchEvent(new Event("input"));
+
+			expect(croppie.zoom).toBe(2);
+			expect(zoomEvents).toHaveLength(1);
+			expect(zoomEvents[0]?.zoom).toBe(2);
+			expect(slider(root).value).toBe("2");
 		});
 	});
 });
