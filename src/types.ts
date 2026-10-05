@@ -50,7 +50,10 @@ export interface ZoomConfig {
 	min: number;
 	/** Maximum zoom level (default: 10) */
 	max: number;
-	/** Initial zoom level */
+	/**
+	 * @deprecated No effect: pass `bind({ url, zoom })` to start at a given zoom. Kept so
+	 * existing configuration still compiles.
+	 */
 	initial?: number;
 	/**
 	 * Automatically enforce minimum zoom to ensure image covers viewport.
