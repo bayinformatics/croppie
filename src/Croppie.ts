@@ -459,15 +459,21 @@ export class Croppie {
 			},
 		);
 
-		switch (options.type) {
-			case "canvas":
-				return canvas;
-			case "base64":
-				return canvasToBase64(canvas, options.format, options.quality);
-			case "blob":
-				return canvasToBlob(canvas, options.format, options.quality);
-			default:
-				throw new Error(`Unknown result type: ${options.type}`);
+		// A "canvas" result belongs to the caller. Any other output canvas is dead once encoded,
+		// so free its pixels now rather than at garbage collection (iOS caps canvas memory)
+		if (options.type === "canvas") return canvas;
+		try {
+			switch (options.type) {
+				case "base64":
+					return canvasToBase64(canvas, options.format, options.quality);
+				case "blob":
+					return await canvasToBlob(canvas, options.format, options.quality);
+				default:
+					throw new Error(`Unknown result type: ${options.type}`);
+			}
+		} finally {
+			canvas.width = 0;
+			canvas.height = 0;
 		}
 	}
 

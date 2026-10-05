@@ -50,6 +50,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - A `bind()` whose `points` array does not have exactly 4 entries rejects before changing anything, instead of leaving the new image half-applied and cancelling a bind that is still loading.
 - Error messages from failed image loads no longer embed the whole data URL.
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
+- `result()` frees the canvas of a `'blob'` or `'base64'` result as soon as it is encoded instead of leaving its memory to garbage collection (iOS caps canvas memory).
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, a new press of the same pointer after a lost `pointerup` starts a fresh drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - Dragging moves the image from where it currently is, so a zoom (wheel, pinch, slider, `setZoom()`) or `reset()` made while the button is held is no longer undone by the next pointer move, and moving back after dragging against an edge moves the image straight away.
 - Dragging inside a CSS-scaled ancestor (`transform: scale()`, `zoom`) keeps the image under the pointer instead of lagging behind or overshooting it, as wheel and pinch zoom already did.
