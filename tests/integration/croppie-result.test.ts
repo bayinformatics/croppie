@@ -571,6 +571,57 @@ describe("Croppie result", () => {
 		});
 	});
 
+	describe("a custom size", () => {
+		beforeEach(async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+		});
+
+		const invalid: Array<[string, number]> = [
+			["NaN", Number.NaN],
+			["0", 0],
+			["a negative number", -5],
+			["Infinity", Number.POSITIVE_INFINITY],
+		];
+
+		for (const [label, value] of invalid) {
+			it(`rejects a width of ${label} with a RangeError`, async () => {
+				const error = await croppie
+					.result({ type: "canvas", size: { width: value, height: 100 } })
+					.then(
+						() => undefined,
+						(caught: unknown) => caught,
+					);
+
+				expect(error).toBeInstanceOf(RangeError);
+				expect((error as Error).message).toContain("size.width");
+			});
+
+			it(`rejects a height of ${label} with a RangeError`, async () => {
+				const error = await croppie
+					.result({ type: "base64", size: { width: 100, height: value } })
+					.then(
+						() => undefined,
+						(caught: unknown) => caught,
+					);
+
+				expect(error).toBeInstanceOf(RangeError);
+				expect((error as Error).message).toContain("size.height");
+			});
+		}
+
+		it("rounds a fractional size to whole pixels", async () => {
+			const canvas = await croppie.result({
+				type: "canvas",
+				size: { width: 100.4, height: 49.6 },
+			});
+
+			expect([canvas.width, canvas.height]).toEqual([100, 50]);
+		});
+	});
+
 	describe("the canvas size cap (16,777,216 px, 16,384 px a side)", () => {
 		it("caps 'original' for a default viewport zoomed out on a large photo", async () => {
 			// At its per-image minimum zoom a 200x200 viewport shows 6048x6048 px of an
