@@ -449,7 +449,7 @@ export class Croppie {
 			this.exifOrientation !== 1
 		) {
 			console.warn(
-				`[@bayinformatics/croppie] bind({ orientation: ${bindOptions.orientation} }) is applied on top of the file's own EXIF orientation (${this.exifOrientation}), which browsers already honour; the image may end up rotated twice. The explicit orientation wins.`,
+				`[@bayinformatics/croppie] bind({ orientation: ${bindOptions.orientation} }) is applied on top of the file's own EXIF orientation (${this.exifOrientation}), which browsers already honor; the image may end up rotated twice. The explicit orientation wins.`,
 			);
 		}
 
@@ -722,7 +722,7 @@ export class Croppie {
 
 	/**
 	 * Rotates the image clockwise by `degrees`, any multiple of 90 (negative turns
-	 * counter-clockwise). The image pixel under the viewport centre stays there, unless the
+	 * counter-clockwise). The image pixel under the viewport center stays there, unless the
 	 * rotated image would then no longer cover the viewport; then the image moves the least
 	 * needed.
 	 *
@@ -744,7 +744,7 @@ export class Croppie {
 		const previousZoom = this.transform.scale;
 		const rotation = ((previousRotation + delta) % 360) as Rotation;
 
-		// The offset of the image centre from the viewport centre turns with the image
+		// The offset of the image center from the viewport center turns with the image
 		const [x, y] = rotateOffset(this.transform.x, this.transform.y, delta);
 		this.transform = { x, y, scale: previousZoom, rotation };
 
@@ -957,7 +957,7 @@ export class Croppie {
 	 *
 	 * The `<img>` keeps its natural size with transform-origin 0 0, so the transform is
 	 * `translate(tx, ty) scale(s) rotate(r)`. The rotation is about the displayed image's
-	 * centre, which sits at `(x, y)` from the boundary centre, so
+	 * center, which sits at `(x, y)` from the boundary center, so
 	 * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`, with `R` from `rotateOffset()`.
 	 */
 	private updateTransform(): void {

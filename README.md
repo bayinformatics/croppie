@@ -211,7 +211,7 @@ Subscribe to or unsubscribe from [events](#events).
 
 #### `rotate(degrees: number): void`
 
-Rotate the image **clockwise** by `degrees`: any multiple of 90, positive or negative (`-90` turns counter-clockwise); anything else throws a `RangeError`. The image pixel under the viewport centre stays there unless the rotated image would then no longer cover the viewport, in which case the image moves the least needed. The zoom limits are recomputed for the rotated image, so with a non-square viewport a quarter turn can raise the zoom to the new minimum. Emits `rotate`, then `update` (and `zoom` if the zoom changed). Does nothing before an image is bound. `reset()` restores the rotation `bind()` started with. `result()` renders the rotated image.
+Rotate the image **clockwise** by `degrees`: any multiple of 90, positive or negative (`-90` turns counter-clockwise); anything else throws a `RangeError`. The image pixel under the viewport center stays there unless the rotated image would then no longer cover the viewport, in which case the image moves the least needed. The zoom limits are recomputed for the rotated image, so with a non-square viewport a quarter turn can raise the zoom to the new minimum. Emits `rotate`, then `update` (and `zoom` if the zoom changed). Does nothing before an image is bound. `reset()` restores the rotation `bind()` started with. `result()` renders the rotated image.
 
 ```typescript
 cropper.rotate(90)   // clockwise

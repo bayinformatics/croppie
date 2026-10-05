@@ -413,7 +413,7 @@ describe("canvas draw", () => {
 			expect(ctx.restore).not.toHaveBeenCalled();
 		});
 
-		it("draws through a context rotated about the output centre for 90", () => {
+		it("draws through a context rotated about the output center for 90", () => {
 			drawCroppedImage(image, tall, 100, 50, { rotation: 90 });
 
 			const ctx = lastContext();
@@ -518,7 +518,7 @@ describe("canvas draw", () => {
 				{ rotation: 90 },
 			);
 
-			// Scale 0.1: the image is 40x30 in a 100x100 box centred on the origin, offset
+			// Scale 0.1: the image is 40x30 in a 100x100 box centered on the origin, offset
 			// by the 30x35 of empty space before it
 			expect(lastContext().drawImage).toHaveBeenCalledWith(
 				image,
@@ -611,7 +611,7 @@ describe("canvas draw", () => {
 		});
 
 		it("letterboxes in the box turned back by the rotation", () => {
-			// A 50x25 frame shown at 90 is 25 wide and 50 tall: centred in the 100x50 output
+			// A 50x25 frame shown at 90 is 25 wide and 50 tall: centered in the 100x50 output
 			drawCroppedImage(image, { ...square, bottomRightY: 45 }, 100, 50, {
 				rotation: 90,
 				circle: true,
