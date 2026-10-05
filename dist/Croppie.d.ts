@@ -23,9 +23,12 @@ export declare class Croppie {
     private sliderEl;
     private image;
     private transform;
-    private zoomConfig;
-    /** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
-    private configuredMinZoom;
+    /**
+     * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
+     * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
+     * `undefined` counts as unset.
+     */
+    private readonly zoomConfig;
     private effectiveMinZoom;
     private eventHandlers;
     private cleanupFns;
@@ -41,22 +44,33 @@ export declare class Croppie {
      */
     private attachEventHandlers;
     /**
-     * Loads an image into the cropper
+     * Loads an image into the cropper.
+     *
+     * A `points` array without exactly 4 entries rejects before anything changes, so it
+     * neither half-applies the new image nor cancels a bind that is still loading.
      */
     bind(options: BindOptions | string): Promise<void>;
     /**
-     * Loads and applies an image for a bind that claimed `generation`. If the instance was
-     * destroyed or a newer bind started meanwhile, resolves without applying or emitting
-     * anything, and without surfacing a load error nobody is waiting for any more.
+     * Loads and applies an image for a bind that claimed `generation`, with the `points` that
+     * `bind()` resolved from `bindOptions` before claiming it. If the instance was destroyed
+     * or a newer bind started meanwhile, resolves without applying or emitting anything, and
+     * without surfacing a load error nobody is waiting for any more.
      */
     private load;
     /**
-     * Binds a File or Blob to the cropper
+     * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
+     * empty file input) rejects with a `TypeError` before anything changes, so it does not
+     * cancel a bind that is still loading.
      */
     bindFile(file: File | Blob): Promise<void>;
     /**
      * Gets the current cropped result. The return type follows `options.type`:
      * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
+     *
+     * The image keeps its proportions at every `size`: a size of another shape than the
+     * viewport centres the crop and leaves the rest transparent (or `backgroundColor`). With
+     * `size: "original"`, a crop zoomed out past the image is scaled down to at most the area
+     * of the image part it shows or 4096x4096 px, whichever is larger.
      */
     result(options: ResultOptions & {
         type: "blob";
