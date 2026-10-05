@@ -386,8 +386,11 @@ export class Croppie {
 			throw new Error("No image bound");
 		}
 
-		const frame = this.getViewportRect();
+		// The viewport rectangle in the displayed frame; the output canvas is in that
+		// orientation, so its size comes from here
+		const displayedFrame = this.getViewportRect();
 		const viewport = this.options.viewport;
+		const rotation = this.transform.rotation;
 
 		// Determine output size
 		let outputWidth: number;
@@ -397,14 +400,14 @@ export class Croppie {
 			outputWidth = viewport.width;
 			outputHeight = viewport.height;
 		} else if (options.size === "original") {
-			// The frame at image resolution, at a whole number of pixels
+			// The displayed crop at image resolution, at a whole number of pixels
 			outputWidth = Math.max(
 				1,
-				Math.round(frame.bottomRightX - frame.topLeftX),
+				Math.round(displayedFrame.bottomRightX - displayedFrame.topLeftX),
 			);
 			outputHeight = Math.max(
 				1,
-				Math.round(frame.bottomRightY - frame.topLeftY),
+				Math.round(displayedFrame.bottomRightY - displayedFrame.topLeftY),
 			);
 		} else if (options.size) {
 			outputWidth = options.size.width;
@@ -414,14 +417,21 @@ export class Croppie {
 			outputHeight = viewport.height;
 		}
 
+		// drawCroppedImage samples the natural image, so hand it the frame in natural coordinates
 		const canvas = drawCroppedImage(
 			this.image,
-			frame,
+			rotatedRectToNatural(
+				displayedFrame,
+				this.image.naturalWidth,
+				this.image.naturalHeight,
+				rotation,
+			),
 			outputWidth,
 			outputHeight,
 			{
 				circle: options.circle ?? viewport.type === "circle",
 				backgroundColor: options.backgroundColor,
+				rotation,
 			},
 		);
 
