@@ -19,6 +19,7 @@
 	<div id="croppie-mount"></div>
 	<script type="module">
 		import Croppie from "/dist/croppie.js";
+		import { injectExifOrientation } from "/tests/fixtures/exif-jpeg.js";
 
 		// Generate a deterministic test image via canvas
 		function createTestImage(width, height) {
@@ -54,20 +55,92 @@
 			return canvas.toDataURL("image/png");
 		}
 
+		// Solid blocks make orientation visible: TL red, TR green, BR yellow, BL blue
+		function createCornersCanvas(width, height, block) {
+			const canvas = document.createElement("canvas");
+			canvas.width = width;
+			canvas.height = height;
+			const ctx = canvas.getContext("2d");
+			ctx.fillStyle = "#808080";
+			ctx.fillRect(0, 0, width, height);
+			ctx.fillStyle = "#ff0000";
+			ctx.fillRect(0, 0, block, block);
+			ctx.fillStyle = "#00ff00";
+			ctx.fillRect(width - block, 0, block, block);
+			ctx.fillStyle = "#ffff00";
+			ctx.fillRect(width - block, height - block, block, block);
+			ctx.fillStyle = "#0000ff";
+			ctx.fillRect(0, height - block, block, block);
+			return canvas;
+		}
+
+		// The same colours as four quadrants, so a central crop of any shape shows all of them
+		function createQuadrantsCanvas(width, height) {
+			const canvas = document.createElement("canvas");
+			canvas.width = width;
+			canvas.height = height;
+			const ctx = canvas.getContext("2d");
+			const halfW = width / 2;
+			const halfH = height / 2;
+			ctx.fillStyle = "#ff0000";
+			ctx.fillRect(0, 0, halfW, halfH);
+			ctx.fillStyle = "#00ff00";
+			ctx.fillRect(halfW, 0, halfW, halfH);
+			ctx.fillStyle = "#ffff00";
+			ctx.fillRect(halfW, halfH, halfW, halfH);
+			ctx.fillStyle = "#0000ff";
+			ctx.fillRect(0, halfH, halfW, halfH);
+			return canvas;
+		}
+
 		const params = new URLSearchParams(window.location.search);
 		const viewportType = params.get("viewport") || "circle";
 		const showZoomer = params.get("zoomer") !== "false";
 		const zoom = params.get("zoom") ? Number.parseFloat(params.get("zoom")) : undefined;
+		// image=grid (default) | corners | quadrants; w/h size the generated image (default 400x400)
+		const imageKind = params.get("image") || "grid";
+		const imageWidth = Number.parseInt(params.get("w") || "400", 10);
+		const imageHeight = Number.parseInt(params.get("h") || "400", 10);
+		// rotate=<degrees> is applied after bind; exif=<1|3|6|8> binds a JPEG carrying that tag
+		const rotateBy = params.get("rotate") ? Number.parseInt(params.get("rotate"), 10) : 0;
+		const exif = params.get("exif") ? Number.parseInt(params.get("exif"), 10) : undefined;
+		const enableExif = params.get("enableExif") === "true";
 
 		const el = document.getElementById("croppie-mount");
 		const croppie = new Croppie(el, {
 			viewport: { width: 200, height: 200, type: viewportType },
 			boundary: { width: 400, height: 400 },
 			showZoomer,
+			enableExif,
 		});
+		window.croppie = croppie;
 
-		const imageUrl = createTestImage(800, 600);
-		await croppie.bind({ url: imageUrl, zoom });
+		const sourceCanvas =
+			imageKind === "corners"
+				? createCornersCanvas(imageWidth, imageHeight, 100)
+				: imageKind === "quadrants"
+					? createQuadrantsCanvas(imageWidth, imageHeight)
+					: undefined;
+
+		if (exif !== undefined && sourceCanvas) {
+			// A real JPEG with the EXIF Orientation tag injected: the browser orients it itself
+			const jpeg = await new Promise((resolve) =>
+				sourceCanvas.toBlob(resolve, "image/jpeg", 1),
+			);
+			const bytes = new Uint8Array(await jpeg.arrayBuffer());
+			await croppie.bindFile(
+				new Blob([injectExifOrientation(bytes, exif)], { type: "image/jpeg" }),
+			);
+		} else {
+			const imageUrl = sourceCanvas
+				? sourceCanvas.toDataURL("image/png")
+				: createTestImage(800, 600);
+			await croppie.bind({ url: imageUrl, zoom });
+		}
+
+		if (rotateBy) {
+			croppie.rotate(rotateBy);
+		}
 
 		// Signal that Croppie is ready for screenshot
 		document.body.dataset.ready = "true";
