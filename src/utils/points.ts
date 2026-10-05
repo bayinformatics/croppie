@@ -12,8 +12,13 @@ export type PointsInput = CropPoints | PointsArray;
 /**
  * Normalize a points input into a CropPoints object.
  *
+ * Coordinates given as strings are parsed with `parseFloat`, as Croppie v2's `bind()` did:
+ * v2's `get()` returned its points as strings (e.g. `["50", "50", "150", "150"]`), which
+ * apps stored and pass back. A string that is not a number becomes `NaN`, which
+ * `calculateTransformFromPoints` rejects.
+ *
  * @param points - An array [topLeftX, topLeftY, bottomRightX, bottomRightY], a CropPoints object, or `undefined`.
- * @returns A CropPoints object corresponding to `points`, or `undefined` if `points` is `undefined`.
+ * @returns A new CropPoints object corresponding to `points`, or `undefined` if `points` is `undefined`.
  * @throws Error if `points` is an array whose length is not exactly 4.
  */
 export function normalizePoints(
@@ -30,14 +35,26 @@ export function normalizePoints(
 			);
 		}
 		return {
-			topLeftX: points[0],
-			topLeftY: points[1],
-			bottomRightX: points[2],
-			bottomRightY: points[3],
+			topLeftX: toCoordinate(points[0]),
+			topLeftY: toCoordinate(points[1]),
+			bottomRightX: toCoordinate(points[2]),
+			bottomRightY: toCoordinate(points[3]),
 		};
 	}
 
-	return points;
+	return {
+		topLeftX: toCoordinate(points.topLeftX),
+		topLeftY: toCoordinate(points.topLeftY),
+		bottomRightX: toCoordinate(points.bottomRightX),
+		bottomRightY: toCoordinate(points.bottomRightY),
+	};
+}
+
+/** A coordinate as a number: a string (v2's `get()` format) is parsed with `parseFloat`. */
+function toCoordinate(value: unknown): number {
+	return typeof value === "string"
+		? Number.parseFloat(value)
+		: (value as number);
 }
 
 /**
