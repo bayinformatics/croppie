@@ -367,6 +367,37 @@ describe("Croppie events", () => {
 			expect(zoomHandler.mock.calls[0]?.[0].zoom).toBeCloseTo(1 / 3, 9);
 		});
 
+		it("reset() emits one zoom event when an update listener zooms during it", async () => {
+			await bindAt(2);
+			const zoomEvents: Array<{ zoom: number; previousZoom: number }> = [];
+			croppie.on("zoom", (event) => zoomEvents.push(event));
+			// Keeps the zoom at 1 or more: reset() goes to the coverage zoom of 1/3
+			croppie.on("update", (data) => {
+				if (data.zoom < 1) croppie.setZoom(1);
+			});
+
+			croppie.reset();
+
+			expect(croppie.zoom).toBe(1);
+			// Only the final change is reported, never the replaced 2 -> 1/3 step
+			expect(zoomEvents).toHaveLength(1);
+			expect(zoomEvents[0]?.zoom).toBe(1);
+			expect(zoomEvents[0]?.previousZoom).toBeCloseTo(1 / 3, 9);
+		});
+
+		it("reset() at the coverage zoom still recenters the image and emits update", async () => {
+			await bindAt();
+			const boundary = container.querySelector(".cr-boundary") as HTMLElement;
+			simulateDrag(boundary, 100, 100, 110, 100);
+			expect(croppie.get().points.topLeftX).not.toBeCloseTo(50, 9);
+			const order = recordEvents();
+
+			croppie.reset();
+
+			expect(order).toEqual(["update"]);
+			expect(croppie.get().points.topLeftX).toBeCloseTo(50, 9);
+		});
+
 		it("reset() without a zoom change emits update only", async () => {
 			await bindAt(); // starts at the coverage zoom, which reset() returns to
 			const order = recordEvents();
