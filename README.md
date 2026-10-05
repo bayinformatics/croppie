@@ -102,13 +102,11 @@ new Croppie(element: HTMLElement, options: CroppieOptions)
 | `enableZoom` | `boolean` | `true` | Let the user zoom with the slider, wheel and pinch. `false` removes all three (the slider is not rendered even with `showZoomer`); `setZoom()` and `zoom =` still work |
 | `zoom` | `{ min?, max?, enforceMinimumCoverage? }` | `{ max: 10 }`, `min` per image | Zoom limits and coverage enforcement. When `min` is not set, the minimum is the zoom at which the image just covers the viewport, so a large photo can zoom out further than 0.1; with `enforceMinimumCoverage: false` it is `min(0.1, the zoom at which the whole image fits)`. A configured `min` is a floor. The effective minimum never exceeds `max` |
 | `customClass` | `string` | — | Extra class for the container |
-| `enableExif` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
+| `enableExif` | `boolean` | `false` | Reads the EXIF Orientation tag of JPEGs bound via `bindFile()` or as data URLs and exposes it as `get().orientation`. Browsers already display EXIF-oriented images upright; this never rotates pixels. Remote URLs are not read; use the exported `readJpegOrientation()` on bytes you fetch |
 | `enableResize` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
-| `enableOrientation` | `boolean` | `false` | Deprecated v2 option (no-op) |
+| `enableOrientation` | `boolean` | `false` | Deprecated, no effect: `rotate()` is always available |
 
 Invalid options throw a `RangeError` from the constructor: a viewport or boundary dimension, `zoom.min` or `zoom.max` that is not a positive finite number, or `zoom.min` greater than `zoom.max`. A boundary smaller than the viewport only logs a warning.
-
-> **Known limitations:** `enableExif` and `rotate()` are not implemented yet ([#21](https://github.com/bayinformatics/croppie/issues/21), [#20](https://github.com/bayinformatics/croppie/issues/20)).
 
 ### Methods
 
@@ -180,7 +178,11 @@ const blob = await cropper.result({
 
 #### `get(): CroppieData`
 
-Get current crop data (points and zoom).
+Get current crop data: `points`, `zoom`, `rotation` and, with `enableExif`, `orientation`.
+
+`points` are in the **natural frame**: the pixel space of the image as the browser decoded it (EXIF orientation already applied). They are never rotated; `rotation` tells you how `result()` turns the crop, and `bind({ points, rotation })` round-trips them exactly. `orientation` is the EXIF tag of the file: informational, never derived from `rotation` and never changed by `rotate()`.
+
+To reproduce the crop on a server, auto-orient the original (sharp `.rotate()`, ImageMagick `-auto-orient`), crop `points`, then rotate the crop clockwise by `rotation`.
 
 #### `setZoom(value: number): void`
 
@@ -198,9 +200,17 @@ Re-centres the image and returns the zoom to the coverage zoom (the smallest zoo
 
 Subscribe to or unsubscribe from [events](#events).
 
-#### `rotate(degrees): void`
+#### `rotate(degrees: number): void`
 
-Present for v2 compatibility but **not implemented**: it logs a warning and does nothing ([#20](https://github.com/bayinformatics/croppie/issues/20)).
+Rotate the image **clockwise** by `degrees`: any multiple of 90, positive or negative (`-90` turns counter-clockwise); anything else throws a `RangeError`. The image pixel under the viewport centre stays there, and the zoom limits are recomputed for the rotated image, so with a non-square viewport a quarter turn can raise the zoom to the new minimum. Emits `rotate`, then `update` (and `zoom` if the zoom changed). Does nothing before an image is bound. `reset()` restores the rotation `bind()` started with. `result()` renders the rotated image.
+
+```typescript
+cropper.rotate(90)   // clockwise
+cropper.rotate(-90)  // counter-clockwise
+cropper.get().rotation // 0 | 90 | 180 | 270
+```
+
+`bind()` also accepts `rotation` (a multiple of 90) for the initial rotation. `points` are not affected by it (see `get()` below). `bind({ orientation })` (EXIF 1–8) is an explicit override for images whose tag was stripped: 1, 3, 6 and 8 map to a rotation of 0, 180, 90 and 270 (mirrored values are ignored with a warning), and an explicit `rotation` wins. Prefer `rotation`. If the file still carries its own tag, the browser already shows it upright, so an explicit `orientation` can rotate it twice (Croppie warns when `enableExif` shows this).
 
 #### `destroy(): void`
 
@@ -229,7 +239,7 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 })
 ```
 
-`update` carries the same data as `get()`; `zoom` carries `{ zoom, previousZoom }`. Within one change `update` fires first, then `zoom`. Nothing is emitted when nothing changed (for example a zoom request that is clamped to the current zoom, or a drag the bounds absorb entirely).
+`update` carries the same data as `get()`; `zoom` carries `{ zoom, previousZoom }`; `rotate` carries `{ rotation, previousRotation }` and fires from `rotate()` and from `reset()` when it restores a different rotation. Within one change `rotate` fires first, then `update`, then `zoom`. Nothing is emitted when nothing changed (for example a zoom request that is clamped to the current zoom, or a drag the bounds absorb entirely).
 
 | Source | `update` | `zoom` |
 |--------|----------|--------|
@@ -278,6 +288,9 @@ Dark mode: `--croppie-boundary-bg` switches to `#0f0f1a` under `@media (prefers-
 | `croppie.bind({ url, points: [x1,y1,x2,y2] })` | `await croppie.bind({ url, points: [x1,y1,x2,y2] })` (an object `{topLeftX, topLeftY, bottomRightX, bottomRightY}` also works) |
 | `enforceBoundary` | `zoom: { enforceMinimumCoverage }` |
 | `minZoom` / `maxZoom` | `zoom: { min, max }` |
+| `enableOrientation: true` | not needed: `rotate()` is always available |
+| `croppie.rotate(90)` | `cropper.rotate(-90)`: v2 turned counter-clockwise, v3 turns **clockwise** |
+| `bind({ url, orientation })` | prefer `bind({ url, rotation })`; `get().orientation` is informational only |
 | `croppie.result({...}).then(cb)` | `const result = await croppie.result({...})` |
 | `$el.on('update', cb)` | `croppie.on('update', cb)` |
 | `import 'croppie/croppie.css'` | `import '@bayinformatics/croppie/croppie.css'` |
@@ -286,7 +299,7 @@ Dark mode: `--croppie-boundary-bg` switches to `#0f0f1a` under `@media (prefers-
 
 - v2 shipped UMD (AMD/CommonJS/global); v3 is ESM-only.
 - v2 `bind()` points/relative points are fully supported; v3 applies points on bind with cover-fit + center preservation within `zoomConfig` bounds (v2's width-only-scale/top-left-anchor quirk, [Foliotek/Croppie#767](https://github.com/Foliotek/Croppie/issues/767), is intentionally not replicated).
-- v2 rotation works with `enableOrientation`; v3 `rotate()` is not yet implemented.
+- v2 rotation needed `enableOrientation`; in v3 `rotate()` is always available and rotates clockwise (v2's `rotate(90)` turned counter-clockwise: negate the argument if you depended on it). `points` stay in the natural (EXIF-oriented) frame and `get().rotation` carries the turn.
 - v2 supported `<script>` tag usage; v3 requires a bundler.
 
 ### Detailed Changes

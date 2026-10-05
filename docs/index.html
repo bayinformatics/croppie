@@ -291,6 +291,12 @@
           <button class="btn" onclick="document.getElementById('file-input').click()">
             Upload Image
           </button>
+          <button class="btn" id="rotate-left-btn" title="Rotate left" aria-label="Rotate left">
+            ↺
+          </button>
+          <button class="btn" id="rotate-right-btn" title="Rotate right" aria-label="Rotate right">
+            ↻
+          </button>
           <button class="btn primary" id="crop-btn">
             Crop →
           </button>
@@ -370,6 +376,9 @@ npm install github:bayinformatics/croppie
         resultPreview.classList.remove('show')
       }
     })
+
+    document.getElementById('rotate-left-btn').addEventListener('click', () => croppie.rotate(-90))
+    document.getElementById('rotate-right-btn').addEventListener('click', () => croppie.rotate(90))
 
     cropBtn.addEventListener('click', async () => {
       const blob = await croppie.result({

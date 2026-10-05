@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
 - `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?) scripts.
 - `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work.
+- `rotate(degrees)` rotates the image clockwise by any multiple of 90 (closes #20); `bind({ rotation })` sets the initial rotation, `get()` returns `rotation`, `reset()` restores the bind-time rotation, and a `rotate` event is emitted. `points` stay in the natural frame and `result()` renders the rotated image. New `Rotation` type.
+- `enableExif` now reads the EXIF Orientation tag of JPEGs bound as data URLs (including `bindFile()`) and reports it as `get().orientation` (closes #21); it never rotates pixels, because browsers already display such images upright. `bind({ orientation })` is an explicit override mapped to a rotation. New `readJpegOrientation()` export for bytes you fetched yourself.
 - `result()` is typed by its output type: `"blob"` returns `Promise<Blob>`, `"base64"` `Promise<string>`, `"canvas"` `Promise<HTMLCanvasElement>` (a generic overload remains for runtime-only types).
 - The zoom slider has `aria-label="Zoom"` and a percentage `aria-valuetext`, and a visible keyboard focus ring in Firefox as well as WebKit browsers.
 
@@ -29,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Zooming (slider, mouse wheel, pinch, `setZoom()`) keeps the point under the viewport centre, the cursor or the finger midpoint fixed, instead of always zooming about the image centre, so the image no longer drifts after a pan.
 - Mouse wheel zoom is multiplicative: ×1.1 per 100px notch, scaled by `deltaY` and `deltaMode` and capped at one notch per event (it was a fixed ±0.1 step).
 - Event contract: `bind()` now emits one `update`; `setZoom()` and `zoom =` emit `zoom`; `reset()` emits `zoom` when the zoom changed; `zoom` and `update` are emitted only when the clamped value actually changed; `update` fires before `zoom`. A drag that the bounds fully absorb no longer emits `update`. See the Events table in the README.
+- `enableOrientation` no longer logs a warning (rotation is always available); `rotate()` accepts any multiple of 90 instead of only 90, 180, 270 and -90.
 - A second touch ends an active drag, so a pinch takes over instead of also panning.
 - The default `zoom.min` is now per image when it is not configured: the zoom at which the image covers the viewport, so a large photo (coverage below 0.1) can zoom out to fit instead of stopping at 0.1. Users who set `zoom.min` see no change. The effective minimum is capped at `zoom.max`, so a small image no longer produces an inverted slider.
 - `result({ size: 'original' })` returns the viewport area at integer image resolution, and with `enforceMinimumCoverage: false` the letterboxed frame; all output sizes keep the image's proportions instead of stretching it over the output.
