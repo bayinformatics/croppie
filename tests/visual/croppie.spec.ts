@@ -61,7 +61,7 @@ async function resultPixels(
 	}, points) as Promise<Rgba[]>;
 }
 
-function expectColour(
+function expectColor(
 	actual: Rgba,
 	expected: [number, number, number],
 	tolerance: number,
@@ -94,10 +94,10 @@ test("result() after rotate(90) is rotated clockwise", async ({ page }) => {
 	);
 
 	// Clockwise: TL red -> TR, TR green -> BR, BR yellow -> BL, BL blue -> TL
-	expectColour(topLeft as Rgba, BLUE, 8);
-	expectColour(topRight as Rgba, RED, 8);
-	expectColour(bottomRight as Rgba, GREEN, 8);
-	expectColour(bottomLeft as Rgba, YELLOW, 8);
+	expectColor(topLeft as Rgba, BLUE, 8);
+	expectColor(topRight as Rgba, RED, 8);
+	expectColor(bottomRight as Rgba, GREEN, 8);
+	expectColor(bottomLeft as Rgba, YELLOW, 8);
 });
 
 test("EXIF orientation 6 is reported, not applied a second time", async ({
@@ -136,10 +136,10 @@ test("EXIF orientation 6 is reported, not applied a second time", async ({
 			[50, 150],
 		],
 	);
-	expectColour(topLeft as Rgba, BLUE, 24);
-	expectColour(topRight as Rgba, RED, 24);
-	expectColour(bottomRight as Rgba, GREEN, 24);
-	expectColour(bottomLeft as Rgba, YELLOW, 24);
+	expectColor(topLeft as Rgba, BLUE, 24);
+	expectColor(topRight as Rgba, RED, 24);
+	expectColor(bottomRight as Rgba, GREEN, 24);
+	expectColor(bottomLeft as Rgba, YELLOW, 24);
 
 	// The preview shows the same thing: the top-left block of the displayed image is blue
 	// (dimmed by the overlay outside the viewport, so check which channel dominates)

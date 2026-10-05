@@ -375,20 +375,20 @@ describe("DOM utilities", () => {
 			element.remove();
 		});
 
-		it("returns the centre when the element has no layout box", () => {
+		it("returns the center when the element has no layout box", () => {
 			expect(anchorFromClientPoint(element, 120, 80)).toEqual({ x: 0, y: 0 });
 		});
 
-		it("returns the centre when only one dimension is empty", () => {
+		it("returns the center when only one dimension is empty", () => {
 			mockElementRect(element, { left: 0, top: 0, width: 200, height: 0 });
 
 			expect(anchorFromClientPoint(element, 120, 80)).toEqual({ x: 0, y: 0 });
 		});
 
-		it("returns the offset from the element centre", () => {
+		it("returns the offset from the element center", () => {
 			mockElementRect(element, { left: 10, top: 20, width: 200, height: 100 });
 
-			// The centre is at client (110, 70)
+			// The center is at client (110, 70)
 			expect(anchorFromClientPoint(element, 110, 70)).toEqual({ x: 0, y: 0 });
 			expect(anchorFromClientPoint(element, 210, 120)).toEqual({
 				x: 100,
@@ -411,7 +411,7 @@ describe("DOM utilities", () => {
 				offsetHeight: 300,
 			});
 
-			// 25px right of the displayed centre (75, 75) is 50px in layout pixels
+			// 25px right of the displayed center (75, 75) is 50px in layout pixels
 			expect(anchorFromClientPoint(element, 100, 75)).toEqual({ x: 50, y: 0 });
 			expect(anchorFromClientPoint(element, 75, 125)).toEqual({ x: 0, y: 100 });
 		});

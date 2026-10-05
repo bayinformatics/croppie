@@ -93,7 +93,7 @@ function downsample(
  *
  * With a `rotation` the frame is still given in the NATURAL image frame, while the output
  * canvas is in the displayed orientation: the image is drawn through a context rotated about
- * the output centre into a destination box of `swapDims(outW, outH, rotation)` (the output
+ * the output center into a destination box of `swapDims(outW, outH, rotation)` (the output
  * turned back), so `[dw, dh] = swapDims(...)`, `kx = dw / frameW`, `ky = dh / frameH` and the
  * destination offsets are measured from `(-dw/2, -dh/2)`. The background and the circle mask
  * are applied first, in canvas coordinates, so they are not rotated.

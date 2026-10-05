@@ -211,7 +211,7 @@ describe("Croppie rotate", () => {
 			expect(previewTransform()).not.toContain("rotate");
 		});
 
-		describe("centring (200x100 image in a 400x400 boundary, zoom 1)", () => {
+		describe("centering (200x100 image in a 400x400 boundary, zoom 1)", () => {
 			let cleanupWide: () => void;
 
 			beforeEach(() => {
@@ -222,19 +222,19 @@ describe("Croppie rotate", () => {
 				cleanupWide();
 			});
 
-			async function bindCentred(): Promise<void> {
+			async function bindCentered(): Promise<void> {
 				create({ boundary: { width: 400, height: 400 } });
 				await croppie.bind({ url: SMALL_PNG, zoom: 1 });
 			}
 
 			it("keeps today's transform at rotation 0", async () => {
-				await bindCentred();
+				await bindCentered();
 
 				expect(previewTransform()).toBe("translate(100px, 150px) scale(1)");
 			});
 
-			it("keeps the rotated image centred for 90 (box x 150-250, y 100-300)", async () => {
-				await bindCentred();
+			it("keeps the rotated image centered for 90 (box x 150-250, y 100-300)", async () => {
+				await bindCentered();
 
 				croppie.rotate(90);
 
@@ -243,8 +243,8 @@ describe("Croppie rotate", () => {
 				);
 			});
 
-			it("keeps the rotated image centred for 180", async () => {
-				await bindCentred();
+			it("keeps the rotated image centered for 180", async () => {
+				await bindCentered();
 
 				croppie.rotate(180);
 
@@ -253,8 +253,8 @@ describe("Croppie rotate", () => {
 				);
 			});
 
-			it("keeps the rotated image centred for 270", async () => {
-				await bindCentred();
+			it("keeps the rotated image centered for 270", async () => {
+				await bindCentered();
 
 				croppie.rotate(270);
 
@@ -322,8 +322,8 @@ describe("Croppie rotate", () => {
 		});
 	});
 
-	describe("the centre of the viewport stays on the same image pixel", () => {
-		it("keeps the natural points of a centred crop through every quarter turn", async () => {
+	describe("the center of the viewport stays on the same image pixel", () => {
+		it("keeps the natural points of a centered crop through every quarter turn", async () => {
 			create();
 			await croppie.bind({
 				url: SMALL_PNG,
@@ -344,7 +344,7 @@ describe("Croppie rotate", () => {
 			}
 		});
 
-		it("keeps the points of an off-centre crop and returns to the start after four turns", async () => {
+		it("keeps the points of an off-center crop and returns to the start after four turns", async () => {
 			create();
 			await croppie.bind({
 				url: SMALL_PNG,
@@ -412,7 +412,7 @@ describe("Croppie rotate", () => {
 			}
 		});
 
-		it("normalises the rotation", async () => {
+		it("normalizes the rotation", async () => {
 			create();
 			await croppie.bind({ url: SMALL_PNG, rotation: 450 });
 			expect(croppie.get().rotation).toBe(90);
@@ -552,7 +552,7 @@ describe("Croppie rotate", () => {
 			const ctx = getLastMockContext();
 			expect(ctx?.translate).toHaveBeenCalledWith(5, 2.5);
 			expect(ctx?.rotate).toHaveBeenCalledWith(Math.PI / 2);
-			// Natural source {7.5, 0, 12.5, 10}, drawn into a 5x10 box centred on the origin
+			// Natural source {7.5, 0, 12.5, 10}, drawn into a 5x10 box centered on the origin
 			expect(ctx?.drawImage).toHaveBeenCalledWith(
 				expect.anything(),
 				7.5,

@@ -55,7 +55,7 @@ describe("resolveMinZoom", () => {
 				expected: 0.5,
 			},
 			{
-				name: "a configured min of 0.1 is honoured for a large photo",
+				name: "a configured min of 0.1 is honored for a large photo",
 				given: { configuredMin: 0.1, coverage: PHOTO.coverage },
 				expected: 0.1,
 			},

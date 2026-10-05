@@ -390,7 +390,7 @@ describe("Croppie zoom", () => {
 	});
 
 	describe("zoom anchoring", () => {
-		// 400x300 image, 100x100 viewport centred in a 300x300 boundary
+		// 400x300 image, 100x100 viewport centered in a 300x300 boundary
 		let cleanupWideImageMock: () => void;
 
 		beforeEach(() => {
@@ -419,7 +419,7 @@ describe("Croppie zoom", () => {
 			return (points.topLeftX + points.bottomRightX) / 2;
 		}
 
-		it("keeps the crop centre fixed when zooming in after a pan", async () => {
+		it("keeps the crop center fixed when zooming in after a pan", async () => {
 			const boundary = await bindWide(1);
 
 			simulateDrag(boundary, 100, 100, 150, 100); // pan x to 50
@@ -431,7 +431,7 @@ describe("Croppie zoom", () => {
 			expect(cropCentreX()).toBeCloseTo(150, 6);
 		});
 
-		it("keeps the crop centre fixed when zooming out after a pan", async () => {
+		it("keeps the crop center fixed when zooming out after a pan", async () => {
 			const boundary = await bindWide(2);
 
 			simulateDrag(boundary, 100, 100, 160, 100); // pan x to 60
@@ -442,7 +442,7 @@ describe("Croppie zoom", () => {
 			expect(cropCentreX()).toBeCloseTo(before, 6);
 		});
 
-		it("keeps the crop centre fixed when zooming with the slider", async () => {
+		it("keeps the crop center fixed when zooming with the slider", async () => {
 			const boundary = await bindWide(1);
 			simulateDrag(boundary, 100, 100, 150, 100);
 			const slider = container.querySelector(".cr-slider") as HTMLInputElement;

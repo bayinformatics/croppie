@@ -186,7 +186,7 @@ To reproduce the crop on a server, auto-orient the original (sharp `.rotate()`, 
 
 #### `setZoom(value: number): void`
 
-Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport centre; non-finite values are ignored. Emits `update` and `zoom` when the clamped zoom changed.
+Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport center; non-finite values are ignored. Emits `update` and `zoom` when the clamped zoom changed.
 
 #### `zoom: number`
 
@@ -194,7 +194,7 @@ Getter and setter for the current zoom level. Setting it clamps to the zoom limi
 
 #### `reset(): void`
 
-Re-centres the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
+Re-centers the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
 
 #### `on(event, handler): void` / `off(event, handler): void`
 
@@ -202,7 +202,7 @@ Subscribe to or unsubscribe from [events](#events).
 
 #### `rotate(degrees: number): void`
 
-Rotate the image **clockwise** by `degrees`: any multiple of 90, positive or negative (`-90` turns counter-clockwise); anything else throws a `RangeError`. The image pixel under the viewport centre stays there, and the zoom limits are recomputed for the rotated image, so with a non-square viewport a quarter turn can raise the zoom to the new minimum. Emits `rotate`, then `update` (and `zoom` if the zoom changed). Does nothing before an image is bound. `reset()` restores the rotation `bind()` started with. `result()` renders the rotated image.
+Rotate the image **clockwise** by `degrees`: any multiple of 90, positive or negative (`-90` turns counter-clockwise); anything else throws a `RangeError`. The image pixel under the viewport center stays there, and the zoom limits are recomputed for the rotated image, so with a non-square viewport a quarter turn can raise the zoom to the new minimum. Emits `rotate`, then `update` (and `zoom` if the zoom changed). Does nothing before an image is bound. `reset()` restores the rotation `bind()` started with. `result()` renders the rotated image.
 
 ```typescript
 cropper.rotate(90)   // clockwise
@@ -248,7 +248,7 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 | Slider, mouse wheel, pinch, `setZoom()`, `zoom =` | only when the clamped zoom changed | only when the clamped zoom changed |
 | `reset()` | always | only when the zoom changed |
 
-Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport centre (slider, `setZoom()`) fixed. One mouse-wheel notch (100px) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan.
+Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport center (slider, `setZoom()`) fixed. One mouse-wheel notch (100px) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan.
 
 ### Zoom and accessibility
 
@@ -258,7 +258,7 @@ Zooming keeps the point under the cursor (mouse wheel), between the fingers (pin
 
 ## Theming
 
-The colours are CSS custom properties, set on `:root` by `croppie.css`. Override them anywhere in your own stylesheet:
+The colors are CSS custom properties, set on `:root` by `croppie.css`. Override them anywhere in your own stylesheet:
 
 ```css
 .my-cropper {

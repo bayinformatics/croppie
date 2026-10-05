@@ -204,7 +204,7 @@ describe("canvas draw", () => {
 
 				const ctx = contextOf(canvas);
 				expect(ctx.drawImage).toHaveBeenCalledTimes(1);
-				// 400x300 scaled by 100/1000 = 40x30, centred at (30, 35): never stretched.
+				// 400x300 scaled by 100/1000 = 40x30, centered at (30, 35): never stretched.
 				// A 10x shrink is first halved to 50x38, which is drawn whole.
 				expect(drawCalls(ctx)).toEqual([
 					["CANVAS 50x38", 0, 0, 50, 38, 30, 35, 40, 30],
@@ -551,7 +551,7 @@ describe("canvas draw", () => {
 			expect(ctx.restore).not.toHaveBeenCalled();
 		});
 
-		it("draws through a context rotated about the output centre for 90", () => {
+		it("draws through a context rotated about the output center for 90", () => {
 			drawCroppedImage(image, frame, 100, 50, { rotation: 90 });
 
 			const ctx = lastContext();
@@ -656,7 +656,7 @@ describe("canvas draw", () => {
 				{ rotation: 90 },
 			);
 
-			// Scale 0.1: the image is 40x30 in a 100x100 box centred on the origin, offset
+			// Scale 0.1: the image is 40x30 in a 100x100 box centered on the origin, offset
 			// by the 30x35 of empty space before it. A 10x shrink is first halved to 50x38.
 			expect(drawCalls(contextOf(canvas))).toEqual([
 				["CANVAS 50x38", 0, 0, 50, 38, -20, -15, 40, 30],
