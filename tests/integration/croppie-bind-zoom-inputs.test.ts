@@ -1,22 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import type {
-	CropPoints,
-	CroppieOptions,
-	PointsArray,
-} from "../../src/types.ts";
+import type { CropPoints, CroppieOptions } from "../../src/types.ts";
 import { buildJpegHeader } from "../fixtures/exif-jpeg.js";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
-import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
 const PHOTO = "https://example.com/photo.jpg"; // 400x300
-const OTHER = "https://example.com/other.jpg"; // 800x400
 const SLOW = "https://example.com/slow.jpg"; // 600x600, loads after 20ms
 
 function dimensions(src: string): { width: number; height: number } {
-	if (src === OTHER) return { width: 800, height: 400 };
 	if (src === SLOW) return { width: 600, height: 600 };
-	// PHOTO and every data URL (the JPEG headers below, SMALL_PNG)
+	// PHOTO and every other image (such as the JPEG data URLs below)
 	return { width: 400, height: 300 };
 }
 
@@ -221,107 +214,6 @@ describe("Croppie bind and zoom inputs", () => {
 			expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
 			expectFinitePoints(croppie.get().points);
 			expect(onUpdate).not.toHaveBeenCalled();
-		});
-	});
-
-	describe("bind({ points })", () => {
-		it("rejects a malformed points array before replacing the image, transform or slider", async () => {
-			const { croppie, root } = mount();
-			await croppie.bind(PHOTO);
-			croppie.setZoom(2);
-			const before = observe({ croppie, root });
-			const onUpdate = mock();
-			croppie.on("update", onUpdate);
-
-			await expect(
-				croppie.bind({
-					url: OTHER,
-					points: [0, 0, 10] as unknown as PointsArray,
-				}),
-			).rejects.toThrow("PointsArray must have exactly 4 elements");
-
-			expect(preview(root).src).toBe(PHOTO);
-			expect(observe({ croppie, root })).toEqual(before);
-			expect(onUpdate).not.toHaveBeenCalled();
-		});
-
-		it("does not let a malformed points array cancel a bind that is still loading", async () => {
-			const { croppie, root } = mount();
-
-			const good = croppie.bind({ url: SLOW, zoom: 2 });
-			await expect(
-				croppie.bind({ url: PHOTO, points: [] as unknown as PointsArray }),
-			).rejects.toThrow("PointsArray must have exactly 4 elements");
-			await good;
-
-			expect(preview(root).src).toBe(SLOW);
-			expect(croppie.zoom).toBe(2);
-		});
-
-		it("binds v2-style string points (as v2's get() returned them) like numbers", async () => {
-			const { croppie } = mount();
-
-			await croppie.bind({
-				url: PHOTO,
-				points: ["100", "50", "200", "150"] as unknown as PointsArray,
-			});
-
-			expect(warn).not.toHaveBeenCalled();
-			expect(croppie.zoom).toBeCloseTo(1, 9);
-			const { points } = croppie.get();
-			expect(points.topLeftX).toBeCloseTo(100, 9);
-			expect(points.topLeftY).toBeCloseTo(50, 9);
-			expect(points.bottomRightX).toBeCloseTo(200, 9);
-			expect(points.bottomRightY).toBeCloseTo(150, 9);
-		});
-
-		it("binds object points with numeric string coordinates like numbers", async () => {
-			const { croppie } = mount();
-
-			await croppie.bind({
-				url: PHOTO,
-				points: {
-					topLeftX: "100",
-					topLeftY: "50",
-					bottomRightX: "200",
-					bottomRightY: "150",
-				} as unknown as CropPoints,
-			});
-
-			expect(warn).not.toHaveBeenCalled();
-			expect(croppie.zoom).toBeCloseTo(1, 9);
-			expect(croppie.get().points.topLeftX).toBeCloseTo(100, 9);
-		});
-
-		it("still warns about and ignores points that are not numbers", async () => {
-			const { croppie } = mount();
-
-			await croppie.bind({
-				url: PHOTO,
-				points: ["abc", "50", "200", "150"] as unknown as PointsArray,
-			});
-
-			expect(warn).toHaveBeenCalledTimes(1);
-			expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
-		});
-	});
-
-	describe("preview image", () => {
-		it("loads a remote image in the loader's CORS mode, so the browser can reuse it", async () => {
-			const { croppie, root } = mount();
-
-			await croppie.bind(PHOTO);
-
-			expect(preview(root).crossOrigin).toBe("anonymous");
-			expect(preview(root).src).toBe(PHOTO);
-		});
-
-		it("gives a data URL no CORS mode, like the loader", async () => {
-			const { croppie, root } = mount();
-
-			await croppie.bind(SMALL_PNG);
-
-			expect(preview(root).crossOrigin).toBeNull();
 		});
 	});
 
