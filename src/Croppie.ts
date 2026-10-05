@@ -346,10 +346,26 @@ export class Croppie {
 	}
 
 	/**
-	 * Binds a File or Blob to the cropper
+	 * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
+	 * empty file input) rejects with a `TypeError` before anything changes, so it does not
+	 * cancel a bind that is still loading.
 	 */
 	async bindFile(file: File | Blob): Promise<void> {
 		this.assertNotDestroyed("bindFile");
+
+		// Validate before claiming a generation, so a bad call cannot supersede a good bind.
+		// The tag check accepts a File or Blob from another realm (e.g. an iframe), which
+		// fails `instanceof`
+		const tag = Object.prototype.toString.call(file);
+		if (
+			!(file instanceof Blob) &&
+			tag !== "[object Blob]" &&
+			tag !== "[object File]"
+		) {
+			throw new TypeError(
+				`[@bayinformatics/croppie] bindFile() expects a File or Blob (got ${String(file)})`,
+			);
+		}
 
 		// Claim the generation before reading, so a bind() started while the file is
 		// still being read supersedes this one
