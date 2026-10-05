@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Internal
 
 - Integration suites for `bind`, `zoom` and `result` (65 tests) are no longer skipped; the image and canvas mocks resolve fixture dimensions and a 2D context, `src/canvas/draw.ts` is covered, and tests are formatted, linted and type-checked.
+- Tests pin `result()`'s quality, circle and `backgroundColor` handling and `loadImage()`'s `crossOrigin` for remote URLs.
 - CI: a composite setup action, least-privilege `permissions`, `cancel-in-progress`, current major versions of all actions, `check:package` in the build job, and CI runs for pull requests against any base branch.
 - Publishing runs lint, typecheck, tests, build and `check:package` first, verifies that the release tag matches `package.json`, and clears `dist/` before downloading the built artifact.
 - Playwright replaced Lost Pixel for visual regression (#16), with an HTML report, retries and `forbidOnly` on CI.
@@ -52,7 +53,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Demo image and the size badge in the README.
+- Demo image and the size badge on the demo page.
 
 ## [3.0.2] - 2025-12-24
 
@@ -69,7 +70,7 @@ Includes the untagged 3.0.1.
 
 ### Internal
 
-- CI workflow with lint, test, build and security checks; publishing to npm and GitHub Packages with provenance, plus a `workflow_dispatch` trigger.
+- CI workflow with lint, test and build jobs; publishing to npm and GitHub Packages with provenance, plus a `workflow_dispatch` trigger.
 
 ## [3.0.0] - 2025-12-24
 

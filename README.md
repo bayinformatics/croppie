@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@bayinformatics/croppie.svg)](https://www.npmjs.com/package/@bayinformatics/croppie)
 [![license](https://img.shields.io/npm/l/@bayinformatics/croppie.svg)](LICENSE)
 [![ci](https://github.com/bayinformatics/croppie/actions/workflows/ci.yml/badge.svg)](https://github.com/bayinformatics/croppie/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/bayinformatics/croppie/graph/badge.svg)](https://codecov.io/gh/bayinformatics/croppie)
+[![codecov](https://codecov.io/gh/bayinformatics/croppie/branch/main/graph/badge.svg)](https://codecov.io/gh/bayinformatics/croppie)
 
 A modern, TypeScript-first image cropper for the web. Fork of [Foliotek/Croppie](https://github.com/Foliotek/Croppie).
 
