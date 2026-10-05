@@ -145,9 +145,9 @@ through `get()` while the derived zoom stays within `zoom.min`/`zoom.max`;
 mismatched-aspect points are cover-fit and center-preserved at the applied
 (clamped) zoom.
 
-#### `bindFile(file: File | Blob): Promise<void>`
+#### `bindFile(file: File | Blob, options?: BindFileOptions): Promise<void>`
 
-Load an image from a File input.
+Load an image from a File input. `options` are those of `bind()` without `url` (`rotation`, `orientation`, `points`, `zoom`), validated and applied the same way, so a file can be bound again with what `get()` returned: `await cropper.bindFile(file, { points, zoom, rotation })`.
 
 ```typescript
 const input = document.querySelector('input[type="file"]')

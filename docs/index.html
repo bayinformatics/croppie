@@ -661,10 +661,7 @@ npm install github:bayinformatics/croppie</pre>
         const { points, rotation } = croppie.get()
         if (!mount() || !source) return
         if (source === IMAGE) await croppie.bind({ url: IMAGE, points, rotation })
-        else {
-          await croppie.bindFile(source)
-          croppie.rotate(rotation)
-        }
+        else await croppie.bindFile(source, { rotation })
       }), 150)
     }).observe(stage.parentElement)
 

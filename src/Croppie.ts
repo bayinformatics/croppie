@@ -9,6 +9,7 @@ import {
 	createWheelZoomHandler,
 } from "./input/zoom.js";
 import type {
+	BindFileOptions,
 	BindOptions,
 	Boundary,
 	CropPoints,
@@ -328,7 +329,7 @@ export class Croppie {
 	 *
 	 * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
 	 */
-	private resolveBindRotation(bindOptions: BindOptions): Rotation {
+	private resolveBindRotation(bindOptions: BindFileOptions): Rotation {
 		if (bindOptions.rotation !== undefined) {
 			return normalizeRotation(bindOptions.rotation);
 		}
@@ -507,12 +508,20 @@ export class Croppie {
 	}
 
 	/**
-	 * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
-	 * empty file input) rejects with a `TypeError` before anything changes, so it does not
-	 * cancel a bind that is still loading. Like `bind()`, it rejects with an `AbortError`
-	 * when a later bind supersedes it or the instance is destroyed while the file loads.
+	 * Binds a File or Blob to the cropper, with the same `options` as `bind()` except `url`:
+	 * `rotation`, `orientation`, `points` and `zoom` apply exactly as there (an invalid
+	 * `rotation` rejects with a `RangeError` before anything changes; malformed `points` are
+	 * ignored with a warning), so a file can be bound back with the data `get()` returned.
+	 *
+	 * Anything else than a File or Blob (such as the `undefined` of an empty file input)
+	 * rejects with a `TypeError` before anything changes, so it does not cancel a bind that is
+	 * still loading. Like `bind()`, it rejects with an `AbortError` when a later bind
+	 * supersedes it or the instance is destroyed while the file loads.
 	 */
-	async bindFile(file: File | Blob): Promise<void> {
+	async bindFile(
+		file: File | Blob,
+		options: BindFileOptions = {},
+	): Promise<void> {
 		this.assertNotDestroyed("bindFile");
 
 		// Validate before claiming a generation, so a bad call cannot supersede a good bind.
@@ -529,12 +538,16 @@ export class Croppie {
 			);
 		}
 
+		// Validate and read the options like bind() does, before claiming a generation
+		const rotation = this.resolveBindRotation(options);
+		const points = readPoints(options.points);
+
 		// Claim the generation before reading, so a bind() started while the file is
 		// still being read supersedes this one
 		await this.runBind(
 			++this.bindGeneration,
 			() => fileToDataUrl(file),
-			(image, url) => this.load(image, { url }, 0),
+			(image, url) => this.load(image, { ...options, url }, rotation, points),
 		);
 	}
 

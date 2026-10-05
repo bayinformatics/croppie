@@ -10,6 +10,7 @@
 // Default export for convenience
 export { Croppie, Croppie as default } from "./Croppie.js";
 export type {
+	BindFileOptions,
 	BindOptions,
 	Boundary,
 	CropPoints,

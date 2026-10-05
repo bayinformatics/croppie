@@ -171,6 +171,12 @@ export interface BindOptions {
 }
 
 /**
+ * Options for `bindFile(file, options)`: those of `bind()` without `url`, since the file is
+ * the image.
+ */
+export type BindFileOptions = Omit<BindOptions, "url">;
+
+/**
  * Result options - for exporting the cropped image
  */
 export interface ResultOptions {
