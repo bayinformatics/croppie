@@ -40,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Tests pin `result()`'s quality, circle and `backgroundColor` handling and `loadImage()`'s `crossOrigin` for remote URLs.
 - CI: a composite setup action, least-privilege `permissions`, `cancel-in-progress` for pull requests (runs on `main` always finish), current major versions of all actions, `check:package` in the build job, and CI runs for pull requests against any base branch.
 - Publishing runs lint, typecheck, tests, build and `check:package` first, and clears `dist/` before downloading the built artifact. Every run first verifies the tag against `package.json`: a release must be tagged `v<version>`, and a manual run must be started on that tag.
-- Playwright replaced Lost Pixel for visual regression (#16), with an HTML report, retries and `forbidOnly` on CI.
+- Playwright replaced Lost Pixel for visual regression (#16), with an HTML report and `forbidOnly` on CI, and no retries, so a flaky screenshot fails instead of passing on a second try.
 - Committed `dist/` and `docs/` bundles are checked for parity with a fresh build in CI, under the pinned Bun version.
 - Dependabot for the `bun` and `github-actions` ecosystems (#18, #22).
 - Added `CONTRIBUTING.md`, `SECURITY.md`, issue forms and a pull request template.
