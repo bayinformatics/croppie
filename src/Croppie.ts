@@ -388,7 +388,9 @@ export class Croppie {
 	 * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
 	 *
 	 * The image keeps its proportions at every `size`: a size of another shape than the
-	 * viewport centres the crop and leaves the rest transparent (or `backgroundColor`).
+	 * viewport centres the crop and leaves the rest transparent (or `backgroundColor`). With
+	 * `size: "original"`, a crop zoomed out past the image is scaled down to at most the area
+	 * of the image part it shows or 4096x4096 px, whichever is larger.
 	 */
 	result(options: ResultOptions & { type: "blob" }): Promise<Blob>;
 	result(options: ResultOptions & { type: "base64" }): Promise<string>;
@@ -416,15 +418,28 @@ export class Croppie {
 			outputWidth = viewport.width;
 			outputHeight = viewport.height;
 		} else if (options.size === "original") {
-			// The frame at image resolution, at a whole number of pixels
-			outputWidth = Math.max(
+			// The frame at image resolution, at a whole number of pixels. A frame that
+			// extends past the image (zoomed out, coverage not enforced) is scaled down until its
+			// area is at most that of its overlap with the image or 4096x4096, whichever is
+			// larger: the empty margin alone could exceed what browsers allocate for a canvas
+			const { topLeftX, topLeftY, bottomRightX, bottomRightY } = frame;
+			const { naturalWidth, naturalHeight } = this.image;
+			const frameWidth = bottomRightX - topLeftX;
+			const frameHeight = bottomRightY - topLeftY;
+			const overlapWidth =
+				Math.min(naturalWidth, bottomRightX) - Math.max(0, topLeftX);
+			const overlapHeight =
+				Math.min(naturalHeight, bottomRightY) - Math.max(0, topLeftY);
+			const overlapArea =
+				Math.max(0, overlapWidth) * Math.max(0, overlapHeight);
+			const shrink = Math.min(
 				1,
-				Math.round(frame.bottomRightX - frame.topLeftX),
+				Math.sqrt(
+					Math.max(4096 * 4096, overlapArea) / (frameWidth * frameHeight),
+				),
 			);
-			outputHeight = Math.max(
-				1,
-				Math.round(frame.bottomRightY - frame.topLeftY),
-			);
+			outputWidth = Math.max(1, Math.round(frameWidth * shrink));
+			outputHeight = Math.max(1, Math.round(frameHeight * shrink));
 		} else if (options.size) {
 			outputWidth = options.size.width;
 			outputHeight = options.size.height;
