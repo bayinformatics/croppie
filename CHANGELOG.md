@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?, plus a check that every relative import in the type declarations has a `.js` extension) scripts.
 - `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work. With `enableZoom: false` a pinch over the cropper zooms the page instead of doing nothing.
 - `result()` is typed by its output type: `"blob"` returns `Promise<Blob>`, `"base64"` `Promise<string>`, `"canvas"` `Promise<HTMLCanvasElement>` (a generic overload remains for runtime-only types).
-- The zoom slider has `aria-label="Zoom"` and a percentage `aria-valuetext`, and a visible keyboard focus ring in Firefox as well as WebKit browsers.
+- The zoom slider has `aria-label="Zoom"` and a percentage `aria-valuetext` (set from its creation, so it is never announced as a raw value), and a visible keyboard focus ring in Firefox as well as WebKit browsers.
 
 ### Changed
 
