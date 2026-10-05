@@ -37,7 +37,7 @@ bun add @bayinformatics/croppie
 
 ## Compatibility
 
-This is an **ESM-only** package for **Node 22 or newer**. It works with modern bundlers like Vite, Webpack, Rollup, Next.js, and Bun.
+This is an **ESM-only** package for **Node 20 or newer**. It works with modern bundlers like Vite, Webpack, Rollup, Next.js, and Bun.
 
 **Breaking Change in v3:** v2 shipped UMD (AMD, CommonJS and a global); v3 is ES modules only.
 
@@ -46,7 +46,7 @@ This is an **ESM-only** package for **Node 22 or newer**. It works with modern b
 + import Croppie from '@bayinformatics/croppie'
 ```
 
-CommonJS `require()` works natively on **Node 22.12+**, which can load an ES module from CommonJS, through the package's `default` export condition. The result is the module namespace:
+CommonJS `require()` works natively on **Node 20.19+ and 22.12+**, which can load an ES module from CommonJS, through the package's `default` export condition. The result is the module namespace:
 
 ```js
 const { Croppie } = require('@bayinformatics/croppie')
