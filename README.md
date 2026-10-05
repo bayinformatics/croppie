@@ -213,7 +213,7 @@ Present for v2 compatibility but **not implemented**: it logs a warning and does
 
 #### `destroy(): void`
 
-Clean up and remove the cropper. It is safe to call more than once. Afterwards `bind()`, `bindFile()` and `result()` reject with a `... called on a destroyed instance` error, and `setZoom()`, `zoom =` and `reset()` do nothing.
+Clean up and remove the cropper. It is safe to call more than once. Afterwards `bind()`, `bindFile()` and `result()` reject with a `... called on a destroyed instance` error, `setZoom()`, `zoom =` and `reset()` do nothing, and `get()` returns zeroed points with the initial zoom of 1.
 
 ### Result Options
 

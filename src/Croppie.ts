@@ -96,7 +96,7 @@ export class Croppie {
 
 	// State
 	private image: HTMLImageElement | null = null;
-	private transform: TransformState = { x: 0, y: 0, scale: 1 };
+	private transform: TransformState = Croppie.initialTransform();
 	/**
 	 * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
 	 * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
@@ -131,6 +131,11 @@ export class Croppie {
 	// bind win (an older bind that finishes loading later sees a newer generation and stops)
 	private destroyed = false;
 	private bindGeneration = 0;
+
+	/** The transform before any image is bound, and again after `destroy()`. */
+	private static initialTransform(): TransformState {
+		return { x: 0, y: 0, scale: 1 };
+	}
 
 	constructor(element: HTMLElement, givenOptions: CroppieOptions) {
 		// Dimensions and zoom limits given as numeric strings (data attributes) are numbers
@@ -686,6 +691,8 @@ export class Croppie {
 		this.previewEl = null;
 		this.sliderEl = null;
 		this.image = null;
+		// get() and the zoom getter report the initial zoom next to the zeroed points
+		this.transform = Croppie.initialTransform();
 	}
 
 	/**
