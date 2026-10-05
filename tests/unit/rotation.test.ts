@@ -81,7 +81,7 @@ describe("rotateOffset", () => {
 
 	it("rotates clockwise in y-down coordinates: R(90)(x, y) = (-y, x)", () => {
 		expect(rotateOffset(3, 5, 90)).toEqual([-5, 3]);
-		// Right of the centre ends up below it
+		// Right of the center ends up below it
 		expect(rotateOffset(1, 0, 90)).toEqual([0, 1]);
 	});
 

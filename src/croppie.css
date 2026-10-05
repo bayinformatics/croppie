@@ -41,7 +41,7 @@
 	max-width: none !important;
 	max-height: none !important;
 	image-rendering: -webkit-optimize-contrast;
-	/* Keep the browser default: honour the EXIF orientation. Croppie's maths and result()
+	/* Keep the browser default: honor the EXIF orientation. Croppie's math and result()
 	   rely on naturalWidth/Height and drawImage seeing the oriented pixels. */
 	image-orientation: from-image;
 }

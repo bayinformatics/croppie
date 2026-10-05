@@ -446,7 +446,7 @@ describe("Croppie result", () => {
 	});
 
 	describe("a size of another shape than the viewport", () => {
-		it("keeps the image's proportions and centres the crop between bars", async () => {
+		it("keeps the image's proportions and centers the crop between bars", async () => {
 			cleanupImageMock();
 			cleanupImageMock = installImageMock({ width: 600, height: 400 });
 			croppie = new Croppie(container, {

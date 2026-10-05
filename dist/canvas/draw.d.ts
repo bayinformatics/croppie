@@ -4,7 +4,7 @@ import type { CropPoints, OutputFormat, Rotation } from "../types.js";
  *
  * The frame is the unclamped viewport rectangle in source-image pixels, so it can extend
  * past the image when the user zoomed out (coverage not enforced). It is scaled by one factor
- * for both axes and centred in the output: the part that overlaps the image is drawn into the
+ * for both axes and centered in the output: the part that overlaps the image is drawn into the
  * proportional sub-rectangle, and the rest of the output stays transparent (or
  * `backgroundColor`). An output of another shape than the frame therefore gets empty bars
  * instead of a stretched image. An output with the frame's shape up to rounding to whole
@@ -23,7 +23,7 @@ import type { CropPoints, OutputFormat, Rotation } from "../types.js";
  *
  * With a `rotation` the frame is still given in the NATURAL image frame, while the output
  * canvas is in the displayed orientation: the image is drawn through a context rotated about
- * the output centre into the box `[bw, bh] = swapDims(outW, outH, rotation)` (the output
+ * the output center into the box `[bw, bh] = swapDims(outW, outH, rotation)` (the output
  * turned back), which takes the place of `outW` and `outH` above, with the destination
  * offsets measured from `(-bw/2, -bh/2)`. The background and the circle mask are applied in
  * canvas coordinates, before the rotation, so they are not rotated.

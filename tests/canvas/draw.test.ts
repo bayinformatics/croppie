@@ -218,7 +218,7 @@ describe("canvas draw", () => {
 
 				const ctx = contextOf(canvas);
 				expect(ctx.drawImage).toHaveBeenCalledTimes(1);
-				// 400x300 scaled by 100/1000 = 40x30, centred at (30, 35): never stretched.
+				// 400x300 scaled by 100/1000 = 40x30, centered at (30, 35): never stretched.
 				// A 10x shrink is first halved to 50x38, which is drawn whole.
 				expect(drawCalls(ctx)).toEqual([
 					["CANVAS 50x38", 0, 0, 50, 38, 30, 35, 40, 30],
@@ -569,7 +569,7 @@ describe("canvas draw", () => {
 			expect(ctx.restore).not.toHaveBeenCalled();
 		});
 
-		it("draws through a context rotated about the output centre for 90", () => {
+		it("draws through a context rotated about the output center for 90", () => {
 			drawCroppedImage(image, tall, 100, 50, { rotation: 90 });
 
 			const ctx = lastContext();
@@ -674,7 +674,7 @@ describe("canvas draw", () => {
 				{ rotation: 90 },
 			);
 
-			// Scale 0.1: the image is 40x30 in a 100x100 box centred on the origin, offset
+			// Scale 0.1: the image is 40x30 in a 100x100 box centered on the origin, offset
 			// by the 30x35 of empty space before it. A 10x shrink is first halved to 50x38.
 			expect(drawCalls(contextOf(canvas))).toEqual([
 				["CANVAS 50x38", 0, 0, 50, 38, -20, -15, 40, 30],
@@ -703,7 +703,7 @@ describe("canvas draw", () => {
 			bottomRightY: 70,
 		};
 
-		it("keeps the image's proportions and centres it between two bars", () => {
+		it("keeps the image's proportions and centers it between two bars", () => {
 			// Scale 1 in a 2:1 output: 50x50, not stretched to 100x50, with 25px either side
 			drawCroppedImage(image, square, 100, 50);
 
@@ -736,7 +736,7 @@ describe("canvas draw", () => {
 			);
 		});
 
-		it("clips a circle, not an ellipse, around the centred frame", () => {
+		it("clips a circle, not an ellipse, around the centered frame", () => {
 			drawCroppedImage(image, square, 100, 50, { circle: true });
 
 			expect(lastContext().ellipse).toHaveBeenCalledWith(
@@ -750,7 +750,7 @@ describe("canvas draw", () => {
 			);
 		});
 
-		it("fills the whole output, bars included, with the background colour", () => {
+		it("fills the whole output, bars included, with the background color", () => {
 			drawCroppedImage(image, square, 100, 50, { backgroundColor: "#fff" });
 
 			const ctx = lastContext();
@@ -759,7 +759,7 @@ describe("canvas draw", () => {
 		});
 
 		it("letterboxes in the box turned back by the rotation", () => {
-			// A 50x25 frame shown at 90 is 25 wide and 50 tall: centred in the 100x50 output
+			// A 50x25 frame shown at 90 is 25 wide and 50 tall: centered in the 100x50 output
 			drawCroppedImage(image, { ...square, bottomRightY: 45 }, 100, 50, {
 				rotation: 90,
 				circle: true,
@@ -783,7 +783,7 @@ describe("canvas draw", () => {
 			);
 		});
 
-		it("centres a frame that extends past the image too", () => {
+		it("centers a frame that extends past the image too", () => {
 			// The 1000x1000 frame at scale 0.1 is 100x100 in the middle of the 200x100 output,
 			// and the 400x300 image 40x30 in the middle of that
 			const canvas = drawCroppedImage(
