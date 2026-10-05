@@ -76,19 +76,21 @@ describe("Croppie bind", () => {
 	});
 
 	describe("bindFile", () => {
+		const imageData = Buffer.from(
+			TINY_PNG.slice("data:image/png;base64,".length),
+			"base64",
+		);
+
 		it("binds a Blob", async () => {
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
 			});
 
-			// Create a simple blob
-			const blob = new Blob(["test"], { type: "image/png" });
-			// Note: In happy-dom this may not fully load, but we test the method works
-			try {
-				await croppie.bindFile(blob);
-			} catch {
-				// Expected in test environment - image loading may fail
-			}
+			const blob = new Blob([imageData], { type: "image/png" });
+			await croppie.bindFile(blob);
+
+			const preview = container.querySelector(".cr-image") as HTMLImageElement;
+			expect(preview.src).toBe(TINY_PNG);
 		});
 
 		it("binds a File", async () => {
@@ -96,12 +98,11 @@ describe("Croppie bind", () => {
 				viewport: { width: 100, height: 100, type: "square" },
 			});
 
-			const file = new File(["test"], "test.png", { type: "image/png" });
-			try {
-				await croppie.bindFile(file);
-			} catch {
-				// Expected in test environment
-			}
+			const file = new File([imageData], "test.png", { type: "image/png" });
+			await croppie.bindFile(file);
+
+			const preview = container.querySelector(".cr-image") as HTMLImageElement;
+			expect(preview.src).toBe(TINY_PNG);
 		});
 	});
 
