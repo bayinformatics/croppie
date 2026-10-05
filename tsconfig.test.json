@@ -5,7 +5,8 @@
     "allowImportingTsExtensions": true,
     "emitDeclarationOnly": false,
     "declaration": false,
-    "rootDir": "."
+    "rootDir": ".",
+    "types": ["bun"]
   },
   "include": ["src/**/*", "tests/**/*", "playwright.config.ts"],
   "exclude": ["node_modules", "dist"]

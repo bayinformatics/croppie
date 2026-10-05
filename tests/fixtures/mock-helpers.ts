@@ -19,13 +19,13 @@ export function installImageMock(dimensions?: {
 	class MockImage extends OriginalImage {
 		private _src = "";
 		private _onload: ((event: Event) => void) | null = null;
-		private _onerror: ((event: Event) => void) | null = null;
+		private _onerror: OnErrorEventHandler = null;
 
-		get src(): string {
+		override get src(): string {
 			return this._src;
 		}
 
-		set src(value: string) {
+		override set src(value: string) {
 			this._src = value;
 			// Schedule onload/onerror to fire asynchronously (like real browsers)
 			setTimeout(() => {
@@ -55,19 +55,19 @@ export function installImageMock(dimensions?: {
 			}, 0);
 		}
 
-		get onload(): ((event: Event) => void) | null {
+		override get onload(): ((event: Event) => void) | null {
 			return this._onload;
 		}
 
-		set onload(handler: ((event: Event) => void) | null) {
+		override set onload(handler: ((event: Event) => void) | null) {
 			this._onload = handler;
 		}
 
-		get onerror(): ((event: Event) => void) | null {
+		override get onerror(): OnErrorEventHandler {
 			return this._onerror;
 		}
 
-		set onerror(handler: ((event: Event) => void) | null) {
+		override set onerror(handler: OnErrorEventHandler) {
 			this._onerror = handler;
 		}
 	}
@@ -108,9 +108,13 @@ export function installGetComputedStyleMock(): () => void {
 					);
 					const scaleMatch = transform.match(/scale\(\s*(-?[\d.]+)\s*\)/);
 
-					const tx = translateMatch ? Number.parseFloat(translateMatch[1]) : 0;
-					const ty = translateMatch ? Number.parseFloat(translateMatch[2]) : 0;
-					const s = scaleMatch ? Number.parseFloat(scaleMatch[1]) : 1;
+					const tx = translateMatch
+						? Number.parseFloat(translateMatch[1] ?? "0")
+						: 0;
+					const ty = translateMatch
+						? Number.parseFloat(translateMatch[2] ?? "0")
+						: 0;
+					const s = scaleMatch ? Number.parseFloat(scaleMatch[1] ?? "1") : 1;
 
 					// Return as 2D matrix: matrix(a, b, c, d, tx, ty)
 					// For scale and translate: matrix(s, 0, 0, s, tx, ty)
@@ -231,7 +235,7 @@ export function createTouchEvent(
 	return new TouchEvent(type, {
 		bubbles: true,
 		cancelable: true,
-		touches: touchList as unknown as TouchList,
+		touches: touchList as unknown as Touch[],
 	});
 }
 

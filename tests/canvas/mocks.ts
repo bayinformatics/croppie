@@ -5,17 +5,19 @@
  * to enable testing canvas-related functionality.
  */
 
+import { mock } from "bun:test";
+
 // Store original methods for restoration
 let originalToBlob: typeof HTMLCanvasElement.prototype.toBlob | undefined;
 let originalToDataURL: typeof HTMLCanvasElement.prototype.toDataURL | undefined;
 
 export interface MockCanvasContext {
-	fillRect: ReturnType<typeof Bun.jest.fn>;
-	beginPath: ReturnType<typeof Bun.jest.fn>;
-	arc: ReturnType<typeof Bun.jest.fn>;
-	closePath: ReturnType<typeof Bun.jest.fn>;
-	clip: ReturnType<typeof Bun.jest.fn>;
-	drawImage: ReturnType<typeof Bun.jest.fn>;
+	fillRect: ReturnType<typeof mock>;
+	beginPath: ReturnType<typeof mock>;
+	arc: ReturnType<typeof mock>;
+	closePath: ReturnType<typeof mock>;
+	clip: ReturnType<typeof mock>;
+	drawImage: ReturnType<typeof mock>;
 	fillStyle: string;
 }
 
@@ -28,12 +30,12 @@ export interface MockCanvasContext {
  */
 export function createMockCanvasContext(): MockCanvasContext {
 	return {
-		fillRect: Bun.jest.fn(),
-		beginPath: Bun.jest.fn(),
-		arc: Bun.jest.fn(),
-		closePath: Bun.jest.fn(),
-		clip: Bun.jest.fn(),
-		drawImage: Bun.jest.fn(),
+		fillRect: mock(),
+		beginPath: mock(),
+		arc: mock(),
+		closePath: mock(),
+		clip: mock(),
+		drawImage: mock(),
 		fillStyle: "",
 	};
 }
