@@ -18,7 +18,6 @@ import type {
 	CroppieOptions,
 	ResultOptions,
 	TransformState,
-	ZoomConfig,
 } from "./types.js";
 import {
 	createBoundary,
@@ -47,11 +46,6 @@ import {
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./utils/index.js";
-
-const DEFAULT_ZOOM: ZoomConfig = {
-	min: DEFAULT_MIN_ZOOM,
-	max: DEFAULT_MAX_ZOOM,
-};
 
 /**
  * Modern, TypeScript-first image cropper.
@@ -87,9 +81,16 @@ export class Croppie {
 	// State
 	private image: HTMLImageElement | null = null;
 	private transform: TransformState = { x: 0, y: 0, scale: 1 };
-	private zoomConfig: ZoomConfig;
-	/** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
-	private configuredMinZoom: number | undefined;
+	/**
+	 * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
+	 * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
+	 * `undefined` counts as unset.
+	 */
+	private readonly zoomConfig: {
+		min: number | undefined;
+		max: number;
+		enforceMinimumCoverage: boolean;
+	};
 	private effectiveMinZoom = DEFAULT_MIN_ZOOM;
 
 	// Event handlers
@@ -124,10 +125,12 @@ export class Croppie {
 			enableZoom: options.enableZoom ?? true,
 		};
 
-		this.configuredMinZoom = options.zoom?.min;
+		// Field by field, not by spreading over defaults: an explicit `undefined` (such as
+		// `zoom: { max: props.maxZoom }`) must get the default, as validateOptions() assumed
 		this.zoomConfig = {
-			...DEFAULT_ZOOM,
-			...options.zoom,
+			min: options.zoom?.min,
+			max: options.zoom?.max ?? DEFAULT_MAX_ZOOM,
+			enforceMinimumCoverage: options.zoom?.enforceMinimumCoverage !== false,
 		};
 
 		// Deprecation warning for v2.6 migration
@@ -164,7 +167,7 @@ export class Croppie {
 		if (this.options.enableZoom && this.options.showZoomer) {
 			const sliderWrap = createSliderContainer();
 			this.sliderEl = createZoomSlider(
-				this.configuredMinZoom ?? DEFAULT_MIN_ZOOM,
+				this.zoomConfig.min ?? DEFAULT_MIN_ZOOM,
 				this.zoomConfig.max,
 				this.transform.scale,
 			);
@@ -632,11 +635,11 @@ export class Croppie {
 		);
 
 		this.effectiveMinZoom = resolveMinZoom({
-			configuredMin: this.configuredMinZoom,
+			configuredMin: this.zoomConfig.min,
 			max: this.zoomConfig.max,
 			coverage,
 			contain: calculateContainZoom(naturalWidth, naturalHeight, width, height),
-			enforceMinimumCoverage: this.zoomConfig.enforceMinimumCoverage !== false,
+			enforceMinimumCoverage: this.zoomConfig.enforceMinimumCoverage,
 		});
 
 		if (this.sliderEl) {
