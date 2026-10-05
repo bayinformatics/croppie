@@ -91,10 +91,32 @@ describe("canvas draw", () => {
 
 			const ctx = lastContext();
 			expect(ctx.beginPath).toHaveBeenCalledTimes(1);
-			expect(ctx.arc).toHaveBeenCalledWith(50, 50, 50, 0, Math.PI * 2);
+			expect(ctx.ellipse).toHaveBeenCalledWith(
+				50,
+				50,
+				50,
+				50,
+				0,
+				0,
+				Math.PI * 2,
+			);
 			expect(ctx.closePath).toHaveBeenCalledTimes(1);
 			expect(ctx.clip).toHaveBeenCalledTimes(1);
 			expect(firstCall(ctx.clip)).toBeLessThan(firstCall(ctx.drawImage));
+		});
+
+		it("clips to an ellipse, not a circle, for a non-square output", () => {
+			drawCroppedImage(image, POINTS, 100, 50, { circle: true });
+
+			expect(lastContext().ellipse).toHaveBeenCalledWith(
+				50,
+				25,
+				50,
+				25,
+				0,
+				0,
+				Math.PI * 2,
+			);
 		});
 
 		it("does not clip when circle is not set", () => {
@@ -102,8 +124,161 @@ describe("canvas draw", () => {
 
 			const ctx = lastContext();
 			expect(ctx.beginPath).not.toHaveBeenCalled();
-			expect(ctx.arc).not.toHaveBeenCalled();
+			expect(ctx.ellipse).not.toHaveBeenCalled();
 			expect(ctx.clip).not.toHaveBeenCalled();
+		});
+
+		it("turns on high-quality image smoothing", () => {
+			drawCroppedImage(image, POINTS, 100, 100);
+
+			const ctx = lastContext();
+			expect(ctx.imageSmoothingEnabled).toBe(true);
+			expect(ctx.imageSmoothingQuality).toBe("high");
+		});
+
+		describe("frames that extend past the image", () => {
+			// 400x300 image, 100x100 output
+			const IMAGE = { naturalWidth: 400, naturalHeight: 300 };
+
+			beforeEach(() => {
+				Object.defineProperty(image, "naturalWidth", {
+					value: IMAGE.naturalWidth,
+					configurable: true,
+				});
+				Object.defineProperty(image, "naturalHeight", {
+					value: IMAGE.naturalHeight,
+					configurable: true,
+				});
+			});
+
+			it("draws a frame inside the image exactly like before", () => {
+				drawCroppedImage(
+					image,
+					{ topLeftX: 10, topLeftY: 20, bottomRightX: 60, bottomRightY: 70 },
+					100,
+					100,
+				);
+
+				expect(lastContext().drawImage).toHaveBeenCalledWith(
+					image,
+					10,
+					20,
+					50,
+					50,
+					0,
+					0,
+					100,
+					100,
+				);
+			});
+
+			it("letterboxes a frame larger than the image into a proportional sub-rect", () => {
+				// The viewport shows 1000x1000 image px: the whole 400x300 image fits
+				drawCroppedImage(
+					image,
+					{
+						topLeftX: -300,
+						topLeftY: -350,
+						bottomRightX: 700,
+						bottomRightY: 650,
+					},
+					100,
+					100,
+				);
+
+				const ctx = lastContext();
+				expect(ctx.drawImage).toHaveBeenCalledTimes(1);
+				// 400x300 scaled by 100/1000 = 40x30, centred at (30, 35): never stretched
+				expect(ctx.drawImage).toHaveBeenCalledWith(
+					image,
+					0,
+					0,
+					400,
+					300,
+					30,
+					35,
+					40,
+					30,
+				);
+			});
+
+			it("offsets the destination when only one side overshoots", () => {
+				// Frame 200x100 starting 50px left of the image, output 200x100 (scale 1)
+				drawCroppedImage(
+					image,
+					{ topLeftX: -50, topLeftY: 0, bottomRightX: 150, bottomRightY: 100 },
+					200,
+					100,
+				);
+
+				expect(lastContext().drawImage).toHaveBeenCalledWith(
+					image,
+					0,
+					0,
+					150,
+					100,
+					50,
+					0,
+					150,
+					100,
+				);
+			});
+
+			it("clips the far edges of an overshooting frame", () => {
+				drawCroppedImage(
+					image,
+					{
+						topLeftX: 300,
+						topLeftY: 250,
+						bottomRightX: 500,
+						bottomRightY: 350,
+					},
+					200,
+					100,
+				);
+
+				expect(lastContext().drawImage).toHaveBeenCalledWith(
+					image,
+					300,
+					250,
+					100,
+					50,
+					0,
+					0,
+					100,
+					50,
+				);
+			});
+
+			it("skips drawImage for a frame entirely outside the image", () => {
+				drawCroppedImage(
+					image,
+					{ topLeftX: 500, topLeftY: 0, bottomRightX: 600, bottomRightY: 100 },
+					100,
+					100,
+				);
+
+				expect(lastContext().drawImage).not.toHaveBeenCalled();
+			});
+
+			it("still fills the background behind a letterboxed image", () => {
+				drawCroppedImage(
+					image,
+					{
+						topLeftX: -300,
+						topLeftY: -350,
+						bottomRightX: 700,
+						bottomRightY: 650,
+					},
+					100,
+					100,
+					{ backgroundColor: "#fff" },
+				);
+
+				const ctx = lastContext();
+				expect(ctx.fillRect).toHaveBeenCalledWith(0, 0, 100, 100);
+				expect(firstCall(ctx.fillRect)).toBeLessThan(firstCall(ctx.drawImage));
+			});
 		});
 
 		it("throws when no 2D context is available", () => {

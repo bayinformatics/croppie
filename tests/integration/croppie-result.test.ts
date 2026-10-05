@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { restoreCanvasMocks, setupCanvasMocks } from "../canvas/mocks.ts";
+import {
+	getLastMockContext,
+	restoreCanvasMocks,
+	setupCanvasMocks,
+} from "../canvas/mocks.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 import {
 	fixtureDimensions,
@@ -299,6 +303,77 @@ describe("Croppie result", () => {
 			const data2 = croppie.get();
 
 			expect(data1.zoom).not.toBe(data2.zoom);
+		});
+	});
+
+	describe("zoomed out past the image (coverage not enforced)", () => {
+		it("letterboxes instead of stretching the image over the whole output", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 400, height: 300 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { min: 0.1, max: 10, enforceMinimumCoverage: false },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 0.1 });
+
+			await croppie.result({ type: "canvas" });
+
+			// The 400x300 image is drawn at 40x30 in the middle of the 100x100 output
+			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				0,
+				0,
+				400,
+				300,
+				30,
+				35,
+				40,
+				30,
+			);
+		});
+
+		it("returns an integer-sized canvas for size 'original'", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { min: 0.1, max: 100, enforceMinimumCoverage: false },
+			});
+			await croppie.bind({ url: SMALL_PNG, zoom: 3 }); // 10x10 image
+
+			const canvas = (await croppie.result({
+				type: "canvas",
+				size: "original",
+			})) as HTMLCanvasElement;
+
+			// The viewport spans 100 / 3 = 33.33 image px, letterboxed around the 10x10 image
+			expect(canvas.width).toBe(33);
+			expect(canvas.height).toBe(33);
+		});
+
+		it("keeps the image's proportions for a custom output size", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 400, height: 300 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { min: 0.1, max: 10, enforceMinimumCoverage: false },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 0.1 });
+
+			await croppie.result({
+				type: "canvas",
+				size: { width: 200, height: 200 },
+			});
+
+			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				0,
+				0,
+				400,
+				300,
+				60,
+				70,
+				80,
+				60,
+			);
 		});
 	});
 });

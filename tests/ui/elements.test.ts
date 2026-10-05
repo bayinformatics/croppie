@@ -241,6 +241,26 @@ describe("UI Elements", () => {
 			expect(overlay.style.maskImage).toContain("radial-gradient");
 		});
 
+		it("cuts an elliptical hole for a non-square circle viewport", () => {
+			const overlay = createOverlay(boundary, {
+				width: 200,
+				height: 100,
+				type: "circle" as const,
+			});
+
+			expect(overlay.style.maskImage).toContain("ellipse 100px 50px");
+		});
+
+		it("cuts a round hole for a square circle viewport", () => {
+			const overlay = createOverlay(boundary, {
+				width: 200,
+				height: 200,
+				type: "circle" as const,
+			});
+
+			expect(overlay.style.maskImage).toContain("ellipse 100px 100px");
+		});
+
 		it("sets webkit mask image for compatibility", () => {
 			// happy-dom >= 20.14 does not implement -webkit-mask-image and silently drops
 			// the assignment, so record it through a temporary accessor on the prototype.

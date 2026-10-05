@@ -22,10 +22,13 @@ export interface MockCanvasContext {
 	fillRect: ReturnType<typeof mock>;
 	beginPath: ReturnType<typeof mock>;
 	arc: ReturnType<typeof mock>;
+	ellipse: ReturnType<typeof mock>;
 	closePath: ReturnType<typeof mock>;
 	clip: ReturnType<typeof mock>;
 	drawImage: ReturnType<typeof mock>;
 	fillStyle: string;
+	imageSmoothingEnabled: boolean;
+	imageSmoothingQuality: ImageSmoothingQuality;
 }
 
 /**
@@ -40,10 +43,14 @@ export function createMockCanvasContext(): MockCanvasContext {
 		fillRect: mock(),
 		beginPath: mock(),
 		arc: mock(),
+		ellipse: mock(),
 		closePath: mock(),
 		clip: mock(),
 		drawImage: mock(),
 		fillStyle: "",
+		// The defaults of a real 2D context
+		imageSmoothingEnabled: true,
+		imageSmoothingQuality: "low",
 	};
 }
 
