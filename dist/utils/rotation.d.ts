@@ -1,6 +1,6 @@
 import type { CropPoints, Rotation } from "../types.js";
 /**
- * Quarter-turn rotation maths.
+ * Quarter-turn rotation math.
  *
  * Frames: **N** is the natural image (`W = naturalWidth`, `H = naturalHeight`, origin at the
  * top-left). **D** is the displayed image: N rotated clockwise by `r`, with dimensions
@@ -30,17 +30,17 @@ import type { CropPoints, Rotation } from "../types.js";
  *   180 -> same as forward; 270 -> `{tlX: W-brY, tlY: tlX, brX: W-tlY, brY: brX}`
  *
  * Screen transform (see `Croppie.updateTransform`), with `(x, y)` the offset of the displayed
- * image centre from the boundary centre and `B` the boundary:
+ * image center from the boundary center and `B` the boundary:
  * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`.
  *
  * `rotate(d)`: `r' = (r + d) mod 360` and `(x', y') = R(d)(x, y)`. The natural pixel under the
- * viewport centre, `P = C - R(-r)(x, y) / s` (with `C` the natural image centre), is invariant,
+ * viewport center, `P = C - R(-r)(x, y) / s` (with `C` the natural image center), is invariant,
  * because `R(-r - d) * R(d) = R(-r)`.
  *
  * @module
  */
 /**
- * Normalise any multiple of 90 degrees (positive or negative) to 0, 90, 180 or 270.
+ * Normalize any multiple of 90 degrees (positive or negative) to 0, 90, 180 or 270.
  *
  * @param degrees - Rotation in degrees, clockwise
  * @returns The equivalent rotation in [0, 360)
@@ -56,7 +56,7 @@ export declare function swapDims(width: number, height: number, rotation: Rotati
 /**
  * Rotate an offset clockwise by `degrees` (y-down screen coordinates): `R(d)(x, y)`.
  *
- * @param degrees - A normalised rotation
+ * @param degrees - A normalized rotation
  */
 export declare function rotateOffset(x: number, y: number, degrees: Rotation): [number, number];
 /**
