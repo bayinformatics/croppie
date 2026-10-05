@@ -5,7 +5,8 @@ export default defineConfig({
 	snapshotPathTemplate:
 		"{testDir}/__screenshots__/{projectName}-{platform}/{testFilePath}/{arg}{ext}",
 	forbidOnly: !!process.env.CI,
-	retries: process.env.CI ? 2 : 0,
+	// No retries, on CI either: a flaky pixel test must fail, not pass on a second try
+	retries: 0,
 	reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
 	use: {
 		trace: "retain-on-failure",

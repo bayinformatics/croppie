@@ -197,8 +197,9 @@ describe("Croppie result", () => {
 				type: "canvas",
 			})) as HTMLCanvasElement;
 
-			// Circle rendering is applied (we can't easily verify the content in tests)
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			// The circle mask clips the drawing once
+			expect(getLastMockContext()?.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("uses square output for square viewport by default", async () => {

@@ -8,17 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- `bind({ points })` is now applied when the image loads, with `points` given as an object or as `[x1, y1, x2, y2]`; `get()` returns the same points back (#19, #23).
-- A `default` condition in the package `exports` map, so `require("@bayinformatics/croppie")` works natively on Node 22.12+ (it loads the ES module).
+- `bind({ points })` is now applied when the image loads, with `points` given as an object or as `[x1, y1, x2, y2]`; `get()` returns the same points back (#19, #23). Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
+- A `default` condition in the package `exports` map, so `require("@bayinformatics/croppie")` works natively on Node 20.19+ and 22.12+ (it loads the ES module).
 - A `./package.json` export.
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
 - Type declarations for the `./croppie.css` and `./style.css` exports, so `import '@bayinformatics/croppie/croppie.css'` type-checks under TypeScript 7, whose default `noUncheckedSideEffectImports` rejected it (TS2882).
-- `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?) scripts.
+- `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?, plus a check that every relative import in the type declarations has a `.js` extension) scripts.
 - `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work. With `enableZoom: false` a pinch over the cropper zooms the page instead of doing nothing.
 
 ### Changed
 
-- The minimum supported Node version is 22 (`engines.node` is `>=22`).
+- The minimum supported Node version is 20 (`engines.node` is `>=20`; 3.1.0 declared `>=18`). Raising it to Node 22 is deferred to 4.0.
 - Development uses Bun 1.4.2, pinned in `.bun-version` and read by CI.
 - Updated dev dependencies: TypeScript 7.0.2, Biome 2.5.15, Playwright 1.63.0, happy-dom 20.14.5, `@types/bun` 1.4.2; added `publint` and `@arethetypeswrong/cli`.
 - Type declarations import with `.js` specifiers (`./Croppie.js`), which resolve under `node16` and `bundler` module resolution.
@@ -33,12 +33,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - The transform computed from `bind({ points })` now derives from the zoom after it has been clamped to the zoom limits (#23).
-- `bind({ points })` accepts v2's string coordinates (as v2's `get()` returned them) instead of ignoring them with a warning.
+- `bind({ points })` accepts v2's string coordinates (as v2's `get()` returned them) instead of ignoring them with a warning. Only plain decimal strings count (such as `"12.50"` or `"-3"`); a string such as `"50px"` or `"0x10"` is still ignored with a warning.
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.
 - `setZoom(NaN)` (or any non-finite value; a numeric string, such as a range input's `value`, is still converted) is ignored instead of corrupting the transform, and every zoom input goes through one code path with one clamp.
 - `bind({ zoom })` with a non-finite zoom (`NaN`, `±Infinity`) starts at the coverage zoom instead of leaving a `NaN` transform that no later zoom could repair.
-- The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
+- The preview image is requested in the same CORS mode as the image `result()` crops, so the browser can reuse the image it already loaded when the response is cacheable, instead of requesting the URL again in another mode.
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, a new press of the same pointer after a lost `pointerup` starts a fresh drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - Dragging moves the image from where it currently is, so a zoom (wheel, pinch, slider, `setZoom()`) or `reset()` made while the button is held is no longer undone by the next pointer move, and moving back after dragging against an edge moves the image straight away.
 - Dragging inside a CSS-scaled ancestor (`transform: scale()`, `zoom`) keeps the image under the pointer instead of lagging behind or overshooting it, as wheel and pinch zoom already did.
@@ -50,9 +50,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Integration suites for `bind`, `zoom` and `result` (65 tests) are no longer skipped; the image and canvas mocks resolve fixture dimensions and a 2D context, `src/canvas/draw.ts` is covered, and tests are formatted, linted and type-checked.
 - Tests pin `result()`'s quality, circle and `backgroundColor` handling and `loadImage()`'s `crossOrigin` for remote URLs.
-- CI: a composite setup action, least-privilege `permissions`, `cancel-in-progress`, current major versions of all actions, `check:package` in the build job, and CI runs for pull requests against any base branch.
-- Publishing runs lint, typecheck, tests, build and `check:package` first, verifies that the release tag matches `package.json`, and clears `dist/` before downloading the built artifact.
-- Playwright replaced Lost Pixel for visual regression (#16), with an HTML report, retries and `forbidOnly` on CI.
+- CI: a composite setup action, least-privilege `permissions`, `cancel-in-progress` for pull requests (runs on `main` always finish), current major versions of all actions, `check:package` in the build job, and CI runs for pull requests against any base branch.
+- Publishing first verifies the tag against `package.json` on every run (a release must be tagged `v<version>`, and a manual run must be started on that tag), then runs lint, typecheck, tests, build and `check:package`, and clears `dist/` before downloading the built artifact.
+- Playwright replaced Lost Pixel for visual regression (#16), with an HTML report and `forbidOnly` on CI, and no retries, so a flaky screenshot fails instead of passing on a second try.
 - Committed `dist/` and `docs/` bundles are checked for parity with a fresh build in CI, under the pinned Bun version.
 - Dependabot for the `bun` and `github-actions` ecosystems (#18, #22).
 - Added `CONTRIBUTING.md`, `SECURITY.md`, issue forms and a pull request template.
