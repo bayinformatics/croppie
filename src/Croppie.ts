@@ -376,7 +376,7 @@ export class Croppie {
 	}
 
 	/**
-	 * Sets the zoom level
+	 * Sets the zoom level, exactly like `setZoom()`
 	 */
 	set zoom(value: number) {
 		this.setZoom(value);
@@ -384,11 +384,12 @@ export class Croppie {
 
 	/**
 	 * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
-	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed;
-	 * a non-finite value is ignored.
+	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
+	 * A numeric string (such as a range input's `value`) is converted to a number;
+	 * a value that is then not finite is ignored.
 	 */
 	setZoom(value: number): void {
-		this.applyZoom(value);
+		this.applyZoom(Number(value));
 	}
 
 	/**
