@@ -125,8 +125,10 @@ export class Croppie {
 	private destroyed = false;
 	private bindGeneration = 0;
 
-	constructor(element: HTMLElement, options: CroppieOptions) {
-		validateOptions(options);
+	constructor(element: HTMLElement, givenOptions: CroppieOptions) {
+		// Dimensions and zoom limits given as numeric strings (data attributes) are numbers
+		// from here on, so no string reaches the arithmetic
+		const options = validateOptions(givenOptions);
 		this.element = element;
 
 		// Calculate default boundary (viewport + 100px padding)

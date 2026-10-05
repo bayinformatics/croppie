@@ -106,7 +106,7 @@ new Croppie(element: HTMLElement, options: CroppieOptions)
 | `enableResize` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
 | `enableOrientation` | `boolean` | `false` | Deprecated v2 option (no-op) |
 
-Invalid options throw a `RangeError` from the constructor: a viewport or boundary dimension, `zoom.min` or `zoom.max` that is not a positive finite number, or a configured `zoom.min` greater than `zoom.max` (or than the default max of 10). A lone `zoom.max` below 0.1 is fine: the minimum is then per image and capped at `zoom.max`. A boundary smaller than the viewport only logs a warning.
+A viewport or boundary dimension, `zoom.min` and `zoom.max` may also be numeric strings (such as data attribute values: `"200"`); they are converted to numbers. Invalid options throw a `RangeError` from the constructor: a viewport or boundary dimension, `zoom.min` or `zoom.max` that is not a positive finite number (a blank or non-numeric string is not), or a configured `zoom.min` greater than `zoom.max` (or than the default max of 10). A lone `zoom.max` below 0.1 is fine: the minimum is then per image and capped at `zoom.max`. A boundary smaller than the viewport only logs a warning.
 
 > **Known limitations:** `enableExif` and `rotate()` are not implemented yet ([#21](https://github.com/bayinformatics/croppie/issues/21), [#20](https://github.com/bayinformatics/croppie/issues/20)).
 
