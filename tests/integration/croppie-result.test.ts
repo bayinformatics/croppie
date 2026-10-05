@@ -569,4 +569,81 @@ describe("Croppie result", () => {
 			expect([canvas.width, canvas.height]).toEqual([5000, 5000]);
 		});
 	});
+
+	describe("the output canvas", () => {
+		beforeEach(async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+		});
+
+		/** Records the canvas of every toBlob/toDataURL call, with its size at that moment. */
+		function recordEncodes(): Array<{
+			canvas: HTMLCanvasElement;
+			size: number[];
+		}> {
+			const encodes: Array<{ canvas: HTMLCanvasElement; size: number[] }> = [];
+			const { toBlob, toDataURL } = HTMLCanvasElement.prototype;
+			HTMLCanvasElement.prototype.toBlob = function (
+				this: HTMLCanvasElement,
+				...args: Parameters<HTMLCanvasElement["toBlob"]>
+			) {
+				encodes.push({ canvas: this, size: [this.width, this.height] });
+				toBlob.apply(this, args);
+			};
+			HTMLCanvasElement.prototype.toDataURL = function (
+				this: HTMLCanvasElement,
+				...args: Parameters<HTMLCanvasElement["toDataURL"]>
+			) {
+				encodes.push({ canvas: this, size: [this.width, this.height] });
+				return toDataURL.apply(this, args);
+			};
+			return encodes;
+		}
+
+		it("is freed once a base64 result is encoded", async () => {
+			const encodes = recordEncodes();
+
+			await croppie.result({ type: "base64" });
+
+			// Encoded at full size, emptied afterwards
+			expect(encodes.map((e) => e.size)).toEqual([[100, 100]]);
+			const canvas = encodes[0]?.canvas;
+			expect([canvas?.width, canvas?.height]).toEqual([0, 0]);
+		});
+
+		it("is freed once a blob result is encoded", async () => {
+			const encodes = recordEncodes();
+
+			await croppie.result({ type: "blob" });
+
+			expect(encodes.map((e) => e.size)).toEqual([[100, 100]]);
+			const canvas = encodes[0]?.canvas;
+			expect([canvas?.width, canvas?.height]).toEqual([0, 0]);
+		});
+
+		it("is freed when the blob cannot be encoded", async () => {
+			let encoded: HTMLCanvasElement | undefined;
+			HTMLCanvasElement.prototype.toBlob = function (
+				this: HTMLCanvasElement,
+				callback: BlobCallback,
+			) {
+				encoded = this;
+				callback(null);
+			};
+
+			await expect(croppie.result({ type: "blob" })).rejects.toThrow(
+				"Failed to create blob from canvas",
+			);
+
+			expect([encoded?.width, encoded?.height]).toEqual([0, 0]);
+		});
+
+		it("is left to the caller for a canvas result", async () => {
+			const canvas = await croppie.result({ type: "canvas" });
+
+			expect([canvas.width, canvas.height]).toEqual([100, 100]);
+		});
+	});
 });
