@@ -111,6 +111,16 @@ describe("Croppie lifecycle", () => {
 			expect(handler).not.toHaveBeenCalled();
 		});
 
+		it("reports the initial zoom of 1 next to the zeroed points, not the last zoom", async () => {
+			create();
+			await croppie.bind({ url: SMALL_PNG, zoom: 2 });
+
+			croppie.destroy();
+
+			expect(croppie.get().zoom).toBe(1);
+			expect(croppie.zoom).toBe(1);
+		});
+
 		it("can be called twice", () => {
 			create();
 
