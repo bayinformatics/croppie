@@ -624,9 +624,13 @@ npm install github:bayinformatics/croppie</pre>
 
     // Binds run one at a time, so a slow load can't land on top of a later one.
     // Each resolves true or false; a failed bind is logged and the queue stays usable.
+    // An AbortError only means a later bind or a rebuild replaced this one: not a failure.
     let queue = Promise.resolve(true)
     const enqueue = (task) => {
-      queue = queue.then(task).then(() => true, (err) => { console.error(err); return false })
+      queue = queue.then(task).then(() => true, (err) => {
+        if (err?.name !== 'AbortError') console.error(err)
+        return false
+      })
       return queue
     }
 

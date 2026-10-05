@@ -41,7 +41,11 @@ describe("Croppie lifecycle", () => {
 	const SUPERSEDED = "bind() was superseded by a later bind() call";
 	const DESTROYED = "instance destroyed during bind()";
 
-	/** Settles `pending` and checks that it rejected with an AbortError carrying `message`. */
+	/**
+	 * Settles `pending` and checks that it rejected with an AbortError carrying `message`.
+	 * Call it as soon as the bind starts: a superseded bind rejects right away, and an
+	 * unobserved rejection fails the test.
+	 */
 	async function expectAbort(
 		pending: Promise<void>,
 		message: string,
@@ -183,9 +187,10 @@ describe("Croppie lifecycle", () => {
 
 			// A is slow (20ms) and started first; B is instant and started second
 			const a = croppie.bind({ url: SMALL_PNG, zoom: 2 });
+			const aborted = expectAbort(a, SUPERSEDED);
 			const b = croppie.bind({ url: TINY_PNG, zoom: 3 });
 			await b;
-			await expectAbort(a, SUPERSEDED);
+			await aborted;
 
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;
 			expect(croppie.zoom).toBe(3);
@@ -198,9 +203,10 @@ describe("Croppie lifecycle", () => {
 			create();
 
 			const a = croppie.bind({ url: SMALL_PNG, zoom: 2 });
+			const aborted = expectAbort(a, SUPERSEDED);
 			const b = croppie.bind({ url: TINY_PNG, zoom: 3 });
 
-			await expectAbort(a, SUPERSEDED);
+			await aborted;
 			await expect(b).resolves.toBeUndefined();
 		});
 
@@ -210,11 +216,12 @@ describe("Croppie lifecycle", () => {
 			croppie.on("update", handler);
 
 			const a = croppie.bind({ url: SMALL_PNG, zoom: 2 });
+			const aborted = expectAbort(a, SUPERSEDED);
 			// Not a data: or http URL, so the mock fires onerror
 			const b = croppie.bind("not-a-valid-source");
 
 			await expect(b).rejects.toThrow();
-			await expectAbort(a, SUPERSEDED);
+			await aborted;
 			expect(handler).not.toHaveBeenCalled();
 		});
 
@@ -236,9 +243,10 @@ describe("Croppie lifecycle", () => {
 			create();
 
 			const file = croppie.bindFile(new Blob(["x"], { type: "image/png" }));
+			const aborted = expectAbort(file, SUPERSEDED);
 			const later = croppie.bind({ url: TINY_PNG, zoom: 3 });
 			await later;
-			await expectAbort(file, SUPERSEDED);
+			await aborted;
 
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;
 			expect(preview.src).toBe(TINY_PNG);

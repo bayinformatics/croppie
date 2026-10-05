@@ -269,15 +269,19 @@ describe("Croppie bind({ points })", () => {
 			});
 			croppie = createCroppie();
 
-			const slow = croppie.bind({ url: SMALL_PNG, zoom: 30 });
+			// Observed at once: the superseded bind rejects as soon as the later bind starts
+			const slow = croppie.bind({ url: SMALL_PNG, zoom: 30 }).then(
+				() => undefined,
+				(caught: unknown) => caught,
+			);
 			await croppie.bind({
 				url: RED_PNG,
 				points: [] as unknown as PointsArray,
 			});
-			// The superseded bind rejects with an AbortError
-			await expect(slow).rejects.toThrow(
-				"bind() was superseded by a later bind() call",
-			);
+
+			const error = await slow;
+			expect(error).toBeInstanceOf(DOMException);
+			expect((error as DOMException).name).toBe("AbortError");
 
 			expect(warn).toHaveBeenCalledTimes(1);
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;

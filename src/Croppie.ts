@@ -262,6 +262,12 @@ export class Croppie {
 	 * Malformed `points` (an array without exactly 4 entries, a coordinate that is not a
 	 * number, a rect without width or height) are ignored with a console warning, and the
 	 * image gets its default framing.
+	 *
+	 * Only the newest bind applies its image. A bind that a later `bind()` or `bindFile()`
+	 * supersedes while it loads rejects with a `DOMException` named `AbortError`
+	 * ("bind() was superseded by a later bind() call"), and so does one whose instance is
+	 * destroyed meanwhile ("instance destroyed during bind()"). A call on a destroyed instance
+	 * rejects at once without superseding anything.
 	 */
 	async bind(options: BindOptions | string): Promise<void> {
 		this.assertNotDestroyed("bind");
@@ -275,29 +281,84 @@ export class Croppie {
 		// in load(); the bind itself goes on, and like any bind it supersedes an older one
 		const points = readPoints(bindOptions.points);
 
-		await this.load(bindOptions, ++this.bindGeneration, points);
+		await this.runBind(
+			++this.bindGeneration,
+			() => bindOptions.url,
+			(image) => this.load(image, bindOptions, points),
+		);
 	}
 
 	/**
-	 * Loads and applies an image for a bind that claimed `generation`, with the `points` that
-	 * `bind()` resolved from `bindOptions` before claiming it (`undefined` when malformed). If
-	 * the instance was destroyed or a newer bind started meanwhile, resolves without applying
-	 * or emitting anything, and without surfacing a load error nobody is waiting for any more.
+	 * The asynchronous part of every bind, for the bind that claimed `generation` (`bind()`
+	 * and `bindFile()` validate their arguments before claiming it, so a call they reject
+	 * supersedes nothing): produces the image URL (`bindFile()` reads it from the file), loads
+	 * the image, then hands it to `apply`.
+	 *
+	 * Only the newest bind applies anything. Once a later bind claimed a generation, or the
+	 * instance was destroyed, the next step rejects with an `AbortError` instead, whether it
+	 * succeeded or failed: the caller learns that its image was not applied, and a load error
+	 * nobody waits for any more is not reported as such.
+	 *
+	 * @param generation - The generation the bind claimed
+	 * @param produceUrl - Gives the URL of the image to load
+	 * @param apply - Applies the loaded image; runs only while the bind is the newest
 	 */
-	private async load(
-		bindOptions: BindOptions,
+	private async runBind(
 		generation: number,
-		points?: CropPoints,
+		produceUrl: () => string | Promise<string>,
+		apply: (image: HTMLImageElement) => void,
 	): Promise<void> {
-		let image: HTMLImageElement;
+		const url = await this.whileNewest(generation, produceUrl());
+		const image = await this.whileNewest(generation, loadImage(url));
+		apply(image);
+	}
+
+	/**
+	 * Settles like `step` while the bind that claimed `generation` is still the newest, and
+	 * rejects with an `AbortError` once it is not (see `runBind()`).
+	 */
+	private async whileNewest<T>(
+		generation: number,
+		step: T | Promise<T>,
+	): Promise<T> {
+		let value: T;
 		try {
-			image = await loadImage(bindOptions.url);
+			value = await step;
 		} catch (error) {
-			if (this.isStaleBind(generation)) return;
+			this.assertNewestBind(generation);
 			throw error;
 		}
-		if (this.isStaleBind(generation)) return;
+		this.assertNewestBind(generation);
+		return value;
+	}
 
+	/**
+	 * Throws an `AbortError` `DOMException` if the instance was destroyed or a later bind
+	 * claimed a generation after the bind that claimed `generation`.
+	 */
+	private assertNewestBind(generation: number): void {
+		if (this.destroyed) {
+			throw new DOMException("instance destroyed during bind()", "AbortError");
+		}
+		if (generation !== this.bindGeneration) {
+			throw new DOMException(
+				"bind() was superseded by a later bind() call",
+				"AbortError",
+			);
+		}
+	}
+
+	/**
+	 * Applies a loaded image with the bind's `bindOptions` (zoom, points) and the `points`
+	 * resolved from them before the bind claimed its generation (`undefined` when malformed).
+	 *
+	 * @throws Error if the image has no intrinsic size
+	 */
+	private load(
+		image: HTMLImageElement,
+		bindOptions: Omit<BindOptions, "url">,
+		points?: CropPoints,
+	): void {
 		// A 0x0 image (e.g. an SVG without a size) would make every zoom calculation Infinity
 		if (!(image.naturalWidth > 0 && image.naturalHeight > 0)) {
 			throw new Error(
@@ -363,7 +424,8 @@ export class Croppie {
 	/**
 	 * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
 	 * empty file input) rejects with a `TypeError` before anything changes, so it does not
-	 * cancel a bind that is still loading.
+	 * cancel a bind that is still loading. Like `bind()`, it rejects with an `AbortError`
+	 * when a later bind supersedes it or the instance is destroyed while the file loads.
 	 */
 	async bindFile(file: File | Blob): Promise<void> {
 		this.assertNotDestroyed("bindFile");
@@ -384,18 +446,11 @@ export class Croppie {
 
 		// Claim the generation before reading, so a bind() started while the file is
 		// still being read supersedes this one
-		const generation = ++this.bindGeneration;
-
-		let dataUrl: string;
-		try {
-			dataUrl = await fileToDataUrl(file);
-		} catch (error) {
-			if (this.isStaleBind(generation)) return;
-			throw error;
-		}
-		if (this.isStaleBind(generation)) return;
-
-		await this.load({ url: dataUrl }, generation);
+		await this.runBind(
+			++this.bindGeneration,
+			() => fileToDataUrl(file),
+			(image) => this.load(image, {}),
+		);
 	}
 
 	/**
@@ -647,13 +702,6 @@ export class Croppie {
 				`[@bayinformatics/croppie] ${method}() called on a destroyed instance`,
 			);
 		}
-	}
-
-	/**
-	 * Whether a bind that claimed `generation` was destroyed or superseded in the meantime
-	 */
-	private isStaleBind(generation: number): boolean {
-		return this.destroyed || generation !== this.bindGeneration;
 	}
 
 	/**

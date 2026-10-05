@@ -130,7 +130,16 @@ await cropper.bind({
 
 `points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`. Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 
-`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). If you call `bind()` again before the previous image has loaded, the last call wins and the earlier one resolves without applying anything. The exception is a `bindFile()` rejected because it was given something that is not a File or Blob: it changes nothing and supersedes nothing. Malformed `points` do not make `bind()` fail (see above), so such a bind still wins like any other. A `bind()` that is still loading when you call `destroy()` also resolves silently. `bind()` emits one `update` when it completes.
+`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). Only the newest bind applies its image and fulfills: if you call `bind()` or `bindFile()` again before the previous image has loaded, the earlier call rejects with a `DOMException` named `AbortError` (message `bind() was superseded by a later bind() call`) without applying anything, also when the later call then fails to load. A bind that is still loading when you call `destroy()` rejects the same way (`instance destroyed during bind()`). A call rejected before it starts loading changes nothing and supersedes nothing: `bindFile()` given something that is not a File or Blob (a `TypeError`), and `bind()` or `bindFile()` on a destroyed instance. Malformed `points` do not make `bind()` fail (see above), so such a bind still wins like any other. `bind()` emits one `update` when it completes.
+
+```typescript
+try {
+  await cropper.bind(url)
+} catch (error) {
+  // A later bind replaced this one, or the cropper was destroyed: nothing to report
+  if ((error as Error).name !== 'AbortError') throw error
+}
+```
 
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
@@ -332,7 +341,13 @@ export default class extends Controller {
 
   async selectFile(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) await this.croppie?.bindFile(file)
+    if (!file) return
+    try {
+      await this.croppie?.bindFile(file)
+    } catch (error) {
+      // Another file was chosen, or the controller disconnected, before this one loaded
+      if ((error as Error).name !== 'AbortError') throw error
+    }
   }
 
   async crop() {
@@ -360,7 +375,10 @@ function ImageCropper({ src, onCrop }) {
       croppieRef.current = new Croppie(containerRef.current, {
         viewport: { width: 200, height: 200, type: 'circle' }
       })
-      croppieRef.current.bind(src)
+      croppieRef.current.bind(src).catch((error) => {
+        // The effect was cleaned up (src changed, or unmount) before the image loaded
+        if (error.name !== 'AbortError') console.error(error)
+      })
     }
     return () => croppieRef.current?.destroy()
   }, [src])
