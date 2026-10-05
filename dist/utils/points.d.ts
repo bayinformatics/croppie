@@ -1,4 +1,4 @@
-import type { CropPoints, PointsArray, TransformState } from "../types";
+import type { CropPoints, PointsArray, TransformState } from "../types.js";
 export type { PointsArray };
 /**
  * Input type that accepts either format
@@ -46,4 +46,4 @@ export declare function pointsToArray(points: CropPoints): PointsArray;
 export declare function calculateTransformFromPoints(points: CropPoints, imageWidth: number, imageHeight: number, viewportWidth: number, viewportHeight: number, scaleBounds?: {
     min: number;
     max: number;
-}): TransformState | undefined;
+}): Pick<TransformState, "x" | "y" | "scale"> | undefined;

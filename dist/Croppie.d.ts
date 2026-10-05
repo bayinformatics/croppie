@@ -23,6 +23,10 @@ export declare class Croppie {
     private sliderEl;
     private image;
     private transform;
+    /** The rotation `bind()` started with; `reset()` returns to it. */
+    private initialRotation;
+    /** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
+    private exifOrientation;
     private zoomConfig;
     /** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
     private configuredMinZoom;
@@ -44,6 +48,14 @@ export declare class Croppie {
      * Loads an image into the cropper
      */
     bind(options: BindOptions | string): Promise<void>;
+    /**
+     * The rotation a bind starts with: the validated `rotation` option; else the rotation an
+     * explicit `orientation` (EXIF 1-8) stands for; else 0. Mirrored or out-of-range
+     * orientations cannot be expressed as a rotation, so they are ignored with a warning.
+     *
+     * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
+     */
+    private resolveBindRotation;
     /**
      * Loads and applies an image for a bind that claimed `generation`. If the instance was
      * destroyed or a newer bind started meanwhile, resolves without applying or emitting
@@ -98,9 +110,19 @@ export declare class Croppie {
      */
     private applyZoom;
     /**
-     * Rotates the image by 90 degree increments
+     * Rotates the image clockwise by `degrees`, any multiple of 90 (negative turns
+     * counter-clockwise). The image pixel under the viewport centre stays there.
+     *
+     * Emits `rotate`, then `update`, then `zoom` if the zoom had to change: the zoom limits are
+     * recomputed for the rotated image, so with a non-square viewport a quarter turn may raise
+     * the zoom to the new minimum. Rotating by a full turn or 0, before an image is bound or
+     * after `destroy()` does nothing. `points` in `get()` stay in the natural frame.
+     * Calling it while the user is dragging is not special-cased.
+     *
+     * @param degrees - Clockwise rotation in degrees
+     * @throws RangeError if `degrees` is not a finite multiple of 90
      */
-    rotate(degrees: 90 | 180 | 270 | -90): void;
+    rotate(degrees: number): void;
     /**
      * Resets the cropper to initial state
      */
@@ -126,14 +148,25 @@ export declare class Croppie {
      */
     private isStaleBind;
     /**
-     * Resolves the effective minimum zoom for an image (see `resolveMinZoom`) and syncs
-     * the slider's `min`, so the slider range is never inverted.
+     * Resolves the effective minimum zoom for an image shown at `rotation` (see
+     * `resolveMinZoom`) and syncs the slider's `min`, so the slider range is never inverted.
      *
-     * @returns The zoom at which the image covers the viewport
+     * @returns The zoom at which the displayed image covers the viewport
      */
     private updateZoomLimits;
     /**
-     * Updates the CSS transform on the preview element
+     * The dimensions of the image as displayed: the natural size, swapped for a quarter turn.
+     *
+     * @param rotation - Defaults to the current rotation
+     */
+    private displayedSize;
+    /**
+     * Updates the CSS transform on the preview element.
+     *
+     * The `<img>` keeps its natural size with transform-origin 0 0, so the transform is
+     * `translate(tx, ty) scale(s) rotate(r)`. The rotation is about the displayed image's
+     * centre, which sits at `(x, y)` from the boundary centre, so
+     * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`, written out per rotation.
      */
     private updateTransform;
     /**
@@ -145,13 +178,17 @@ export declare class Croppie {
      */
     private constrainPosition;
     /**
-     * Calculates the crop points based on current transform, clamped to the image
+     * Calculates the crop points based on current transform, clamped to the image, in the
+     * natural frame (the pixel space of the image as decoded): the displayed-frame rectangle
+     * is clamped to the displayed image and then mapped back through the rotation.
      */
     private getPoints;
     /**
-     * The viewport rectangle in image pixels, NOT clamped to the image: it extends past the
-     * image when the user zoomed out further than the image covers. `result()` renders this
-     * frame so the output keeps the image's proportions.
+     * The viewport rectangle in the DISPLAYED frame (the image after rotation), in image
+     * pixels and NOT clamped to the image: it extends past the image when the user zoomed out
+     * further than the image covers. With `(Dw, Dh)` the displayed dimensions:
+     * `topLeft = (Dw/2 - (x + vw/2) / s, Dh/2 - (y + vh/2) / s)` and `bottomRight = topLeft +
+     * (vw, vh) / s`.
      */
     private getViewportRect;
     /**

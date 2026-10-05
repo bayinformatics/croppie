@@ -41,6 +41,9 @@
 	max-width: none !important;
 	max-height: none !important;
 	image-rendering: -webkit-optimize-contrast;
+	/* Keep the browser default: honour the EXIF orientation. Croppie's maths and result()
+	   rely on naturalWidth/Height and drawImage seeing the oriented pixels. */
+	image-orientation: from-image;
 }
 
 /* Viewport - the visible crop area */
