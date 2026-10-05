@@ -455,7 +455,7 @@ export class Croppie {
 
 		// Resolve the zoom limits (from the displayed dimensions) and sync the slider's min
 		this.initialRotation = rotation;
-		const coverageZoom = this.updateZoomLimits(this.image, rotation);
+		const coverageZoom = this.updateZoomLimits(rotation);
 
 		// Calculate initial zoom. As in setZoom(), a numeric string is converted and a value
 		// that is then not finite (NaN, ±Infinity, a blank or non-numeric string) is ignored:
@@ -749,7 +749,7 @@ export class Croppie {
 		this.transform = { x, y, scale: previousZoom, rotation };
 
 		// The displayed dimensions changed, so the zoom limits did too
-		this.updateZoomLimits(this.image, rotation);
+		this.updateZoomLimits(rotation);
 		if (this.transform.scale < this.effectiveMinZoom) {
 			this.transform = zoomAboutAnchor(
 				this.transform,
@@ -780,7 +780,7 @@ export class Croppie {
 		// changes the displayed dimensions, so the zoom limits and the stored coverage zoom are
 		// refreshed for it first
 		if (rotation !== previousRotation) {
-			this.updateZoomLimits(this.image, rotation);
+			this.updateZoomLimits(rotation);
 		}
 		this.transform = {
 			x: 0,
@@ -889,23 +889,16 @@ export class Croppie {
 	}
 
 	/**
-	 * Resolves the effective minimum zoom for an image shown at `rotation` (see
+	 * Resolves the effective minimum zoom for the bound image shown at `rotation` (see
 	 * `resolveMinZoom`), stores it with the coverage zoom of the image as displayed (the one
 	 * place both are computed), and syncs the slider's `min`, so the slider range is never
 	 * inverted.
 	 *
 	 * @returns The zoom at which the displayed image covers the viewport
 	 */
-	private updateZoomLimits(
-		image: HTMLImageElement,
-		rotation: Rotation,
-	): number {
+	private updateZoomLimits(rotation: Rotation): number {
 		// Coverage and fit depend on the image as displayed, i.e. after the rotation
-		const [displayedWidth, displayedHeight] = swapDims(
-			image.naturalWidth,
-			image.naturalHeight,
-			rotation,
-		);
+		const [displayedWidth, displayedHeight] = this.displayedSize(rotation);
 		const { width, height } = this.options.viewport;
 		const coverage = this.coverageZoom(rotation);
 		this.coverage = coverage;
