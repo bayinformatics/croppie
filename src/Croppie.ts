@@ -267,12 +267,7 @@ export class Croppie {
 		}
 
 		// Calculate minimum zoom to cover viewport
-		const coverageZoom = calculateInitialZoom(
-			this.image.naturalWidth,
-			this.image.naturalHeight,
-			this.options.viewport.width,
-			this.options.viewport.height,
-		);
+		const coverageZoom = this.coverageZoom(this.image);
 
 		// Calculate effective min zoom (enforce coverage by default)
 		if (this.zoomConfig.enforceMinimumCoverage !== false) {
@@ -435,12 +430,13 @@ export class Croppie {
 	 *
 	 * @param requested - Requested zoom level; not clamped by the caller
 	 * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
+	 * @returns Whether the zoom changed, in which case `update` was emitted
 	 */
 	private applyZoom(
 		requested: number,
 		anchor: ZoomAnchor = CENTER_ANCHOR,
-	): void {
-		if (!Number.isFinite(requested)) return;
+	): boolean {
+		if (!Number.isFinite(requested)) return false;
 
 		const previousZoom = this.transform.scale;
 		const zoom = clamp(requested, this.effectiveMinZoom, this.zoomConfig.max);
@@ -454,12 +450,14 @@ export class Croppie {
 		// Always sync, so a slider drag the clamp rejected snaps back
 		this.updateSlider();
 
-		if (zoom === previousZoom) return;
+		if (zoom === previousZoom) return false;
 
 		this.emitUpdate();
 		// An update listener zoomed again: its nested call already emitted the final zoom
-		if (this.transform.scale !== zoom) return;
-		this.emitEvent("zoom", { zoom, previousZoom });
+		if (this.transform.scale === zoom) {
+			this.emitEvent("zoom", { zoom, previousZoom });
+		}
+		return true;
 	}
 
 	/**
@@ -471,38 +469,23 @@ export class Croppie {
 	}
 
 	/**
-	 * Resets the cropper to initial state
+	 * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+	 *
+	 * The zoom goes through the same path as `setZoom()`, so the events follow the same
+	 * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
+	 * position did, and no stale `zoom` when an `update` listener zooms again.
 	 */
 	reset(): void {
-		if (this.image) {
-			const previousZoom = this.transform.scale;
-			const coverageZoom = calculateInitialZoom(
-				this.image.naturalWidth,
-				this.image.naturalHeight,
-				this.options.viewport.width,
-				this.options.viewport.height,
-			);
+		if (!this.image) return;
 
-			// Clamp to effective minimum zoom (same logic as bind)
-			const initialZoom = clamp(
-				coverageZoom,
-				this.effectiveMinZoom,
-				this.zoomConfig.max,
-			);
+		this.transform.x = 0;
+		this.transform.y = 0;
+		if (this.applyZoom(this.coverageZoom(this.image))) return;
 
-			this.transform = { x: 0, y: 0, scale: initialZoom };
-			this.constrainPosition();
-			this.updateTransform();
-			this.updateSlider();
-			this.emitUpdate();
-
-			if (previousZoom !== this.transform.scale) {
-				this.emitEvent("zoom", {
-					zoom: this.transform.scale,
-					previousZoom,
-				});
-			}
-		}
+		// Same zoom: only the position changed, and applyZoom() emitted nothing
+		this.constrainPosition();
+		this.updateTransform();
+		this.emitUpdate();
 	}
 
 	/**
@@ -557,6 +540,19 @@ export class Croppie {
 		this.eventHandlers
 			.get(event)
 			?.delete(handler as CroppieEventHandler<keyof CroppieEvents>);
+	}
+
+	/**
+	 * The smallest zoom at which `image` covers the viewport: where `bind()` starts by default
+	 * and `reset()` returns to.
+	 */
+	private coverageZoom(image: HTMLImageElement): number {
+		return calculateInitialZoom(
+			image.naturalWidth,
+			image.naturalHeight,
+			this.options.viewport.width,
+			this.options.viewport.height,
+		);
 	}
 
 	/**
