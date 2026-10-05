@@ -27,9 +27,12 @@ export declare class Croppie {
     private initialRotation;
     /** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
     private exifOrientation;
-    private zoomConfig;
-    /** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
-    private configuredMinZoom;
+    /**
+     * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
+     * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
+     * `undefined` counts as unset.
+     */
+    private readonly zoomConfig;
     private effectiveMinZoom;
     private eventHandlers;
     private cleanupFns;
@@ -45,7 +48,11 @@ export declare class Croppie {
      */
     private attachEventHandlers;
     /**
-     * Loads an image into the cropper
+     * Loads an image into the cropper.
+     *
+     * A `rotation` that is not a multiple of 90 or a `points` array without exactly 4
+     * entries rejects before anything changes, so it neither half-applies the new image nor
+     * cancels a bind that is still loading.
      */
     bind(options: BindOptions | string): Promise<void>;
     /**
@@ -57,18 +64,27 @@ export declare class Croppie {
      */
     private resolveBindRotation;
     /**
-     * Loads and applies an image for a bind that claimed `generation`. If the instance was
-     * destroyed or a newer bind started meanwhile, resolves without applying or emitting
-     * anything, and without surfacing a load error nobody is waiting for any more.
+     * Loads and applies an image for a bind that claimed `generation`, with the `rotation` and
+     * the (natural-frame) `points` that `bind()` resolved from `bindOptions` before claiming it.
+     * If the instance was destroyed or a newer bind started meanwhile, resolves without
+     * applying or emitting anything, and without surfacing a load error nobody is waiting for
+     * any more.
      */
     private load;
     /**
-     * Binds a File or Blob to the cropper
+     * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
+     * empty file input) rejects with a `TypeError` before anything changes, so it does not
+     * cancel a bind that is still loading.
      */
     bindFile(file: File | Blob): Promise<void>;
     /**
      * Gets the current cropped result. The return type follows `options.type`:
      * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
+     *
+     * The image keeps its proportions at every `size`: a size of another shape than the
+     * viewport centres the crop and leaves the rest transparent (or `backgroundColor`). With
+     * `size: "original"`, a crop zoomed out past the image is scaled down to at most the area
+     * of the image part it shows or 4096x4096 px, whichever is larger.
      */
     result(options: ResultOptions & {
         type: "blob";
@@ -89,13 +105,14 @@ export declare class Croppie {
      */
     get zoom(): number;
     /**
-     * Sets the zoom level
+     * Sets the zoom level, exactly like `setZoom()`
      */
     set zoom(value: number);
     /**
      * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
-     * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed;
-     * a non-finite value is ignored.
+     * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
+     * A numeric string (such as a range input's `value`) is converted to a number;
+     * a value that is then not finite is ignored.
      */
     setZoom(value: number): void;
     /**
@@ -103,7 +120,9 @@ export declare class Croppie {
      *
      * Clamps the request to the effective limits, zooms about `anchor` so the image point
      * under it stays put, re-clamps the position, syncs the slider and emits `update`
-     * then `zoom`. Nothing is emitted when the clamped zoom did not change.
+     * then `zoom`. Nothing is emitted when the clamped zoom did not change. When an `update`
+     * listener zooms again, that nested call emits the final `zoom` and this one emits none,
+     * so `zoom` never reports a value that has already been replaced.
      *
      * @param requested - Requested zoom level; not clamped by the caller
      * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
@@ -111,7 +130,9 @@ export declare class Croppie {
     private applyZoom;
     /**
      * Rotates the image clockwise by `degrees`, any multiple of 90 (negative turns
-     * counter-clockwise). The image pixel under the viewport centre stays there.
+     * counter-clockwise). The image pixel under the viewport centre stays there, unless the
+     * rotated image would then no longer cover the viewport; then the image moves the least
+     * needed.
      *
      * Emits `rotate`, then `update`, then `zoom` if the zoom had to change: the zoom limits are
      * recomputed for the rotated image, so with a non-square viewport a quarter turn may raise
