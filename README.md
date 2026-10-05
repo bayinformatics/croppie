@@ -305,7 +305,7 @@ Dark mode: `--croppie-boundary-bg` switches to `#0f0f1a` under `@media (prefers-
 | `enforceBoundary` | `zoom: { enforceMinimumCoverage }` |
 | `minZoom` / `maxZoom` | `zoom: { min, max }` |
 | `enableOrientation: true` | not needed: `rotate()` is always available |
-| `croppie.rotate(90)` | `cropper.rotate(-90)`: v2 turned counter-clockwise, v3 turns **clockwise** |
+| `croppie.rotate(90)` | `cropper.rotate(-90)`: v2 turned counter-clockwise ([Foliotek/Croppie#543](https://github.com/Foliotek/Croppie/issues/543)), v3 turns **clockwise** |
 | `bind({ url, orientation })` | prefer `bind({ url, rotation })`; `get().orientation` is informational only |
 | `croppie.result({...}).then(cb)` | `const result = await croppie.result({...})` |
 | `$el.on('update', cb)` | `croppie.on('update', cb)` |
@@ -315,7 +315,7 @@ Dark mode: `--croppie-boundary-bg` switches to `#0f0f1a` under `@media (prefers-
 
 - v2 shipped UMD (AMD/CommonJS/global); v3 is ESM-only.
 - v2 `bind()` points/relative points are fully supported; v3 applies points on bind with cover-fit + center preservation within `zoomConfig` bounds (v2's width-only-scale/top-left-anchor quirk, [Foliotek/Croppie#767](https://github.com/Foliotek/Croppie/issues/767), is intentionally not replicated).
-- v2 rotation needed `enableOrientation`; in v3 `rotate()` is always available and rotates clockwise (v2's `rotate(90)` turned counter-clockwise: negate the argument if you depended on it). `points` stay in the natural (EXIF-oriented) frame and `get().rotation` carries the turn.
+- v2 rotation needed `enableOrientation`; in v3 `rotate()` is always available and rotates clockwise (v2's `rotate(90)` turned counter-clockwise, see [Foliotek/Croppie#543](https://github.com/Foliotek/Croppie/issues/543): negate the argument if you depended on it). `points` stay in the natural (EXIF-oriented) frame and `get().rotation` carries the turn.
 - v2 supported `<script>` tag usage; v3 requires a bundler.
 
 ### Detailed Changes
