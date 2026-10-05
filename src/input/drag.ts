@@ -1,4 +1,4 @@
-import type { TransformState } from "../types.ts";
+import type { TransformState } from "../types.js";
 
 export interface DragCallbacks {
 	onStart?: (state: TransformState) => void;

@@ -8,7 +8,7 @@
  */
 
 // Default export for convenience
-export { Croppie, Croppie as default } from "./Croppie.ts";
+export { Croppie, Croppie as default } from "./Croppie.js";
 export type {
 	BindOptions,
 	Boundary,
@@ -23,4 +23,4 @@ export type {
 	Viewport,
 	ViewportType,
 	ZoomConfig,
-} from "./types.ts";
+} from "./types.js";

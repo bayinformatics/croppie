@@ -1,18 +1,18 @@
-export { calculateBounds, type TransformBounds } from "./bounds.ts";
-export { clamp } from "./clamp.ts";
-export { debounce } from "./debounce.ts";
-export { createElement, getTransformValues, setTransform } from "./dom.ts";
+export { calculateBounds, type TransformBounds } from "./bounds.js";
+export { clamp } from "./clamp.js";
+export { debounce } from "./debounce.js";
+export { createElement, getTransformValues, setTransform } from "./dom.js";
 export {
 	aspectRatio,
 	calculateInitialZoom,
 	fileToDataUrl,
 	getImageDimensions,
 	loadImage,
-} from "./image.ts";
+} from "./image.js";
 export {
 	calculateTransformFromPoints,
 	normalizePoints,
 	type PointsArray,
 	type PointsInput,
 	pointsToArray,
-} from "./points.ts";
+} from "./points.js";

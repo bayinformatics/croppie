@@ -1,6 +1,6 @@
-export { createDragHandler, type DragCallbacks } from "./drag.ts";
+export { createDragHandler, type DragCallbacks } from "./drag.js";
 export {
 	createPinchZoomHandler,
 	createWheelZoomHandler,
 	type ZoomCallbacks,
-} from "./zoom.ts";
+} from "./zoom.js";

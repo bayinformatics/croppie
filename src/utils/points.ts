@@ -1,5 +1,5 @@
 import type { CropPoints, PointsArray, TransformState } from "../types";
-import { clamp } from "./clamp.ts";
+import { clamp } from "./clamp.js";
 
 // Re-export for convenience
 export type { PointsArray };

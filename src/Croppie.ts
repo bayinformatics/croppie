@@ -2,12 +2,12 @@ import {
 	canvasToBase64,
 	canvasToBlob,
 	drawCroppedImage,
-} from "./canvas/index.ts";
-import { createDragHandler } from "./input/drag.ts";
+} from "./canvas/index.js";
+import { createDragHandler } from "./input/drag.js";
 import {
 	createPinchZoomHandler,
 	createWheelZoomHandler,
-} from "./input/zoom.ts";
+} from "./input/zoom.js";
 import type {
 	BindOptions,
 	Boundary,
@@ -19,7 +19,7 @@ import type {
 	ResultOptions,
 	TransformState,
 	ZoomConfig,
-} from "./types.ts";
+} from "./types.js";
 import {
 	createBoundary,
 	createContainer,
@@ -28,7 +28,7 @@ import {
 	createSliderContainer,
 	createViewport,
 	createZoomSlider,
-} from "./ui/index.ts";
+} from "./ui/index.js";
 import {
 	calculateBounds,
 	calculateInitialZoom,
@@ -38,7 +38,7 @@ import {
 	loadImage,
 	normalizePoints,
 	setTransform,
-} from "./utils/index.ts";
+} from "./utils/index.js";
 
 const DEFAULT_ZOOM: ZoomConfig = {
 	min: 0.1,

@@ -6,4 +6,4 @@ export {
 	createSliderContainer,
 	createViewport,
 	createZoomSlider,
-} from "./elements.ts";
+} from "./elements.js";
