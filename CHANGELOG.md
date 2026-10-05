@@ -28,7 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - The transform computed from `bind({ points })` now derives from the zoom after it has been clamped to the zoom limits (#23).
-- `bind({ points })` accepts v2's string coordinates (as v2's `get()` returned them) instead of ignoring them with a warning.
+- `bind({ points })` accepts v2's string coordinates (as v2's `get()` returned them) instead of ignoring them with a warning. Only plain decimal strings count (such as `"12.50"` or `"-3"`); a string such as `"50px"` or `"0x10"` is still ignored with a warning.
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.
 - The preview image is requested in the same CORS mode as the image `result()` crops, so a remote image is downloaded once and the preview shows exactly the cropped pixels.
