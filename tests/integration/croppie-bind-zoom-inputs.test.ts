@@ -316,6 +316,34 @@ describe("Croppie bind and zoom inputs", () => {
 		});
 	});
 
+	describe("bindFile() with something that is not a File or Blob", () => {
+		const invalid: Array<[string, unknown]> = [
+			["undefined (an empty file input)", undefined],
+			["null", null],
+			["a URL string", "photo.jpg"],
+			["a plain object", {}],
+		];
+
+		for (const [label, value] of invalid) {
+			it(`rejects ${label} with a TypeError without cancelling a bind that is still loading`, async () => {
+				const { croppie, root } = mount();
+
+				const good = croppie.bind({ url: SLOW, zoom: 2 });
+				const error = await croppie
+					.bindFile(value as Blob)
+					.catch((caught: unknown) => caught);
+				await good;
+
+				expect(error).toBeInstanceOf(TypeError);
+				expect((error as Error).message).toContain(
+					"bindFile() expects a File or Blob",
+				);
+				expect(preview(root).src).toBe(SLOW);
+				expect(croppie.zoom).toBe(2);
+			});
+		}
+	});
+
 	describe("zoom events when an update listener zooms again", () => {
 		/** Caps the zoom at 2 from an update listener and records the zoom events. */
 		async function mountCapped() {
