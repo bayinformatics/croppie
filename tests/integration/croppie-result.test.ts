@@ -202,12 +202,19 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-			});
+			await croppie.result({ type: "canvas" });
 
-			// Circle rendering is applied (we can't easily verify the content in tests)
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			const ctx = getLastMockContext();
+			expect(ctx?.ellipse).toHaveBeenCalledWith(
+				50,
+				50,
+				50,
+				50,
+				0,
+				0,
+				Math.PI * 2,
+			);
+			expect(ctx?.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("uses square output for square viewport by default", async () => {
