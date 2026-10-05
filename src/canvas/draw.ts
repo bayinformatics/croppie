@@ -6,7 +6,7 @@ import { intersectFrame } from "../utils/points.js";
  *
  * The frame is the unclamped viewport rectangle in source-image pixels, so it can extend
  * past the image when the user zoomed out (coverage not enforced). It is scaled by one factor
- * for both axes and centred in the output: the part that overlaps the image is drawn into the
+ * for both axes and centered in the output: the part that overlaps the image is drawn into the
  * proportional sub-rectangle, and the rest of the output stays transparent (or
  * `backgroundColor`). An output of another shape than the frame therefore gets empty bars
  * instead of a stretched image. An output with the frame's shape up to rounding to whole
@@ -68,7 +68,7 @@ export function drawCroppedImage(
 		return canvas;
 	}
 
-	// One scale keeps the image's proportions, with the frame centred in the output; an
+	// One scale keeps the image's proportions, with the frame centered in the output; an
 	// output that is the frame's shape rounded to whole pixels is filled exactly instead
 	const fill = isRoundedShape(
 		outputWidth,
