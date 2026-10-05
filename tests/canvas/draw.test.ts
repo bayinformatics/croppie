@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	mock,
+	spyOn,
+} from "bun:test";
 import {
 	canvasToBase64,
 	canvasToBlob,
@@ -7,6 +15,7 @@ import {
 import type { CropPoints } from "../../src/types.ts";
 import {
 	getLastMockContext,
+	getMockContext,
 	type MockCanvasContext,
 	restoreCanvasMocks,
 	setupCanvasMocks,
@@ -16,6 +25,15 @@ function lastContext(): MockCanvasContext {
 	const ctx = getLastMockContext();
 	if (!ctx) {
 		throw new Error("No 2D context was requested");
+	}
+	return ctx;
+}
+
+/** The context of the output canvas itself, not of an intermediate downscaling step. */
+function contextOf(canvas: HTMLCanvasElement): MockCanvasContext {
+	const ctx = getMockContext(canvas);
+	if (!ctx) {
+		throw new Error("No 2D context was requested for this canvas");
 	}
 	return ctx;
 }
@@ -171,7 +189,7 @@ describe("canvas draw", () => {
 
 			it("letterboxes a frame larger than the image into a proportional sub-rect", () => {
 				// The viewport shows 1000x1000 image px: the whole 400x300 image fits
-				drawCroppedImage(
+				const canvas = drawCroppedImage(
 					image,
 					{
 						topLeftX: -300,
@@ -183,15 +201,16 @@ describe("canvas draw", () => {
 					100,
 				);
 
-				const ctx = lastContext();
+				const ctx = contextOf(canvas);
 				expect(ctx.drawImage).toHaveBeenCalledTimes(1);
-				// 400x300 scaled by 100/1000 = 40x30, centred at (30, 35): never stretched
+				// 400x300 scaled by 100/1000 = 40x30, centred at (30, 35): never stretched.
+				// A 10x shrink is first halved to 50x38, which is drawn whole.
 				expect(ctx.drawImage).toHaveBeenCalledWith(
-					image,
+					expect.objectContaining({ tagName: "CANVAS", width: 50, height: 38 }),
 					0,
 					0,
-					400,
-					300,
+					50,
+					38,
 					30,
 					35,
 					40,
@@ -259,7 +278,7 @@ describe("canvas draw", () => {
 			});
 
 			it("still fills the background behind a letterboxed image", () => {
-				drawCroppedImage(
+				const canvas = drawCroppedImage(
 					image,
 					{
 						topLeftX: -300,
@@ -272,7 +291,7 @@ describe("canvas draw", () => {
 					{ backgroundColor: "#fff" },
 				);
 
-				const ctx = lastContext();
+				const ctx = contextOf(canvas);
 				expect(ctx.fillRect).toHaveBeenCalledWith(0, 0, 100, 100);
 				expect(firstCall(ctx.fillRect)).toBeLessThan(firstCall(ctx.drawImage));
 			});
@@ -361,6 +380,174 @@ describe("canvas draw", () => {
 
 			await expect(canvasToBlob(canvas)).rejects.toThrow(
 				"Failed to create blob from canvas",
+			);
+		});
+	});
+
+	describe("drawCroppedImage downscaling", () => {
+		// One drawImage that shrinks by much more than 2x aliases in WebKit, even with
+		// imageSmoothingQuality "high"; the source is halved step by step instead
+		function sizeImage(width: number, height: number): void {
+			Object.defineProperty(image, "naturalWidth", {
+				value: width,
+				configurable: true,
+			});
+			Object.defineProperty(image, "naturalHeight", {
+				value: height,
+				configurable: true,
+			});
+		}
+
+		const whole = (width: number, height: number): CropPoints => ({
+			topLeftX: 0,
+			topLeftY: 0,
+			bottomRightX: width,
+			bottomRightY: height,
+		});
+
+		it("draws straight from the image when it shrinks by less than 2x", () => {
+			const canvas = drawCroppedImage(image, whole(150, 150), 100, 100);
+
+			const ctx = contextOf(canvas);
+			expect(ctx.drawImage).toHaveBeenCalledTimes(1);
+			expect(ctx.drawImage).toHaveBeenCalledWith(
+				image,
+				0,
+				0,
+				150,
+				150,
+				0,
+				0,
+				100,
+				100,
+			);
+		});
+
+		it("halves a large source until one more halving would undershoot the output", () => {
+			sizeImage(4000, 3000);
+
+			const canvas = drawCroppedImage(image, whole(4000, 3000), 100, 75);
+
+			// 4000x3000 -> 2000x1500 -> 1000x750 -> 500x375 -> 250x188 -> 125x94, then 100x75
+			const ctx = contextOf(canvas);
+			expect(ctx.drawImage).toHaveBeenCalledTimes(1);
+			expect(ctx.drawImage).toHaveBeenCalledWith(
+				expect.objectContaining({ tagName: "CANVAS", width: 125, height: 94 }),
+				0,
+				0,
+				125,
+				94,
+				0,
+				0,
+				100,
+				75,
+			);
+		});
+
+		it("starts the first step from the crop rectangle, not the whole image", () => {
+			sizeImage(4000, 3000);
+			const created: HTMLCanvasElement[] = [];
+			const createElement = document.createElement.bind(document);
+			const spy = spyOn(document, "createElement").mockImplementation(((
+				tag: string,
+			) => {
+				const el = createElement(tag);
+				if (tag === "canvas") created.push(el as HTMLCanvasElement);
+				return el;
+			}) as typeof document.createElement);
+
+			drawCroppedImage(
+				image,
+				{
+					topLeftX: 1000,
+					topLeftY: 500,
+					bottomRightX: 1800,
+					bottomRightY: 1100,
+				},
+				100,
+				75,
+			);
+			spy.mockRestore();
+
+			// created[0] is the output canvas; created[1] is the first step
+			const first = created[1];
+			if (!first) throw new Error("No step canvas was created");
+			expect([first.width, first.height]).toEqual([400, 300]);
+			expect(contextOf(first).drawImage).toHaveBeenCalledWith(
+				image,
+				1000,
+				500,
+				800,
+				600,
+				0,
+				0,
+				400,
+				300,
+			);
+		});
+
+		it("smooths every step at high quality", () => {
+			sizeImage(4000, 3000);
+			const created: HTMLCanvasElement[] = [];
+			const createElement = document.createElement.bind(document);
+			const spy = spyOn(document, "createElement").mockImplementation(((
+				tag: string,
+			) => {
+				const el = createElement(tag);
+				if (tag === "canvas") created.push(el as HTMLCanvasElement);
+				return el;
+			}) as typeof document.createElement);
+
+			drawCroppedImage(image, whole(4000, 3000), 100, 75);
+			spy.mockRestore();
+
+			expect(created.length).toBe(6);
+			for (const canvas of created) {
+				expect(contextOf(canvas).imageSmoothingQuality).toBe("high");
+			}
+		});
+
+		it("never makes a step canvas larger than 16,777,216 pixels (the iOS canvas limit)", () => {
+			sizeImage(12000, 12000);
+			const created: HTMLCanvasElement[] = [];
+			const createElement = document.createElement.bind(document);
+			const spy = spyOn(document, "createElement").mockImplementation(((
+				tag: string,
+			) => {
+				const el = createElement(tag);
+				if (tag === "canvas") created.push(el as HTMLCanvasElement);
+				return el;
+			}) as typeof document.createElement);
+
+			drawCroppedImage(image, whole(12000, 12000), 100, 100);
+			spy.mockRestore();
+
+			// Halving 12000x12000 would give 36 MP; the first step is capped instead
+			for (const canvas of created) {
+				expect(canvas.width * canvas.height).toBeLessThanOrEqual(16_777_216);
+			}
+			expect(created.length).toBeGreaterThan(2);
+		});
+
+		it("halves the source the same way under a rotation", () => {
+			sizeImage(4000, 3000);
+
+			const canvas = drawCroppedImage(image, whole(4000, 3000), 75, 100, {
+				rotation: 90,
+			});
+
+			// The destination box is the output turned back (100x75), so the steps match the
+			// unrotated case and the last one is drawn into the rotated context
+			expect(contextOf(canvas).drawImage).toHaveBeenCalledWith(
+				expect.objectContaining({ tagName: "CANVAS", width: 125, height: 94 }),
+				0,
+				0,
+				125,
+				94,
+				-50,
+				-37.5,
+				100,
+				75,
 			);
 		});
 	});

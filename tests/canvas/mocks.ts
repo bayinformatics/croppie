@@ -137,6 +137,17 @@ export function restoreCanvasMocks(): void {
 }
 
 /**
+ * The mock 2D context of a specific canvas, for code that draws through several canvases.
+ *
+ * @returns The context, or `undefined` if `getContext("2d")` was never called on `canvas`
+ */
+export function getMockContext(
+	canvas: HTMLCanvasElement,
+): MockCanvasContext | undefined {
+	return mockContexts.get(canvas);
+}
+
+/**
  * The mock 2D context most recently handed out by the mocked `getContext("2d")`.
  *
  * @returns The context, or `undefined` if none was requested since `setupCanvasMocks()`
