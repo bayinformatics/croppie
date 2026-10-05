@@ -25,3 +25,4 @@ export type {
 	ViewportType,
 	ZoomConfig,
 } from "./types.js";
+export { readJpegOrientation } from "./utils/exif.js";

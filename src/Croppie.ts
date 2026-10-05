@@ -39,11 +39,13 @@ import {
 	clamp,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
+	exifOrientationToRotation,
 	fileToDataUrl,
 	loadImage,
 	naturalRectToRotated,
 	normalizePoints,
 	normalizeRotation,
+	readDataUrlOrientation,
 	resolveMinZoom,
 	rotatedRectToNatural,
 	rotateOffset,
@@ -95,6 +97,8 @@ export class Croppie {
 	private transform: TransformState = { x: 0, y: 0, scale: 1, rotation: 0 };
 	/** The rotation `bind()` started with; `reset()` returns to it. */
 	private initialRotation: Rotation = 0;
+	/** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
+	private exifOrientation: number | undefined;
 	private zoomConfig: ZoomConfig;
 	/** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
 	private configuredMinZoom: number | undefined;
@@ -252,14 +256,26 @@ export class Croppie {
 	}
 
 	/**
-	 * The rotation a bind starts with: the validated `rotation` option, or 0.
+	 * The rotation a bind starts with: the validated `rotation` option; else the rotation an
+	 * explicit `orientation` (EXIF 1-8) stands for; else 0. Mirrored or out-of-range
+	 * orientations cannot be expressed as a rotation, so they are ignored with a warning.
 	 *
 	 * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
 	 */
 	private resolveBindRotation(bindOptions: BindOptions): Rotation {
-		return bindOptions.rotation !== undefined
-			? normalizeRotation(bindOptions.rotation)
-			: 0;
+		if (bindOptions.rotation !== undefined) {
+			return normalizeRotation(bindOptions.rotation);
+		}
+		if (bindOptions.orientation === undefined) return 0;
+
+		const rotation = exifOrientationToRotation(bindOptions.orientation);
+		if (rotation === undefined) {
+			console.warn(
+				`[@bayinformatics/croppie] Ignoring bind({ orientation: ${bindOptions.orientation} }): only the EXIF orientations 1, 3, 6 and 8 can be expressed as a rotation`,
+			);
+			return 0;
+		}
+		return rotation;
 	}
 
 	/**
@@ -293,6 +309,21 @@ export class Croppie {
 			// Use the loaded image's src to ensure preview matches the image we crop from
 			// (important for URLs that return different content on each request)
 			this.previewEl.src = this.image.src;
+		}
+
+		// Read the tag from the data URL's prefix; the browser has already oriented the pixels,
+		// so it is only reported, never applied
+		this.exifOrientation = this.options.enableExif
+			? readDataUrlOrientation(bindOptions.url)
+			: undefined;
+		if (
+			bindOptions.orientation !== undefined &&
+			this.exifOrientation !== undefined &&
+			this.exifOrientation !== 1
+		) {
+			console.warn(
+				`[@bayinformatics/croppie] bind({ orientation: ${bindOptions.orientation} }) is applied on top of the file's own EXIF orientation (${this.exifOrientation}), which browsers already honour; the image may end up rotated twice. The explicit orientation wins.`,
+			);
 		}
 
 		// Resolve the zoom limits (from the displayed dimensions) and sync the slider's min
@@ -455,6 +486,9 @@ export class Croppie {
 			points: this.getPoints(),
 			zoom: this.transform.scale,
 			rotation: this.transform.rotation,
+			...(this.exifOrientation !== undefined && {
+				orientation: this.exifOrientation,
+			}),
 		};
 	}
 
