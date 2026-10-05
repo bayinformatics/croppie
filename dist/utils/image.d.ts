@@ -1,7 +1,17 @@
 /**
+ * Describe a URL for an error message without dumping it whole.
+ *
+ * A data URL can be megabytes of base64 (a photo from `bindFile()`), so it is summarised as
+ * `data:<mime>;…(<n> chars)`; any other URL is cut to 120 characters plus an ellipsis.
+ *
+ * @param url - The URL to describe
+ * @returns A short, human-readable description of the URL
+ */
+export declare function describeUrl(url: string): string;
+/**
  * Creates an HTMLImageElement for the given URL and loads its image data.
  *
- * If `url` does not start with `"data:"`, the image's `crossOrigin` is set to `"anonymous"`. The returned operation rejects with an `Error` if the image fails to load.
+ * If `url` does not start with `"data:"`, the image's `crossOrigin` is set to `"anonymous"`. The returned operation rejects with an `Error` if the image fails to load; its message describes the URL with `describeUrl`, so a data URL is never embedded whole.
  *
  * @param url - The image URL or data URL to load.
  * @returns The loaded `HTMLImageElement`.
@@ -40,3 +50,13 @@ export declare function aspectRatio(width: number, height: number): number;
  * @returns The scale factor to apply to the image so it fills the viewport; values > 1 enlarge the image, values < 1 shrink it
  */
 export declare function calculateInitialZoom(imageWidth: number, imageHeight: number, viewportWidth: number, viewportHeight: number): number;
+/**
+ * Compute the scale factor that fits a whole image inside a viewport.
+ *
+ * @param imageWidth - Image width in pixels
+ * @param imageHeight - Image height in pixels
+ * @param viewportWidth - Viewport width in pixels
+ * @param viewportHeight - Viewport height in pixels
+ * @returns The scale factor at which the entire image is visible inside the viewport (the smaller of the two ratios, so never above `calculateInitialZoom`)
+ */
+export declare function calculateContainZoom(imageWidth: number, imageHeight: number, viewportWidth: number, viewportHeight: number): number;

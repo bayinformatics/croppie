@@ -24,9 +24,13 @@ export declare class Croppie {
     private image;
     private transform;
     private zoomConfig;
+    /** `options.zoom.min` as given; undefined when unset (then the minimum is per image). */
+    private configuredMinZoom;
     private effectiveMinZoom;
     private eventHandlers;
     private cleanupFns;
+    private destroyed;
+    private bindGeneration;
     constructor(element: HTMLElement, options: CroppieOptions);
     /**
      * Creates all DOM elements
@@ -41,12 +45,28 @@ export declare class Croppie {
      */
     bind(options: BindOptions | string): Promise<void>;
     /**
+     * Loads and applies an image for a bind that claimed `generation`. If the instance was
+     * destroyed or a newer bind started meanwhile, resolves without applying or emitting
+     * anything, and without surfacing a load error nobody is waiting for any more.
+     */
+    private load;
+    /**
      * Binds a File or Blob to the cropper
      */
     bindFile(file: File | Blob): Promise<void>;
     /**
-     * Gets the current cropped result
+     * Gets the current cropped result. The return type follows `options.type`:
+     * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
      */
+    result(options: ResultOptions & {
+        type: "blob";
+    }): Promise<Blob>;
+    result(options: ResultOptions & {
+        type: "base64";
+    }): Promise<string>;
+    result(options: ResultOptions & {
+        type: "canvas";
+    }): Promise<HTMLCanvasElement>;
     result(options: ResultOptions): Promise<Blob | string | HTMLCanvasElement>;
     /**
      * Gets the current crop data
@@ -98,11 +118,26 @@ export declare class Croppie {
      */
     off<K extends keyof CroppieEvents>(event: K, handler: CroppieEventHandler<K>): void;
     /**
+     * Throws if the instance was destroyed, naming the method that was called
+     */
+    private assertNotDestroyed;
+    /**
+     * Whether a bind that claimed `generation` was destroyed or superseded in the meantime
+     */
+    private isStaleBind;
+    /**
+     * Resolves the effective minimum zoom for an image (see `resolveMinZoom`) and syncs
+     * the slider's `min`, so the slider range is never inverted.
+     *
+     * @returns The zoom at which the image covers the viewport
+     */
+    private updateZoomLimits;
+    /**
      * Updates the CSS transform on the preview element
      */
     private updateTransform;
     /**
-     * Updates the slider value to match current zoom
+     * Updates the slider value to match current zoom, and its spoken value ("150%")
      */
     private updateSlider;
     /**
@@ -110,9 +145,15 @@ export declare class Croppie {
      */
     private constrainPosition;
     /**
-     * Calculates the crop points based on current transform
+     * Calculates the crop points based on current transform, clamped to the image
      */
     private getPoints;
+    /**
+     * The viewport rectangle in image pixels, NOT clamped to the image: it extends past the
+     * image when the user zoomed out further than the image covers. `result()` renders this
+     * frame so the output keeps the image's proportions.
+     */
+    private getViewportRect;
     /**
      * Emits an update event
      */

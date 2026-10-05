@@ -146,12 +146,18 @@
 	);
 }
 
-/* Focus states for accessibility */
-.croppie-container .cr-slider:focus {
-	outline: none;
+/* Focus states for accessibility: a ring for keyboard focus only, in every browser */
+.croppie-container .cr-slider:focus-visible {
+	outline: 2px solid var(--croppie-slider-start);
+	outline-offset: 3px;
 }
 
 .croppie-container .cr-slider:focus-visible::-webkit-slider-thumb {
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 4px
+		var(--croppie-slider-shadow-focus);
+}
+
+.croppie-container .cr-slider:focus-visible::-moz-range-thumb {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 4px
 		var(--croppie-slider-shadow-focus);
 }
