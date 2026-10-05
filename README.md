@@ -362,7 +362,7 @@ bun install --frozen-lockfile
 # Run the tests
 bun run test
 
-# Lint and type-check (sources, tests and Playwright config)
+# Lint (sources, tests, scripts and Playwright config) and type-check (the same, minus scripts)
 bun run lint
 bun run typecheck
 
