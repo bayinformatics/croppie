@@ -77,13 +77,14 @@ export declare class Croppie {
      */
     get zoom(): number;
     /**
-     * Sets the zoom level
+     * Sets the zoom level, exactly like `setZoom()`
      */
     set zoom(value: number);
     /**
      * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
-     * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed;
-     * a non-finite value is ignored.
+     * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
+     * A numeric string (such as a range input's `value`) is converted to a number;
+     * a value that is then not finite is ignored.
      */
     setZoom(value: number): void;
     /**
@@ -91,7 +92,9 @@ export declare class Croppie {
      *
      * Clamps the request to the effective limits, zooms about `anchor` so the image point
      * under it stays put, re-clamps the position, syncs the slider and emits `update`
-     * then `zoom`. Nothing is emitted when the clamped zoom did not change.
+     * then `zoom`. Nothing is emitted when the clamped zoom did not change. When an `update`
+     * listener zooms again, that nested call emits the final `zoom` and this one emits none,
+     * so `zoom` never reports a value that has already been replaced.
      *
      * @param requested - Requested zoom level; not clamped by the caller
      * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)

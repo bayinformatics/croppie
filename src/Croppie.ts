@@ -212,6 +212,13 @@ export class Croppie {
 		);
 		this.cleanupFns.push(dragCleanup);
 
+		// The drag handler turns off every browser touch gesture on the boundary. Without
+		// zoom there is no pinch handler, so give pinch-zoom back to the browser: a pinch
+		// over the cropper then zooms the page instead of doing nothing
+		if (!this.options.enableZoom) {
+			this.boundaryEl.style.touchAction = "pinch-zoom";
+		}
+
 		// Wheel zoom handler
 		if (this.options.enableZoom && this.options.mouseWheelZoom) {
 			const requireCtrl = this.options.mouseWheelZoom === "ctrl";
@@ -274,16 +281,23 @@ export class Croppie {
 		this.image = image;
 
 		if (this.previewEl) {
-			// Use the loaded image's src to ensure preview matches the image we crop from
-			// (important for URLs that return different content on each request)
+			// Show the image we crop from. In the loader's CORS mode the browser reuses the image
+			// it already loaded; in any other mode it requests the URL again, which costs a second
+			// download and can return different pixels (e.g. a URL that serves a random image)
+			this.previewEl.crossOrigin = this.image.crossOrigin;
 			this.previewEl.src = this.image.src;
 		}
 
 		// Resolve the zoom limits for this image and sync the slider's min
 		const coverageZoom = this.updateZoomLimits(this.image);
 
-		// Calculate initial zoom
-		const initialZoom = bindOptions.zoom ?? coverageZoom;
+		// Calculate initial zoom. As in setZoom(), a numeric string is converted and a value
+		// that is then not finite (NaN, ±Infinity) is ignored: the coverage zoom applies instead
+		// of a NaN that no later zoom could repair
+		const requestedZoom = Number(bindOptions.zoom ?? coverageZoom);
+		const initialZoom = Number.isFinite(requestedZoom)
+			? requestedZoom
+			: coverageZoom;
 
 		this.transform = {
 			x: 0,
@@ -430,7 +444,7 @@ export class Croppie {
 	}
 
 	/**
-	 * Sets the zoom level
+	 * Sets the zoom level, exactly like `setZoom()`
 	 */
 	set zoom(value: number) {
 		this.setZoom(value);
@@ -438,11 +452,12 @@ export class Croppie {
 
 	/**
 	 * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
-	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed;
-	 * a non-finite value is ignored.
+	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
+	 * A numeric string (such as a range input's `value`) is converted to a number;
+	 * a value that is then not finite is ignored.
 	 */
 	setZoom(value: number): void {
-		this.applyZoom(value);
+		this.applyZoom(Number(value));
 	}
 
 	/**
@@ -450,7 +465,9 @@ export class Croppie {
 	 *
 	 * Clamps the request to the effective limits, zooms about `anchor` so the image point
 	 * under it stays put, re-clamps the position, syncs the slider and emits `update`
-	 * then `zoom`. Nothing is emitted when the clamped zoom did not change.
+	 * then `zoom`. Nothing is emitted when the clamped zoom did not change. When an `update`
+	 * listener zooms again, that nested call emits the final `zoom` and this one emits none,
+	 * so `zoom` never reports a value that has already been replaced.
 	 *
 	 * @param requested - Requested zoom level; not clamped by the caller
 	 * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
@@ -476,6 +493,8 @@ export class Croppie {
 		if (zoom === previousZoom) return;
 
 		this.emitUpdate();
+		// An update listener zoomed again: its nested call already emitted the final zoom
+		if (this.transform.scale !== zoom) return;
 		this.emitEvent("zoom", { zoom, previousZoom });
 	}
 

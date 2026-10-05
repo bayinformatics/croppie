@@ -386,7 +386,9 @@ describe("Drag Handler", () => {
 			expect(onEnd).toHaveBeenCalledTimes(1);
 			expect(onStart).toHaveBeenCalledTimes(1);
 			expect(element.style.cursor).toBe("grab");
-			expect(element.releasePointerCapture).toHaveBeenCalledWith(1);
+			// The first pointer is still down: it keeps the capture, so its pointerup still
+			// reaches the element
+			expect(element.releasePointerCapture).not.toHaveBeenCalled();
 
 			// Neither finger pans any more
 			for (const pointerId of [1, 2]) {

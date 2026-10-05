@@ -5,6 +5,7 @@ import {
 	expect,
 	expectTypeOf,
 	it,
+	mock,
 } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import type { ResultOptions } from "../../src/types.ts";
@@ -170,6 +171,9 @@ describe("Croppie result", () => {
 		});
 
 		it("applies quality to blob", async () => {
+			const toBlob = mock(HTMLCanvasElement.prototype.toBlob);
+			HTMLCanvasElement.prototype.toBlob = toBlob;
+
 			const blob = await croppie.result({
 				type: "blob",
 				format: "jpeg",
@@ -177,6 +181,17 @@ describe("Croppie result", () => {
 			});
 
 			expect(blob.type).toBe("image/jpeg");
+			expect(toBlob.mock.calls[0]?.[1]).toBe("image/jpeg");
+			expect(toBlob.mock.calls[0]?.[2]).toBe(0.5);
+		});
+
+		it("applies quality to base64", async () => {
+			const toDataURL = mock(HTMLCanvasElement.prototype.toDataURL);
+			HTMLCanvasElement.prototype.toDataURL = toDataURL;
+
+			await croppie.result({ type: "base64", format: "jpeg", quality: 0.5 });
+
+			expect(toDataURL).toHaveBeenCalledWith("image/jpeg", 0.5);
 		});
 	});
 
@@ -201,11 +216,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-			});
+			await croppie.result({ type: "canvas" });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
 		});
 
 		it("can override circle option", async () => {
@@ -214,12 +227,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-				circle: true,
-			});
+			await croppie.result({ type: "canvas", circle: true });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("can force square output on circle viewport", async () => {
@@ -228,12 +238,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = await croppie.result({
-				type: "canvas",
-				circle: false,
-			});
+			await croppie.result({ type: "canvas", circle: false });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
 		});
 	});
 
@@ -245,22 +252,27 @@ describe("Croppie result", () => {
 			await croppie.bind(TINY_PNG);
 		});
 
-		it("accepts background color", async () => {
-			const canvas = await croppie.result({
-				type: "canvas",
-				backgroundColor: "#ff0000",
-			});
+		it("fills the output with the background color", async () => {
+			await croppie.result({ type: "canvas", backgroundColor: "#ff0000" });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			const ctx = getLastMockContext();
+			expect(ctx?.fillStyle).toBe("#ff0000");
+			expect(ctx?.fillRect).toHaveBeenCalledWith(0, 0, 100, 100);
 		});
 
 		it("accepts rgba background color", async () => {
-			const canvas = await croppie.result({
+			await croppie.result({
 				type: "canvas",
 				backgroundColor: "rgba(255, 0, 0, 0.5)",
 			});
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.fillStyle).toBe("rgba(255, 0, 0, 0.5)");
+		});
+
+		it("leaves the background transparent by default", async () => {
+			await croppie.result({ type: "canvas" });
+
+			expect(getLastMockContext()?.fillRect).not.toHaveBeenCalled();
 		});
 	});
 

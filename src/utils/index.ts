@@ -3,6 +3,7 @@ export { clamp } from "./clamp.js";
 export { debounce } from "./debounce.js";
 export {
 	anchorFromClientPoint,
+	clientToLayoutScale,
 	createElement,
 	getTransformValues,
 	setTransform,
