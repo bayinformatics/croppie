@@ -540,9 +540,9 @@ describe("Croppie result", () => {
 			expect(dy + dh / 2).toBeCloseTo(2048, 6);
 		});
 
-		it("scales a frame around a large image to the image's area, keeping its shape", async () => {
+		it("scales a frame around a large image down to the canvas cap, keeping its shape", async () => {
 			// Zoomed out to fit, a 1000x200 viewport spans 40320x8064 px around the 6048x8064
-			// photo; scaled by sqrt(6048 / 40320) it has as many pixels as the photo
+			// photo; scaled by sqrt(16777216 / (40320 * 8064)) it is 9158.9 x 1831.8
 			await bindZoomedOut({
 				image: { width: 6048, height: 8064 },
 				viewport: { width: 1000, height: 200 },
@@ -551,11 +551,12 @@ describe("Croppie result", () => {
 
 			const canvas = await croppie.result({ type: "canvas", size: "original" });
 
-			// 5:1 like the viewport, 48.8 MP like the photo
-			expect([canvas.width, canvas.height]).toEqual([15616, 3123]);
+			// 5:1 like the viewport; 9159x1832 would be over 16,777,216 px, so rounded down
+			expect([canvas.width, canvas.height]).toEqual([9158, 1831]);
+			expect(canvas.width * canvas.height).toBeLessThanOrEqual(16_777_216);
 		});
 
-		it("keeps the image resolution for a large crop inside the image", async () => {
+		it("caps a large crop inside the image at 4096x4096", async () => {
 			cleanupImageMock();
 			cleanupImageMock = installImageMock({ width: 6000, height: 6000 });
 			croppie = new Croppie(container, {
@@ -565,8 +566,82 @@ describe("Croppie result", () => {
 
 			const canvas = await croppie.result({ type: "canvas", size: "original" });
 
-			// 5000x5000 is above 4096x4096 but has no empty margin, so it is not scaled
-			expect([canvas.width, canvas.height]).toEqual([5000, 5000]);
+			// The 5000x5000 crop (25 MP) is scaled down to 16,777,216 px
+			expect([canvas.width, canvas.height]).toEqual([4096, 4096]);
+		});
+	});
+
+	describe("the canvas size cap (16,777,216 px, 16,384 px a side)", () => {
+		it("caps 'original' for a default viewport zoomed out on a large photo", async () => {
+			// At its per-image minimum zoom a 200x200 viewport shows 6048x6048 px of an
+			// 8064x6048 photo: 36.6 MP, which iOS Safari cannot allocate
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 8064, height: 6048 });
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 0 });
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			expect([canvas.width, canvas.height]).toEqual([4096, 4096]);
+		});
+
+		it("caps each side of 'original' at 16,384 px", async () => {
+			// A 1000x50 viewport at the coverage zoom of a 20000x1000 image shows all of it
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 20000, height: 1000 });
+			croppie = new Croppie(container, {
+				viewport: { width: 1000, height: 50, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+
+			const canvas = await croppie.result({ type: "canvas", size: "original" });
+
+			// 20 MP and 20000 px wide: the side cap (x0.8192) is the tighter one
+			expect([canvas.width, canvas.height]).toEqual([16384, 819]);
+		});
+
+		it("caps a custom size by area, keeping its shape", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+
+			const canvas = await croppie.result({
+				type: "canvas",
+				size: { width: 5000, height: 5000 },
+			});
+
+			expect([canvas.width, canvas.height]).toEqual([4096, 4096]);
+		});
+
+		it("caps each side of a custom size", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+
+			const canvas = await croppie.result({
+				type: "canvas",
+				size: { width: 20000, height: 100 },
+			});
+
+			expect([canvas.width, canvas.height]).toEqual([16384, 82]);
+		});
+
+		it("leaves a size within the cap alone", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+			});
+			await croppie.bind(TINY_PNG);
+
+			const canvas = await croppie.result({
+				type: "canvas",
+				size: { width: 4096, height: 4096 },
+			});
+
+			expect([canvas.width, canvas.height]).toEqual([4096, 4096]);
 		});
 	});
 
