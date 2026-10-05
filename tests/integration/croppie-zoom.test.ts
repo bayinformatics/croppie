@@ -580,4 +580,120 @@ describe("Croppie zoom", () => {
 			});
 		});
 	});
+
+	describe("enableZoom", () => {
+		// 400x300 image, 100x100 viewport: coverage zoom is 1/3
+		let cleanupWideImageMock: () => void;
+		let boundary: HTMLElement;
+
+		beforeEach(() => {
+			cleanupWideImageMock = installImageMock({ width: 400, height: 300 });
+		});
+
+		afterEach(() => {
+			cleanupWideImageMock();
+		});
+
+		async function bindWith(options: { enableZoom?: boolean }): Promise<void> {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				boundary: { width: 300, height: 300 },
+				zoom: { min: 0.1, max: 10 },
+				...options,
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 1 });
+			boundary = container.querySelector(".cr-boundary") as HTMLElement;
+		}
+
+		it("renders the slider by default", async () => {
+			await bindWith({});
+
+			expect(container.querySelector(".cr-slider")).not.toBeNull();
+		});
+
+		it("renders the slider when enableZoom is true", async () => {
+			await bindWith({ enableZoom: true });
+
+			expect(container.querySelector(".cr-slider")).not.toBeNull();
+		});
+
+		it("does not render the slider when enableZoom is false", async () => {
+			await bindWith({ enableZoom: false });
+
+			expect(container.querySelector(".cr-slider")).toBeNull();
+		});
+
+		it("ignores the mouse wheel when enableZoom is false", async () => {
+			await bindWith({ enableZoom: false });
+
+			const event = createWheelEvent(-100);
+			const preventDefault = mock();
+			event.preventDefault = preventDefault;
+			boundary.dispatchEvent(event);
+
+			expect(croppie.zoom).toBe(1);
+			// The page can still scroll over the cropper
+			expect(preventDefault).not.toHaveBeenCalled();
+		});
+
+		it("ignores pinch gestures when enableZoom is false", async () => {
+			await bindWith({ enableZoom: false });
+
+			boundary.dispatchEvent(
+				createTouchEvent("touchstart", [
+					{ clientX: 100, clientY: 150 },
+					{ clientX: 200, clientY: 150 },
+				]),
+			);
+			boundary.dispatchEvent(
+				createTouchEvent("touchmove", [
+					{ clientX: 50, clientY: 150 },
+					{ clientX: 250, clientY: 150 },
+				]),
+			);
+
+			expect(croppie.zoom).toBe(1);
+		});
+
+		it("still pans when enableZoom is false", async () => {
+			await bindWith({ enableZoom: false });
+			const before = croppie.get().points.topLeftX;
+
+			simulateDrag(boundary, 100, 100, 130, 100);
+
+			expect(croppie.get().points.topLeftX).not.toBe(before);
+		});
+
+		it("setZoom() still works and emits zoom when enableZoom is false", async () => {
+			await bindWith({ enableZoom: false });
+			const handler = mock();
+			croppie.on("zoom", handler);
+
+			croppie.setZoom(2);
+
+			expect(croppie.zoom).toBe(2);
+			expect(handler).toHaveBeenCalledTimes(1);
+			expect(handler.mock.calls[0]?.[0]).toEqual({ zoom: 2, previousZoom: 1 });
+		});
+
+		it("the zoom setter still works when enableZoom is false", async () => {
+			await bindWith({ enableZoom: false });
+
+			croppie.zoom = 3;
+
+			expect(croppie.zoom).toBe(3);
+		});
+
+		it("enableZoom: false wins over showZoomer: true", async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				showZoomer: true,
+				enableZoom: false,
+			});
+			await croppie.bind(TINY_PNG);
+
+			expect(container.querySelector(".cr-slider")).toBeNull();
+			expect(container.querySelector(".cr-slider-wrap")).toBeNull();
+		});
+	});
 });
