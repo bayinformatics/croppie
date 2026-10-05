@@ -470,6 +470,92 @@ describe("Croppie rotate", () => {
 		});
 	});
 
+	describe("bindFile(file, options)", () => {
+		// Any file loads as the mocked 20x10 image
+		const file = () => new Blob(["x"], { type: "image/png" });
+		const natural: CropPoints = {
+			topLeftX: 2,
+			topLeftY: 3,
+			bottomRightX: 7,
+			bottomRightY: 8,
+		};
+
+		it("applies the rotation, points and zoom like bind()", async () => {
+			create();
+
+			await croppie.bindFile(file(), { points: natural, rotation: 90 });
+
+			const data = croppie.get();
+			expectPoints(data.points, natural);
+			expect(data.rotation).toBe(90);
+			expect(data.zoom).toBeCloseTo(20, 9);
+		});
+
+		it("applies a zoom", async () => {
+			create();
+
+			await croppie.bindFile(file(), { zoom: 30 });
+
+			expect(croppie.zoom).toBe(30);
+		});
+
+		it("maps an orientation to a rotation", async () => {
+			create();
+
+			await croppie.bindFile(file(), { orientation: 6 });
+
+			expect(croppie.get().rotation).toBe(90);
+		});
+
+		it("makes reset() return to the bind-time rotation", async () => {
+			create();
+			await croppie.bindFile(file(), { rotation: 90 });
+
+			croppie.rotate(90);
+			croppie.reset();
+
+			expect(croppie.get().rotation).toBe(90);
+		});
+
+		it("rejects an invalid rotation with a RangeError before superseding a bind still loading", async () => {
+			create();
+			const good = croppie.bind({ url: SMALL_PNG, zoom: 40 }).then(
+				() => "fulfilled",
+				(caught: unknown) => caught,
+			);
+
+			const error = await croppie.bindFile(file(), { rotation: 45 }).then(
+				() => undefined,
+				(caught: unknown) => caught,
+			);
+
+			expect(error).toBeInstanceOf(RangeError);
+			expect(await good).toBe("fulfilled");
+			expect(croppie.zoom).toBe(40);
+		});
+
+		it("ignores malformed points with a warning, like bind()", async () => {
+			const originalWarn = console.warn;
+			const warn = mock();
+			console.warn = warn;
+			try {
+				create();
+
+				await croppie.bindFile(file(), {
+					points: [1, 2, 3] as unknown as CropPoints,
+				});
+
+				expect(warn).toHaveBeenCalledTimes(1);
+				expect(String(warn.mock.calls[0]?.[0])).toContain(
+					"invalid initial points",
+				);
+				expect(croppie.zoom).toBeCloseTo(10, 9); // the coverage zoom
+			} finally {
+				console.warn = originalWarn;
+			}
+		});
+	});
+
 	describe("reset()", () => {
 		it("restores the rotation given to bind()", async () => {
 			create();
