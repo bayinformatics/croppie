@@ -18,7 +18,7 @@ describe("normalizePoints", () => {
 		});
 	});
 
-	test("passes through object format unchanged", () => {
+	test("returns a copy of the object format with the same values", () => {
 		const input = {
 			topLeftX: 10,
 			topLeftY: 20,
@@ -27,6 +27,8 @@ describe("normalizePoints", () => {
 		};
 		const result = normalizePoints(input);
 		expect(result).toEqual(input);
+		// A new object, so the caller's points are never aliased or mutated
+		expect(result).not.toBe(input);
 	});
 
 	test("returns undefined for undefined input", () => {

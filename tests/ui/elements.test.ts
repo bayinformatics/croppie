@@ -267,6 +267,10 @@ describe("UI Elements", () => {
 			const proto = Object.getPrototypeOf(
 				document.createElement("div").style,
 			) as object;
+			const original = Object.getOwnPropertyDescriptor(
+				proto,
+				"webkitMaskImage",
+			);
 			let assigned: unknown;
 			Object.defineProperty(proto, "webkitMaskImage", {
 				configurable: true,
@@ -277,10 +281,17 @@ describe("UI Elements", () => {
 			});
 
 			try {
-				createOverlay(boundary, viewport);
+				const overlay = createOverlay(boundary, viewport);
 				expect(assigned).toBeTruthy();
+				// The same gradient as the standard property (which happy-dom trims), on the overlay itself
+				expect(String(assigned).trim()).toBe(overlay.style.maskImage);
 			} finally {
-				Reflect.deleteProperty(proto, "webkitMaskImage");
+				// Put back what was there (nothing in happy-dom 20.14) instead of deleting it
+				if (original) {
+					Object.defineProperty(proto, "webkitMaskImage", original);
+				} else {
+					Reflect.deleteProperty(proto, "webkitMaskImage");
+				}
 			}
 		});
 	});
