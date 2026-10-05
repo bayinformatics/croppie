@@ -1,3 +1,6 @@
 [test]
 preload = ["./tests/integration/setup.ts"]
 coverage = true
+coverageSkipTestFiles = true
+coverageReporter = ["text", "lcov"]
+pathIgnorePatterns = ["tests/visual/**"]

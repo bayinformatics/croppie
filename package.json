@@ -32,7 +32,7 @@
     "build:docs": "bun build src/index.ts --outdir docs --entry-naming croppie.[ext] --minify --sourcemap && cp src/croppie.css docs/croppie.css",
     "build:css": "cp src/croppie.css dist/croppie.css",
     "build:types": "tsc -p tsconfig.json",
-    "test": "bun test tests/unit tests/integration tests/input tests/ui tests/utils",
+    "test": "bun test",
     "test:unit": "bun test tests/unit",
     "test:integration": "bun test tests/integration",
     "test:visual": "bun run build && bunx playwright test",
