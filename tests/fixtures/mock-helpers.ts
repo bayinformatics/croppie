@@ -158,6 +158,51 @@ export function createMockImage(width = 400, height = 300): HTMLImageElement {
 	return img;
 }
 
+/** A layout box for `mockElementRect`; offsetWidth/offsetHeight default to width/height. */
+export interface MockRect {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+	offsetWidth?: number;
+	offsetHeight?: number;
+}
+
+/**
+ * Give an element a layout box. happy-dom does no layout: getBoundingClientRect() is all
+ * zeros and offsetWidth/offsetHeight are 0, so cursor/finger-anchored zoom needs this.
+ *
+ * Pass `offsetWidth`/`offsetHeight` different from `width`/`height` to simulate a
+ * CSS-scaled element (rect is the scaled box, offset* the layout size).
+ *
+ * @param element - The element to give a box
+ * @param rect - Viewport-relative box in CSS pixels
+ */
+export function mockElementRect(element: HTMLElement, rect: MockRect): void {
+	element.getBoundingClientRect = () =>
+		({
+			x: rect.left,
+			y: rect.top,
+			left: rect.left,
+			top: rect.top,
+			width: rect.width,
+			height: rect.height,
+			right: rect.left + rect.width,
+			bottom: rect.top + rect.height,
+			toJSON() {
+				return this;
+			},
+		}) as DOMRect;
+	Object.defineProperty(element, "offsetWidth", {
+		value: rect.offsetWidth ?? rect.width,
+		configurable: true,
+	});
+	Object.defineProperty(element, "offsetHeight", {
+		value: rect.offsetHeight ?? rect.height,
+		configurable: true,
+	});
+}
+
 /**
  * Create a PointerEvent configured for simulating pointer-based drag interactions in tests.
  *

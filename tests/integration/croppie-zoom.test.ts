@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import {
+	createTouchEvent,
 	createWheelEvent,
 	installImageMock,
+	mockElementRect,
 	simulateDrag,
 } from "../fixtures/mock-helpers.ts";
 import {
@@ -430,11 +432,14 @@ describe("Croppie zoom", () => {
 			cleanupWideImageMock();
 		});
 
-		async function bindWide(zoom: number): Promise<HTMLElement> {
+		async function bindWide(
+			zoom: number,
+			zoomConfig = { min: 0.1, max: 10 },
+		): Promise<HTMLElement> {
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
 				boundary: { width: 300, height: 300 },
-				zoom: { min: 0.1, max: 10 },
+				zoom: zoomConfig,
 			});
 			await croppie.bind({ url: TINY_PNG, zoom });
 			return container.querySelector(".cr-boundary") as HTMLElement;
@@ -492,6 +497,87 @@ describe("Croppie zoom", () => {
 			// The full 100px viewport still maps onto the image (200px at zoom 0.5);
 			// a gap would show up as a shortened crop after clamping to the image.
 			expect(points.bottomRightX - points.topLeftX).toBeCloseTo(200, 6);
+		});
+
+		describe("wheel and pinch", () => {
+			function boxBoundary(boundary: HTMLElement): void {
+				mockElementRect(boundary, { left: 0, top: 0, width: 300, height: 300 });
+			}
+
+			it("wheel zoom keeps the point under the cursor fixed", async () => {
+				const boundary = await bindWide(1);
+				boxBoundary(boundary);
+
+				// Client x 200 is the viewport's right edge, which shows image x 250
+				expect(croppie.get().points.bottomRightX).toBeCloseTo(250, 6);
+				boundary.dispatchEvent(
+					createWheelEvent(-100, { clientX: 200, clientY: 150 }),
+				);
+
+				expect(croppie.zoom).toBeCloseTo(1.1, 9);
+				expect(croppie.get().points.bottomRightX).toBeCloseTo(250, 6);
+			});
+
+			it("pinch zoom keeps the point under the finger midpoint fixed", async () => {
+				const boundary = await bindWide(1);
+				boxBoundary(boundary);
+
+				boundary.dispatchEvent(
+					createTouchEvent("touchstart", [
+						{ clientX: 150, clientY: 150 },
+						{ clientX: 250, clientY: 150 },
+					]),
+				);
+				boundary.dispatchEvent(
+					createTouchEvent("touchmove", [
+						{ clientX: 100, clientY: 150 },
+						{ clientX: 300, clientY: 150 },
+					]),
+				);
+
+				expect(croppie.zoom).toBeCloseTo(2, 9);
+				expect(croppie.get().points.bottomRightX).toBeCloseTo(250, 6);
+			});
+
+			it("a wheel step clamped to the zoom limit emits one zoom and one update, then nothing", async () => {
+				const boundary = await bindWide(0.95, { min: 0.5, max: 1 });
+				const zoomHandler = mock();
+				const updateHandler = mock();
+				croppie.on("zoom", zoomHandler);
+				croppie.on("update", updateHandler);
+
+				boundary.dispatchEvent(createWheelEvent(-100)); // 0.95 * 1.1 -> clamped to 1
+
+				expect(zoomHandler).toHaveBeenCalledTimes(1);
+				expect(zoomHandler.mock.calls[0]?.[0]).toEqual({
+					zoom: 1,
+					previousZoom: 0.95,
+				});
+				expect(updateHandler).toHaveBeenCalledTimes(1);
+
+				boundary.dispatchEvent(createWheelEvent(-100)); // already at the max
+
+				expect(zoomHandler).toHaveBeenCalledTimes(1);
+				expect(updateHandler).toHaveBeenCalledTimes(1);
+			});
+
+			it("zooming out at the coverage minimum emits nothing", async () => {
+				croppie = new Croppie(container, {
+					viewport: { width: 100, height: 100, type: "square" },
+					boundary: { width: 300, height: 300 },
+				});
+				await croppie.bind(TINY_PNG); // starts at the coverage zoom (1/3)
+				const zoomHandler = mock();
+				const updateHandler = mock();
+				croppie.on("zoom", zoomHandler);
+				croppie.on("update", updateHandler);
+				const boundary = container.querySelector(".cr-boundary") as HTMLElement;
+
+				boundary.dispatchEvent(createWheelEvent(100));
+
+				expect(zoomHandler).not.toHaveBeenCalled();
+				expect(updateHandler).not.toHaveBeenCalled();
+			});
 		});
 	});
 });

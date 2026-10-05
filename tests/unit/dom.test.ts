@@ -1,10 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
+	anchorFromClientPoint,
 	createElement,
 	getTransformValues,
 	setTransform,
 } from "../../src/utils/dom.ts";
-import { installGetComputedStyleMock } from "../fixtures/mock-helpers.ts";
+import {
+	installGetComputedStyleMock,
+	mockElementRect,
+} from "../fixtures/mock-helpers.ts";
 
 describe("DOM utilities", () => {
 	describe("createElement", () => {
@@ -323,6 +327,73 @@ describe("DOM utilities", () => {
 				expect(values.y).toBeCloseTo(y, 5);
 				expect(values.scale).toBeCloseTo(scale, 5);
 			}
+		});
+	});
+
+	describe("anchorFromClientPoint", () => {
+		let element: HTMLDivElement;
+
+		beforeEach(() => {
+			element = document.createElement("div");
+			document.body.appendChild(element);
+		});
+
+		afterEach(() => {
+			element.remove();
+		});
+
+		it("returns the centre when the element has no layout box", () => {
+			expect(anchorFromClientPoint(element, 120, 80)).toEqual({ x: 0, y: 0 });
+		});
+
+		it("returns the centre when only one dimension is empty", () => {
+			mockElementRect(element, { left: 0, top: 0, width: 200, height: 0 });
+
+			expect(anchorFromClientPoint(element, 120, 80)).toEqual({ x: 0, y: 0 });
+		});
+
+		it("returns the offset from the element centre", () => {
+			mockElementRect(element, { left: 10, top: 20, width: 200, height: 100 });
+
+			// The centre is at client (110, 70)
+			expect(anchorFromClientPoint(element, 110, 70)).toEqual({ x: 0, y: 0 });
+			expect(anchorFromClientPoint(element, 210, 120)).toEqual({
+				x: 100,
+				y: 50,
+			});
+			expect(anchorFromClientPoint(element, 10, 20)).toEqual({
+				x: -100,
+				y: -50,
+			});
+		});
+
+		it("converts a CSS-scaled element back to layout pixels", () => {
+			// Laid out at 300x300 but displayed at half size (rect 150x150)
+			mockElementRect(element, {
+				left: 0,
+				top: 0,
+				width: 150,
+				height: 150,
+				offsetWidth: 300,
+				offsetHeight: 300,
+			});
+
+			// 25px right of the displayed centre (75, 75) is 50px in layout pixels
+			expect(anchorFromClientPoint(element, 100, 75)).toEqual({ x: 50, y: 0 });
+			expect(anchorFromClientPoint(element, 75, 125)).toEqual({ x: 0, y: 100 });
+		});
+
+		it("treats a missing layout size as unscaled", () => {
+			mockElementRect(element, {
+				left: 0,
+				top: 0,
+				width: 200,
+				height: 200,
+				offsetWidth: 0,
+				offsetHeight: 0,
+			});
+
+			expect(anchorFromClientPoint(element, 150, 100)).toEqual({ x: 50, y: 0 });
 		});
 	});
 });
