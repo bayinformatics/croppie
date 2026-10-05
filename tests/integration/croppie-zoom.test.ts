@@ -696,4 +696,45 @@ describe("Croppie zoom", () => {
 			expect(container.querySelector(".cr-slider-wrap")).toBeNull();
 		});
 	});
+
+	describe("slider accessibility", () => {
+		function slider(): HTMLInputElement {
+			return container.querySelector(".cr-slider") as HTMLInputElement;
+		}
+
+		beforeEach(async () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { min: 0.1, max: 100, enforceMinimumCoverage: false },
+			});
+			await croppie.bind({ url: TINY_PNG, zoom: 1 });
+		});
+
+		it("has an accessible name", () => {
+			expect(slider().getAttribute("aria-label")).toBe("Zoom");
+		});
+
+		it("describes the zoom as a percentage after bind", () => {
+			expect(slider().getAttribute("aria-valuetext")).toBe("100%");
+		});
+
+		it("updates aria-valuetext when the zoom changes", () => {
+			croppie.setZoom(1.5);
+
+			expect(slider().getAttribute("aria-valuetext")).toBe("150%");
+		});
+
+		it("rounds the percentage", () => {
+			croppie.setZoom(0.333);
+
+			expect(slider().getAttribute("aria-valuetext")).toBe("33%");
+		});
+
+		it("follows the slider itself", () => {
+			slider().value = "2";
+			slider().dispatchEvent(new Event("input"));
+
+			expect(slider().getAttribute("aria-valuetext")).toBe("200%");
+		});
+	});
 });

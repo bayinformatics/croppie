@@ -330,6 +330,12 @@ describe("UI Elements", () => {
 	});
 
 	describe("createZoomSlider", () => {
+		it("has an accessible name", () => {
+			const slider = createZoomSlider(0.5, 2, 1);
+
+			expect(slider.getAttribute("aria-label")).toBe("Zoom");
+		});
+
 		it("creates an input element", () => {
 			const slider = createZoomSlider(0.5, 2, 1);
 			expect(slider.tagName).toBe("INPUT");
