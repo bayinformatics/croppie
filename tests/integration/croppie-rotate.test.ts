@@ -616,4 +616,30 @@ describe("Croppie rotate", () => {
 			expect(getLastMockContext()?.rotate).toHaveBeenCalledWith(Math.PI / 2);
 		});
 	});
+
+	describe("the image keeps covering the viewport", () => {
+		it("re-clamps the position after a quarter turn", async () => {
+			create({ viewport: { width: 100, height: 50, type: "square" } });
+			// Zoom 10 with the crop in the top-left corner: offset (50, 25), a corner of the bounds
+			await croppie.bind({
+				url: SMALL_PNG,
+				points: { topLeftX: 0, topLeftY: 0, bottomRightX: 10, bottomRightY: 5 },
+			});
+
+			// The offset turns to (-25, 50), but the displayed 10x20 image at zoom 10 is exactly
+			// as wide as the viewport, so it is clamped to (0, 50)
+			croppie.rotate(90);
+
+			expect(croppie.zoom).toBe(10);
+			expectPoints(croppie.get().points, {
+				topLeftX: 2.5,
+				topLeftY: 0,
+				bottomRightX: 7.5,
+				bottomRightY: 10,
+			});
+			expect(previewTransform()).toBe(
+				"translate(200px, 100px) scale(10) rotate(90deg)",
+			);
+		});
+	});
 });
