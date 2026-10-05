@@ -105,7 +105,11 @@ export class Croppie {
 		max: number;
 		enforceMinimumCoverage: boolean;
 	};
-	private effectiveMinZoom = DEFAULT_MIN_ZOOM;
+	/**
+	 * The lowest zoom the user may reach: resolved per image on bind (see `resolveMinZoom`);
+	 * before that, the configured or default minimum, capped at `zoom.max`.
+	 */
+	private effectiveMinZoom: number;
 
 	// Event handlers
 	private eventHandlers: Map<
@@ -146,6 +150,12 @@ export class Croppie {
 			max: options.zoom?.max ?? DEFAULT_MAX_ZOOM,
 			enforceMinimumCoverage: options.zoom?.enforceMinimumCoverage !== false,
 		};
+		// A lone zoom.max below the default minimum is valid (the minimum is per image and
+		// capped at max), so the placeholder until the first bind is capped at max too
+		this.effectiveMinZoom = Math.min(
+			this.zoomConfig.min ?? DEFAULT_MIN_ZOOM,
+			this.zoomConfig.max,
+		);
 
 		// Deprecation warning for v2.6 migration
 		if (options.enableOrientation !== undefined) {
@@ -181,7 +191,7 @@ export class Croppie {
 		if (this.options.enableZoom && this.options.showZoomer) {
 			const sliderWrap = createSliderContainer();
 			this.sliderEl = createZoomSlider(
-				this.zoomConfig.min ?? DEFAULT_MIN_ZOOM,
+				this.effectiveMinZoom,
 				this.zoomConfig.max,
 				this.transform.scale,
 			);

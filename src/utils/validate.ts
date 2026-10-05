@@ -1,5 +1,5 @@
 import type { CroppieOptions } from "../types.js";
-import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from "./limits.js";
+import { DEFAULT_MAX_ZOOM } from "./limits.js";
 
 const PREFIX = "[@bayinformatics/croppie]";
 
@@ -16,9 +16,11 @@ function assertPositiveFinite(name: string, value: unknown): void {
  *
  * Throws a `RangeError` for values that would silently produce NaN/Infinity maths or an
  * unusable slider: a viewport or boundary dimension that is not a positive finite number,
- * a `zoom.min` / `zoom.max` that is not, or `zoom.min > zoom.max` (a lone `min` is
- * compared with the default max, a lone `max` with the default min). A boundary smaller
- * than the viewport only logs a warning, since the viewport is then clipped but nothing breaks.
+ * a `zoom.min` / `zoom.max` that is not, or a configured `zoom.min` greater than `zoom.max`
+ * (a lone `min` is compared with the default max). A lone `max` only has to be positive
+ * and finite: an unset `min` is per image, and the resolved minimum is capped at `max`. A
+ * boundary smaller than the viewport only logs a warning, since the viewport is then clipped
+ * but nothing breaks.
  *
  * @param options - The constructor options to check
  * @throws RangeError for invalid dimensions or zoom limits
@@ -41,9 +43,10 @@ export function validateOptions(options: CroppieOptions): void {
 		assertPositiveFinite("zoom.max", zoom.max);
 	}
 
-	const min = zoom?.min ?? DEFAULT_MIN_ZOOM;
+	// An unset min is per image and capped at max, so only a configured min is compared
+	const min = zoom?.min;
 	const max = zoom?.max ?? DEFAULT_MAX_ZOOM;
-	if (min > max) {
+	if (min !== undefined && min > max) {
 		throw new RangeError(
 			`${PREFIX} zoom.min (${min}) must not be greater than zoom.max (${max})`,
 		);
