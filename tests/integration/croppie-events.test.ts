@@ -6,7 +6,10 @@ import {
 	installImageMock,
 	simulateDrag,
 } from "../fixtures/mock-helpers.ts";
-import { TINY_PNG } from "../fixtures/test-image-data-url.ts";
+import {
+	fixtureDimensions,
+	TINY_PNG,
+} from "../fixtures/test-image-data-url.ts";
 
 describe("Croppie events", () => {
 	let container: HTMLDivElement;
@@ -14,7 +17,7 @@ describe("Croppie events", () => {
 	let cleanupImageMock: () => void;
 
 	beforeEach(() => {
-		cleanupImageMock = installImageMock({ width: 400, height: 300 });
+		cleanupImageMock = installImageMock(fixtureDimensions);
 		container = document.createElement("div");
 		document.body.appendChild(container);
 	});
@@ -24,6 +27,15 @@ describe("Croppie events", () => {
 		container.remove();
 		cleanupImageMock();
 	});
+
+	/**
+	 * Replaces the file-level image mock (fixtures at their own size: TINY_PNG is 1x1) with
+	 * one whose images are 400x300, for the current test. The file-level afterEach removes it.
+	 */
+	function use400x300Image(): void {
+		cleanupImageMock();
+		cleanupImageMock = installImageMock({ width: 400, height: 300 });
+	}
 
 	describe("on() method", () => {
 		it("registers event handler", async () => {
@@ -162,6 +174,9 @@ describe("Croppie events", () => {
 		});
 
 		it("fires on drag", async () => {
+			// A drag the bounds absorb emits nothing, and a 1x1 image at the maximum zoom of 10
+			// is smaller than the viewport, so it cannot move
+			use400x300Image();
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
 			});
@@ -273,6 +288,8 @@ describe("Croppie events", () => {
 	});
 
 	describe("event contract", () => {
+		beforeEach(use400x300Image);
+
 		// 400x300 image in a 100x100 viewport: coverage zoom is 1/3
 		async function bindAt(zoom?: number): Promise<void> {
 			croppie = new Croppie(container, {
@@ -436,6 +453,8 @@ describe("Croppie events", () => {
 	});
 
 	describe("drag updates", () => {
+		beforeEach(use400x300Image);
+
 		// 400x300 image at its coverage zoom (1/3) in a 100x100 viewport: the image is
 		// 133.3 x 100, so the pan range is x in [-16.7, 16.7] and y is locked to 0
 		async function bindCovered(): Promise<HTMLElement> {
