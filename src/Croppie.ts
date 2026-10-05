@@ -66,7 +66,7 @@ export class Croppie {
 	private readonly options: Required<
 		Pick<
 			CroppieOptions,
-			"viewport" | "boundary" | "showZoomer" | "mouseWheelZoom"
+			"viewport" | "boundary" | "showZoomer" | "mouseWheelZoom" | "enableZoom"
 		>
 	> &
 		CroppieOptions;
@@ -108,6 +108,7 @@ export class Croppie {
 			boundary: options.boundary ?? defaultBoundary,
 			showZoomer: options.showZoomer ?? true,
 			mouseWheelZoom: options.mouseWheelZoom ?? true,
+			enableZoom: options.enableZoom ?? true,
 		};
 
 		this.zoomConfig = {
@@ -146,7 +147,7 @@ export class Croppie {
 		this.container.appendChild(this.boundaryEl);
 
 		// Add zoom slider if enabled
-		if (this.options.showZoomer) {
+		if (this.options.enableZoom && this.options.showZoomer) {
 			const sliderWrap = createSliderContainer();
 			this.sliderEl = createZoomSlider(
 				this.zoomConfig.min,
@@ -198,7 +199,7 @@ export class Croppie {
 		this.cleanupFns.push(dragCleanup);
 
 		// Wheel zoom handler
-		if (this.options.mouseWheelZoom) {
+		if (this.options.enableZoom && this.options.mouseWheelZoom) {
 			const requireCtrl = this.options.mouseWheelZoom === "ctrl";
 			const wheelCleanup = createWheelZoomHandler(
 				this.boundaryEl,
@@ -210,12 +211,14 @@ export class Croppie {
 		}
 
 		// Pinch zoom handler
-		const pinchCleanup = createPinchZoomHandler(
-			this.boundaryEl,
-			() => this.transform.scale,
-			(zoom, anchor) => this.applyZoom(zoom, anchor),
-		);
-		this.cleanupFns.push(pinchCleanup);
+		if (this.options.enableZoom) {
+			const pinchCleanup = createPinchZoomHandler(
+				this.boundaryEl,
+				() => this.transform.scale,
+				(zoom, anchor) => this.applyZoom(zoom, anchor),
+			);
+			this.cleanupFns.push(pinchCleanup);
+		}
 	}
 
 	/**

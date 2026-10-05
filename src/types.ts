@@ -67,6 +67,13 @@ export interface CroppieOptions {
 	showZoomer?: boolean;
 	/** Enable mouse wheel zoom */
 	mouseWheelZoom?: boolean | "ctrl";
+	/**
+	 * Let the user zoom: the slider, the mouse wheel and pinch. When `false` none of them
+	 * is attached (the slider is not rendered even if `showZoomer` is true), but
+	 * `setZoom()` and the `zoom` property keep working.
+	 * @default true
+	 */
+	enableZoom?: boolean;
 	/** Enable EXIF orientation correction */
 	enableExif?: boolean;
 	/**
