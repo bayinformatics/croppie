@@ -216,37 +216,38 @@ describe("Croppie bind and zoom inputs", () => {
 	});
 
 	describe("bind({ points })", () => {
-		it("rejects a malformed points array before replacing the image, transform or slider", async () => {
+		it("ignores a malformed points array with one warning and binds the new image with its default framing", async () => {
 			const { croppie, root } = mount();
 			await croppie.bind(PHOTO);
 			croppie.setZoom(2);
-			const before = observe({ croppie, root });
 			const onUpdate = mock();
 			croppie.on("update", onUpdate);
 
-			await expect(
-				croppie.bind({
-					url: OTHER,
-					points: [0, 0, 10] as unknown as PointsArray,
-				}),
-			).rejects.toThrow("PointsArray must have exactly 4 elements");
+			await croppie.bind({
+				url: OTHER,
+				points: [0, 0, 10] as unknown as PointsArray,
+			});
+			const ignored = observe({ croppie, root });
+			// The same image bound without points
+			await croppie.bind(OTHER);
 
-			expect(preview(root).src).toBe(PHOTO);
-			expect(observe({ croppie, root })).toEqual(before);
-			expect(onUpdate).not.toHaveBeenCalled();
+			expect(warn).toHaveBeenCalledTimes(1);
+			expect(preview(root).src).toBe(OTHER);
+			expect(ignored).toEqual(observe({ croppie, root }));
+			// One update per bind, nothing half-applied in between
+			expect(onUpdate).toHaveBeenCalledTimes(2);
 		});
 
-		it("does not let a malformed points array cancel a bind that is still loading", async () => {
+		it("treats a bind with malformed points as the last bind: it supersedes one still loading", async () => {
 			const { croppie, root } = mount();
 
-			const good = croppie.bind({ url: SLOW, zoom: 2 });
-			await expect(
-				croppie.bind({ url: PHOTO, points: [] as unknown as PointsArray }),
-			).rejects.toThrow("PointsArray must have exactly 4 elements");
-			await good;
+			const slow = croppie.bind({ url: SLOW, zoom: 2 });
+			await croppie.bind({ url: PHOTO, points: [] as unknown as PointsArray });
+			await slow;
 
-			expect(preview(root).src).toBe(SLOW);
-			expect(croppie.zoom).toBe(2);
+			expect(warn).toHaveBeenCalledTimes(1);
+			expect(preview(root).src).toBe(PHOTO);
+			expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
 		});
 
 		it("binds v2-style string points (as v2's get() returned them) like numbers", async () => {
