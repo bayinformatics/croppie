@@ -56,6 +56,18 @@ import {
 } from "./utils/index.js";
 
 /**
+ * `normalizePoints()` for `bind()`: an array without exactly 4 entries gives `undefined`, so
+ * `bind()` warns about it and ignores it like any other malformed points, instead of throwing.
+ */
+function readPoints(points: BindOptions["points"]): CropPoints | undefined {
+	try {
+		return normalizePoints(points);
+	} catch {
+		return undefined;
+	}
+}
+
+/**
  * Modern, TypeScript-first image cropper.
  *
  * @example
@@ -255,9 +267,11 @@ export class Croppie {
 	/**
 	 * Loads an image into the cropper.
 	 *
-	 * A `rotation` that is not a multiple of 90 or a `points` array without exactly 4
-	 * entries rejects before anything changes, so it neither half-applies the new image nor
-	 * cancels a bind that is still loading.
+	 * A `rotation` that is not a multiple of 90 rejects before anything changes, so it
+	 * neither half-applies the new image nor cancels a bind that is still loading.
+	 * Malformed `points` (an array without exactly 4 entries, a coordinate that is not a
+	 * number, a rect without width or height) are ignored with a console warning, and the
+	 * image gets its default framing.
 	 */
 	async bind(options: BindOptions | string): Promise<void> {
 		this.assertNotDestroyed("bind");
@@ -265,12 +279,13 @@ export class Croppie {
 		const bindOptions: BindOptions =
 			typeof options === "string" ? { url: options } : options;
 
-		// Validate before claiming a generation, so a bad call cannot supersede a good bind
-		// or leave a half-applied image behind
+		// Validate and read before claiming a generation. An invalid rotation rejects, so a bad
+		// call cannot supersede a good bind or leave a half-applied image behind. Reading the
+		// points cannot throw: an array without exactly 4 entries is malformed like a NaN
+		// coordinate, and is ignored with the same warning in load(); the bind itself goes on,
+		// and like any bind it supersedes an older one
 		const rotation = this.resolveBindRotation(bindOptions);
-		const points = bindOptions.points
-			? normalizePoints(bindOptions.points)
-			: undefined;
+		const points = readPoints(bindOptions.points);
 
 		await this.load(bindOptions, ++this.bindGeneration, rotation, points);
 	}
@@ -300,10 +315,10 @@ export class Croppie {
 
 	/**
 	 * Loads and applies an image for a bind that claimed `generation`, with the `rotation` and
-	 * the (natural-frame) `points` that `bind()` resolved from `bindOptions` before claiming it.
-	 * If the instance was destroyed or a newer bind started meanwhile, resolves without
-	 * applying or emitting anything, and without surfacing a load error nobody is waiting for
-	 * any more.
+	 * the (natural-frame) `points` that `bind()` resolved from `bindOptions` before claiming it
+	 * (`points` is `undefined` when malformed). If the instance was destroyed or a newer bind
+	 * started meanwhile, resolves without applying or emitting anything, and without surfacing
+	 * a load error nobody is waiting for any more.
 	 */
 	private async load(
 		bindOptions: BindOptions,
@@ -334,9 +349,10 @@ export class Croppie {
 		if (file) this.objectUrl = bindOptions.url;
 
 		if (this.previewEl) {
-			// Show the image we crop from. In the loader's CORS mode the browser reuses the image
-			// it already loaded; in any other mode it requests the URL again, which costs a second
-			// download and can return different pixels (e.g. a URL that serves a random image)
+			// Show the image we crop from. In the loader's CORS mode the browser can reuse the image
+			// it already loaded (when the response is cacheable); in any other mode it requests the
+			// URL again, which can cost a second download and return different pixels (e.g. a URL
+			// that serves a random image)
 			this.previewEl.crossOrigin = this.image.crossOrigin;
 			this.previewEl.src = this.image.src;
 		}
@@ -382,27 +398,29 @@ export class Croppie {
 
 		// Apply initial points if provided. They are in the natural frame; the transform
 		// works in the displayed (rotated) frame, so map the rectangle across first.
-		if (points) {
+		if (bindOptions.points) {
 			const [displayedWidth, displayedHeight] = this.displayedSize(rotation);
-			const pointsTransform = calculateTransformFromPoints(
-				naturalRectToRotated(
-					points,
-					this.image.naturalWidth,
-					this.image.naturalHeight,
-					rotation,
-				),
-				displayedWidth,
-				displayedHeight,
-				this.options.viewport.width,
-				this.options.viewport.height,
-				{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
-			);
+			const pointsTransform = points
+				? calculateTransformFromPoints(
+						naturalRectToRotated(
+							points,
+							this.image.naturalWidth,
+							this.image.naturalHeight,
+							rotation,
+						),
+						displayedWidth,
+						displayedHeight,
+						this.options.viewport.width,
+						this.options.viewport.height,
+						{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
+					)
+				: undefined;
 			if (pointsTransform) {
 				this.transform = { ...pointsTransform, rotation };
 			} else {
 				console.warn(
 					"[@bayinformatics/croppie] Ignoring invalid initial points:",
-					points,
+					bindOptions.points,
 				);
 			}
 		}
