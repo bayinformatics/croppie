@@ -101,6 +101,11 @@ export class Croppie {
 	// Cleanup functions
 	private cleanupFns: Array<() => void> = [];
 
+	// Lifecycle: `destroyed` guards every public method; `bindGeneration` makes the last
+	// bind win (an older bind that finishes loading later sees a newer generation and stops)
+	private destroyed = false;
+	private bindGeneration = 0;
+
 	constructor(element: HTMLElement, options: CroppieOptions) {
 		validateOptions(options);
 		this.element = element;
@@ -234,10 +239,31 @@ export class Croppie {
 	 * Loads an image into the cropper
 	 */
 	async bind(options: BindOptions | string): Promise<void> {
+		this.assertNotDestroyed("bind");
+
 		const bindOptions: BindOptions =
 			typeof options === "string" ? { url: options } : options;
 
-		const image = await loadImage(bindOptions.url);
+		await this.load(bindOptions, ++this.bindGeneration);
+	}
+
+	/**
+	 * Loads and applies an image for a bind that claimed `generation`. If the instance was
+	 * destroyed or a newer bind started meanwhile, resolves without applying or emitting
+	 * anything, and without surfacing a load error nobody is waiting for any more.
+	 */
+	private async load(
+		bindOptions: BindOptions,
+		generation: number,
+	): Promise<void> {
+		let image: HTMLImageElement;
+		try {
+			image = await loadImage(bindOptions.url);
+		} catch (error) {
+			if (this.isStaleBind(generation)) return;
+			throw error;
+		}
+		if (this.isStaleBind(generation)) return;
 
 		// A 0x0 image (e.g. an SVG without a size) would make every zoom calculation Infinity
 		if (!(image.naturalWidth > 0 && image.naturalHeight > 0)) {
@@ -298,8 +324,22 @@ export class Croppie {
 	 * Binds a File or Blob to the cropper
 	 */
 	async bindFile(file: File | Blob): Promise<void> {
-		const dataUrl = await fileToDataUrl(file);
-		await this.bind({ url: dataUrl });
+		this.assertNotDestroyed("bindFile");
+
+		// Claim the generation before reading, so a bind() started while the file is
+		// still being read supersedes this one
+		const generation = ++this.bindGeneration;
+
+		let dataUrl: string;
+		try {
+			dataUrl = await fileToDataUrl(file);
+		} catch (error) {
+			if (this.isStaleBind(generation)) return;
+			throw error;
+		}
+		if (this.isStaleBind(generation)) return;
+
+		await this.load({ url: dataUrl }, generation);
 	}
 
 	/**
@@ -308,6 +348,8 @@ export class Croppie {
 	async result(
 		options: ResultOptions,
 	): Promise<Blob | string | HTMLCanvasElement> {
+		this.assertNotDestroyed("result");
+
 		if (!this.image) {
 			throw new Error("No image bound");
 		}
@@ -403,7 +445,7 @@ export class Croppie {
 		requested: number,
 		anchor: ZoomAnchor = CENTER_ANCHOR,
 	): void {
-		if (!Number.isFinite(requested)) return;
+		if (this.destroyed || !Number.isFinite(requested)) return;
 
 		const previousZoom = this.transform.scale;
 		const zoom = clamp(requested, this.effectiveMinZoom, this.zoomConfig.max);
@@ -435,6 +477,8 @@ export class Croppie {
 	 * Resets the cropper to initial state
 	 */
 	reset(): void {
+		if (this.destroyed) return;
+
 		if (this.image) {
 			const previousZoom = this.transform.scale;
 			const coverageZoom = this.updateZoomLimits(this.image);
@@ -465,6 +509,11 @@ export class Croppie {
 	 * Destroys the cropper and cleans up
 	 */
 	destroy(): void {
+		if (this.destroyed) return;
+		this.destroyed = true;
+		// Invalidate any bind that is still loading
+		this.bindGeneration++;
+
 		// Run all cleanup functions
 		for (const cleanup of this.cleanupFns) {
 			cleanup();
@@ -513,6 +562,24 @@ export class Croppie {
 		this.eventHandlers
 			.get(event)
 			?.delete(handler as CroppieEventHandler<keyof CroppieEvents>);
+	}
+
+	/**
+	 * Throws if the instance was destroyed, naming the method that was called
+	 */
+	private assertNotDestroyed(method: string): void {
+		if (this.destroyed) {
+			throw new Error(
+				`[@bayinformatics/croppie] ${method}() called on a destroyed instance`,
+			);
+		}
+	}
+
+	/**
+	 * Whether a bind that claimed `generation` was destroyed or superseded in the meantime
+	 */
+	private isStaleBind(generation: number): boolean {
+		return this.destroyed || generation !== this.bindGeneration;
 	}
 
 	/**
