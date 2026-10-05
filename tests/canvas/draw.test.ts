@@ -483,7 +483,7 @@ describe("canvas draw", () => {
 		});
 
 		it("clips and fills in canvas coordinates, before the rotation", () => {
-			drawCroppedImage(image, frame, 100, 50, {
+			drawCroppedImage(image, tall, 100, 50, {
 				rotation: 90,
 				circle: true,
 				backgroundColor: "#fff",
@@ -493,7 +493,7 @@ describe("canvas draw", () => {
 			expect(ctx.ellipse).toHaveBeenCalledWith(
 				50,
 				25,
-				25,
+				50,
 				25,
 				0,
 				0,
@@ -608,6 +608,38 @@ describe("canvas draw", () => {
 			const ctx = lastContext();
 			expect(ctx.fillRect).toHaveBeenCalledWith(0, 0, 100, 50);
 			expect(firstCall(ctx.fillRect)).toBeLessThan(firstCall(ctx.drawImage));
+		});
+
+		it("letterboxes in the box turned back by the rotation", () => {
+			// A 50x25 frame shown at 90 is 25 wide and 50 tall: centred in the 100x50 output
+			drawCroppedImage(image, { ...square, bottomRightY: 45 }, 100, 50, {
+				rotation: 90,
+				circle: true,
+			});
+
+			const ctx = lastContext();
+			// In the 50x100 box centred on the origin, the 50x25 frame is centred vertically
+			expect(ctx.drawImage).toHaveBeenCalledWith(
+				image,
+				10,
+				20,
+				50,
+				25,
+				-25,
+				-12.5,
+				50,
+				25,
+			);
+			// The mask is the turned frame, in canvas coordinates
+			expect(ctx.ellipse).toHaveBeenCalledWith(
+				50,
+				25,
+				12.5,
+				25,
+				0,
+				0,
+				Math.PI * 2,
+			);
 		});
 
 		it("centres a frame that extends past the image too", () => {
