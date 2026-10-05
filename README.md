@@ -100,11 +100,13 @@ new Croppie(element: HTMLElement, options: CroppieOptions)
 | `showZoomer` | `boolean` | `true` | Show zoom slider |
 | `mouseWheelZoom` | `boolean \| 'ctrl'` | `true` | Enable scroll zoom (optionally require Ctrl key) |
 | `enableZoom` | `boolean` | `true` | Let the user zoom with the slider, wheel and pinch. `false` removes all three (the slider is not rendered even with `showZoomer`); `setZoom()` and `zoom =` still work |
-| `zoom` | `{ min, max, enforceMinimumCoverage? }` | `{ min: 0.1, max: 10 }` | Zoom limits and coverage enforcement |
+| `zoom` | `{ min?, max?, enforceMinimumCoverage? }` | `{ max: 10 }`, `min` per image | Zoom limits and coverage enforcement. When `min` is not set, the minimum is the zoom at which the image just covers the viewport, so a large photo can zoom out further than 0.1; with `enforceMinimumCoverage: false` it is `min(0.1, the zoom at which the whole image fits)`. A configured `min` is a floor. The effective minimum never exceeds `max` |
 | `customClass` | `string` | — | Extra class for the container |
 | `enableExif` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
 | `enableResize` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
 | `enableOrientation` | `boolean` | `false` | Deprecated v2 option (no-op) |
+
+Invalid options throw a `RangeError` from the constructor: a viewport or boundary dimension, `zoom.min` or `zoom.max` that is not a positive finite number, or `zoom.min` greater than `zoom.max`. A boundary smaller than the viewport only logs a warning.
 
 > **Known limitations:** `enableExif` and `rotate()` are not implemented yet ([#21](https://github.com/bayinformatics/croppie/issues/21), [#20](https://github.com/bayinformatics/croppie/issues/20)).
 
@@ -128,6 +130,8 @@ await cropper.bind({
 
 `points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`.
 
+`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). If you call `bind()` again before the previous image has loaded, the last call wins and the earlier one resolves without applying anything. A `bind()` that is still loading when you call `destroy()` also resolves silently. `bind()` emits one `update` when it completes.
+
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
 through `get()` while the derived zoom stays within `zoom.min`/`zoom.max`;
@@ -146,9 +150,16 @@ input.addEventListener('change', async (e) => {
 })
 ```
 
-#### `result(options: ResultOptions): Promise<Blob | string | HTMLCanvasElement>`
+#### `result(options: ResultOptions)`
 
-Get the cropped result.
+Get the cropped result. The return type follows `options.type`:
+
+```typescript
+result(options: ResultOptions & { type: 'blob' }): Promise<Blob>
+result(options: ResultOptions & { type: 'base64' }): Promise<string>
+result(options: ResultOptions & { type: 'canvas' }): Promise<HTMLCanvasElement>
+result(options: ResultOptions): Promise<Blob | string | HTMLCanvasElement>  // type only known at runtime
+```
 
 ```typescript
 // Get as Blob (for uploading)
@@ -193,14 +204,14 @@ Present for v2 compatibility but **not implemented**: it logs a warning and does
 
 #### `destroy(): void`
 
-Clean up and remove the cropper.
+Clean up and remove the cropper. It is safe to call more than once. Afterwards `bind()`, `bindFile()` and `result()` reject with a `... called on a destroyed instance` error, and `setZoom()`, `zoom =` and `reset()` do nothing.
 
 ### Result Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `type` | `'blob' \| 'base64' \| 'canvas'` | Required | Output type |
-| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size |
+| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution, rounded to whole pixels |
 | `format` | `'png' \| 'jpeg' \| 'webp'` | `'png'` | Output format for blob/base64 |
 | `quality` | `number` | `0.92` | JPEG/WebP quality (0-1) |
 | `circle` | `boolean` | `viewport.type === 'circle'` | Apply circular mask |
@@ -228,6 +239,12 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 | `reset()` | always | only when the zoom changed |
 
 Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport centre (slider, `setZoom()`) fixed. One mouse-wheel notch (100px) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan.
+
+### Zoom and accessibility
+
+- The zoom slider has the accessible name "Zoom" and announces its value as a percentage (`aria-valuetext`, for example "150%"). Keyboard focus shows a visible ring in every browser.
+- If the image is zoomed out so far that it no longer covers the viewport (`enforceMinimumCoverage: false`), `result()` keeps the image's proportions: the image is drawn at its true scale, and the rest of the output is transparent or `backgroundColor`. `get().points` stays clamped to the image.
+- A `'circle'` viewport that is not square is an ellipse, in the overlay and in the output mask.
 
 ## Theming
 

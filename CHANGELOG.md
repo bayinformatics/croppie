@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
 - `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?) scripts.
 - `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work.
+- `result()` is typed by its output type: `"blob"` returns `Promise<Blob>`, `"base64"` `Promise<string>`, `"canvas"` `Promise<HTMLCanvasElement>` (a generic overload remains for runtime-only types).
+- The zoom slider has `aria-label="Zoom"` and a percentage `aria-valuetext`, and a visible keyboard focus ring in Firefox as well as WebKit browsers.
 
 ### Changed
 
@@ -28,6 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Mouse wheel zoom is multiplicative: ×1.1 per 100px notch, scaled by `deltaY` and `deltaMode` and capped at one notch per event (it was a fixed ±0.1 step).
 - Event contract: `bind()` now emits one `update`; `setZoom()` and `zoom =` emit `zoom`; `reset()` emits `zoom` when the zoom changed; `zoom` and `update` are emitted only when the clamped value actually changed; `update` fires before `zoom`. A drag that the bounds fully absorb no longer emits `update`. See the Events table in the README.
 - A second touch ends an active drag, so a pinch takes over instead of also panning.
+- The default `zoom.min` is now per image when it is not configured: the zoom at which the image covers the viewport, so a large photo (coverage below 0.1) can zoom out to fit instead of stopping at 0.1. Users who set `zoom.min` see no change. The effective minimum is capped at `zoom.max`, so a small image no longer produces an inverted slider.
+- `result({ size: 'original' })` returns the viewport area at integer image resolution, and with `enforceMinimumCoverage: false` the letterboxed frame; all output sizes keep the image's proportions instead of stretching it over the output.
+- `result()` renders with high-quality image smoothing, and a `'circle'` viewport that is not square is clipped to an ellipse (output and overlay).
 
 ### Fixed
 
@@ -35,6 +40,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.
 - `setZoom(NaN)` (or any non-finite value) is ignored instead of corrupting the transform, and every zoom input goes through one code path with one clamp.
+- A 0×0 image (for example an SVG without a size) is rejected by `bind()` with a clear error instead of producing an `Infinity` zoom range.
+- Invalid options throw a `RangeError` from the constructor (non-positive or non-finite viewport, boundary or zoom limits, `zoom.min` greater than `zoom.max`).
+- `bind()`, `bindFile()` and `result()` on a destroyed instance reject with a clear error, `setZoom()`, `zoom =` and `reset()` do nothing, and `destroy()` is idempotent. Overlapping `bind()` calls resolve to the last one, and a bind that is still loading when the instance is destroyed no longer applies an image to a dead instance.
+- Error messages from failed image loads no longer embed the whole data URL.
 - Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, and pointer capture is guarded so dragging still works where it is missing or throws.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
 
