@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import type { PointsArray } from "../../src/types.ts";
 import {
 	calculateTransformFromPoints,
 	normalizePoints,
@@ -42,6 +43,38 @@ describe("normalizePoints", () => {
 			"PointsArray must have exactly 4 elements",
 		);
 	});
+});
+
+describe("normalizePoints with decimal string coordinates", () => {
+	// v2's get() returned toFixed() strings; anything else that is not a plain decimal number
+	// becomes NaN, which calculateTransformFromPoints rejects (bind() warns and ignores it)
+	const REJECTED = ["50px", "0x10", "0b1", "1,5", "", " ", "Infinity", "1e"];
+	const ACCEPTED: Array<[string, number]> = [
+		["12.50", 12.5],
+		["-3", -3],
+		[".5", 0.5],
+		["5.", 5],
+		["1e2", 100],
+		["0.0", 0],
+		[" 7 ", 7],
+	];
+
+	function topLeftX(value: string): number | undefined {
+		return normalizePoints([value, 0, 1, 1] as unknown as PointsArray)
+			?.topLeftX;
+	}
+
+	for (const value of REJECTED) {
+		test(`turns ${JSON.stringify(value)} into NaN`, () => {
+			expect(topLeftX(value)).toBeNaN();
+		});
+	}
+
+	for (const [value, expected] of ACCEPTED) {
+		test(`parses ${JSON.stringify(value)} as ${expected}`, () => {
+			expect(topLeftX(value)).toBe(expected);
+		});
+	}
 });
 
 describe("pointsToArray", () => {

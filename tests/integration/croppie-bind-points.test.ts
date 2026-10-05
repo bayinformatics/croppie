@@ -171,6 +171,20 @@ describe("Croppie bind({ points })", () => {
 			// The coverage zoom of a 10x10 image in a 100x100 viewport
 			expect(croppie.zoom).toBeCloseTo(10, 9);
 		});
+
+		for (const value of ["2px", "0x2"]) {
+			it(`warns about and ignores a coordinate string that is not a decimal number (${value})`, async () => {
+				croppie = createCroppie();
+
+				await croppie.bind({
+					url: SMALL_PNG,
+					points: [value, "3", "7", "8"] as unknown as PointsArray,
+				});
+
+				expect(warn).toHaveBeenCalledTimes(1);
+				expect(croppie.zoom).toBeCloseTo(10, 9);
+			});
+		}
 	});
 
 	describe("malformed points", () => {
