@@ -93,16 +93,18 @@ export function createOverlay(
  *
  * @param boundary - Dimensions of the bounding container used to center the cutout.
  * @param viewport - Viewport dimensions and type ("circle" for circular cutouts, otherwise rectangular).
- * @returns A CSS `mask-image` value: a `radial-gradient` for circular viewports or two overlapping `linear-gradient`s for rectangular viewports that together produce a transparent hole where the viewport is located.
+ * @returns A CSS `mask-image` value: an elliptical `radial-gradient` for circular viewports or two overlapping `linear-gradient`s for rectangular viewports that together produce a transparent hole where the viewport is located.
  */
 function createMaskImage(boundary: Boundary, viewport: Viewport): string {
 	const centerX = boundary.width / 2;
 	const centerY = boundary.height / 2;
 
 	if (viewport.type === "circle") {
-		const radius = viewport.width / 2;
-		// Create a radial gradient that's transparent in the center
-		return `radial-gradient(circle ${radius}px at ${centerX}px ${centerY}px, transparent ${radius}px, black ${radius}px)`;
+		// An ellipse matches the viewport's border-radius: 50% outline (a circle when square).
+		// Colour stops are measured along the horizontal radius.
+		const radiusX = viewport.width / 2;
+		const radiusY = viewport.height / 2;
+		return `radial-gradient(ellipse ${radiusX}px ${radiusY}px at ${centerX}px ${centerY}px, transparent ${radiusX}px, black ${radiusX}px)`;
 	}
 
 	// For square, use a more complex gradient

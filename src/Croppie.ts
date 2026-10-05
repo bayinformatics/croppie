@@ -354,7 +354,7 @@ export class Croppie {
 			throw new Error("No image bound");
 		}
 
-		const points = this.getPoints();
+		const frame = this.getViewportRect();
 		const viewport = this.options.viewport;
 
 		// Determine output size
@@ -365,8 +365,15 @@ export class Croppie {
 			outputWidth = viewport.width;
 			outputHeight = viewport.height;
 		} else if (options.size === "original") {
-			outputWidth = points.bottomRightX - points.topLeftX;
-			outputHeight = points.bottomRightY - points.topLeftY;
+			// The frame at image resolution, at a whole number of pixels
+			outputWidth = Math.max(
+				1,
+				Math.round(frame.bottomRightX - frame.topLeftX),
+			);
+			outputHeight = Math.max(
+				1,
+				Math.round(frame.bottomRightY - frame.topLeftY),
+			);
 		} else if (options.size) {
 			outputWidth = options.size.width;
 			outputHeight = options.size.height;
@@ -377,7 +384,7 @@ export class Croppie {
 
 		const canvas = drawCroppedImage(
 			this.image,
-			points,
+			frame,
 			outputWidth,
 			outputHeight,
 			{
@@ -662,9 +669,29 @@ export class Croppie {
 	}
 
 	/**
-	 * Calculates the crop points based on current transform
+	 * Calculates the crop points based on current transform, clamped to the image
 	 */
 	private getPoints(): CropPoints {
+		if (!this.image) {
+			return { topLeftX: 0, topLeftY: 0, bottomRightX: 0, bottomRightY: 0 };
+		}
+
+		const rect = this.getViewportRect();
+
+		return {
+			topLeftX: Math.max(0, rect.topLeftX),
+			topLeftY: Math.max(0, rect.topLeftY),
+			bottomRightX: Math.min(this.image.naturalWidth, rect.bottomRightX),
+			bottomRightY: Math.min(this.image.naturalHeight, rect.bottomRightY),
+		};
+	}
+
+	/**
+	 * The viewport rectangle in image pixels, NOT clamped to the image: it extends past the
+	 * image when the user zoomed out further than the image covers. `result()` renders this
+	 * frame so the output keeps the image's proportions.
+	 */
+	private getViewportRect(): CropPoints {
 		if (!this.image) {
 			return { topLeftX: 0, topLeftY: 0, bottomRightX: 0, bottomRightY: 0 };
 		}
@@ -690,12 +717,7 @@ export class Croppie {
 		const bottomRightX = topLeftX + viewport.width / this.transform.scale;
 		const bottomRightY = topLeftY + viewport.height / this.transform.scale;
 
-		return {
-			topLeftX: Math.max(0, topLeftX),
-			topLeftY: Math.max(0, topLeftY),
-			bottomRightX: Math.min(imageWidth, bottomRightX),
-			bottomRightY: Math.min(imageHeight, bottomRightY),
-		};
+		return { topLeftX, topLeftY, bottomRightX, bottomRightY };
 	}
 
 	/**

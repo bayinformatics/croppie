@@ -38,6 +38,15 @@ describe("canvas draw", () => {
 	beforeEach(() => {
 		setupCanvasMocks();
 		image = document.createElement("img");
+		// happy-dom reports 0x0; the frame is intersected with the natural size
+		Object.defineProperty(image, "naturalWidth", {
+			value: 400,
+			configurable: true,
+		});
+		Object.defineProperty(image, "naturalHeight", {
+			value: 300,
+			configurable: true,
+		});
 	});
 
 	afterEach(() => {
@@ -137,19 +146,7 @@ describe("canvas draw", () => {
 		});
 
 		describe("frames that extend past the image", () => {
-			// 400x300 image, 100x100 output
-			const IMAGE = { naturalWidth: 400, naturalHeight: 300 };
-
-			beforeEach(() => {
-				Object.defineProperty(image, "naturalWidth", {
-					value: IMAGE.naturalWidth,
-					configurable: true,
-				});
-				Object.defineProperty(image, "naturalHeight", {
-					value: IMAGE.naturalHeight,
-					configurable: true,
-				});
-			});
+			// The image is 400x300; the output is 100x100 unless a test says otherwise
 
 			it("draws a frame inside the image exactly like before", () => {
 				drawCroppedImage(
