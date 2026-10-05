@@ -138,8 +138,8 @@ export interface CroppieData {
 	points: CropPoints;
 	/** Current zoom level */
 	zoom: number;
-	/** Current clockwise rotation (always set by `get()`) */
-	rotation?: Rotation;
+	/** Current clockwise rotation */
+	rotation: Rotation;
 	/**
 	 * The EXIF Orientation tag (1-8) of the bound image when read via `enableExif`.
 	 * Informational: it is never derived from `rotation` and never changed by `rotate()`.
