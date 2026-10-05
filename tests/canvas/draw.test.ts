@@ -14,6 +14,7 @@ import {
 } from "../../src/canvas/draw.ts";
 import type { CropPoints } from "../../src/types.ts";
 import {
+	drawCalls,
 	getLastMockContext,
 	getMockContext,
 	type MockCanvasContext,
@@ -205,17 +206,9 @@ describe("canvas draw", () => {
 				expect(ctx.drawImage).toHaveBeenCalledTimes(1);
 				// 400x300 scaled by 100/1000 = 40x30, centred at (30, 35): never stretched.
 				// A 10x shrink is first halved to 50x38, which is drawn whole.
-				expect(ctx.drawImage).toHaveBeenCalledWith(
-					expect.objectContaining({ tagName: "CANVAS", width: 50, height: 38 }),
-					0,
-					0,
-					50,
-					38,
-					30,
-					35,
-					40,
-					30,
-				);
+				expect(drawCalls(ctx)).toEqual([
+					["CANVAS 50x38", 0, 0, 50, 38, 30, 35, 40, 30],
+				]);
 			});
 
 			it("offsets the destination when only one side overshoots", () => {
@@ -431,17 +424,9 @@ describe("canvas draw", () => {
 			// 4000x3000 -> 2000x1500 -> 1000x750 -> 500x375 -> 250x188 -> 125x94, then 100x75
 			const ctx = contextOf(canvas);
 			expect(ctx.drawImage).toHaveBeenCalledTimes(1);
-			expect(ctx.drawImage).toHaveBeenCalledWith(
-				expect.objectContaining({ tagName: "CANVAS", width: 125, height: 94 }),
-				0,
-				0,
-				125,
-				94,
-				0,
-				0,
-				100,
-				75,
-			);
+			expect(drawCalls(ctx)).toEqual([
+				["CANVAS 125x94", 0, 0, 125, 94, 0, 0, 100, 75],
+			]);
 		});
 
 		it("starts the first step from the crop rectangle, not the whole image", () => {
@@ -473,17 +458,9 @@ describe("canvas draw", () => {
 			const first = created[1];
 			if (!first) throw new Error("No step canvas was created");
 			expect([first.width, first.height]).toEqual([400, 300]);
-			expect(contextOf(first).drawImage).toHaveBeenCalledWith(
-				image,
-				1000,
-				500,
-				800,
-				600,
-				0,
-				0,
-				400,
-				300,
-			);
+			expect(drawCalls(contextOf(first))).toEqual([
+				["IMG", 1000, 500, 800, 600, 0, 0, 400, 300],
+			]);
 		});
 
 		it("smooths every step at high quality", () => {
@@ -538,17 +515,9 @@ describe("canvas draw", () => {
 
 			// The destination box is the output turned back (100x75), so the steps match the
 			// unrotated case and the last one is drawn into the rotated context
-			expect(contextOf(canvas).drawImage).toHaveBeenCalledWith(
-				expect.objectContaining({ tagName: "CANVAS", width: 125, height: 94 }),
-				0,
-				0,
-				125,
-				94,
-				-50,
-				-37.5,
-				100,
-				75,
-			);
+			expect(drawCalls(contextOf(canvas))).toEqual([
+				["CANVAS 125x94", 0, 0, 125, 94, -50, -37.5, 100, 75],
+			]);
 		});
 	});
 
@@ -689,17 +658,9 @@ describe("canvas draw", () => {
 
 			// Scale 0.1: the image is 40x30 in a 100x100 box centred on the origin, offset
 			// by the 30x35 of empty space before it. A 10x shrink is first halved to 50x38.
-			expect(contextOf(canvas).drawImage).toHaveBeenCalledWith(
-				expect.objectContaining({ tagName: "CANVAS", width: 50, height: 38 }),
-				0,
-				0,
-				50,
-				38,
-				-20,
-				-15,
-				40,
-				30,
-			);
+			expect(drawCalls(contextOf(canvas))).toEqual([
+				["CANVAS 50x38", 0, 0, 50, 38, -20, -15, 40, 30],
+			]);
 		});
 
 		it("skips drawImage for a frame that misses the image", () => {

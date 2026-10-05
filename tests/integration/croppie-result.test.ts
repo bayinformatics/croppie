@@ -9,7 +9,9 @@ import {
 import { Croppie } from "../../src/Croppie.ts";
 import type { ResultOptions } from "../../src/types.ts";
 import {
-	getLastMockContext,
+	drawCalls,
+	getMockContext,
+	type MockCanvasContext,
 	restoreCanvasMocks,
 	setupCanvasMocks,
 } from "../canvas/mocks.ts";
@@ -19,6 +21,13 @@ import {
 	SMALL_PNG,
 	TINY_PNG,
 } from "../fixtures/test-image-data-url.ts";
+
+/** The mock context of the canvas result() returned, not of a downscaling step. */
+function outputContext(canvas: HTMLCanvasElement): MockCanvasContext {
+	const ctx = getMockContext(canvas);
+	if (!ctx) throw new Error("result() drew nothing into its canvas");
+	return ctx;
+}
 
 describe("Croppie result", () => {
 	let container: HTMLDivElement;
@@ -324,20 +333,13 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind({ url: TINY_PNG, zoom: 0.1 });
 
-			await croppie.result({ type: "canvas" });
+			const canvas = await croppie.result({ type: "canvas" });
 
-			// The 400x300 image is drawn at 40x30 in the middle of the 100x100 output
-			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				0,
-				0,
-				400,
-				300,
-				30,
-				35,
-				40,
-				30,
-			);
+			// The 400x300 image is drawn at 40x30 in the middle of the 100x100 output,
+			// from the 50x38 step it was halved to first
+			expect(drawCalls(outputContext(canvas))).toEqual([
+				["CANVAS 50x38", 0, 0, 50, 38, 30, 35, 40, 30],
+			]);
 		});
 
 		it("returns an integer-sized canvas for size 'original'", async () => {
@@ -366,22 +368,15 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind({ url: TINY_PNG, zoom: 0.1 });
 
-			await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				size: { width: 200, height: 200 },
 			});
 
-			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				0,
-				0,
-				400,
-				300,
-				60,
-				70,
-				80,
-				60,
-			);
+			// 80x60 in the middle of 200x200, from the 100x75 step it was halved to first
+			expect(drawCalls(outputContext(canvas))).toEqual([
+				["CANVAS 100x75", 0, 0, 100, 75, 60, 70, 80, 60],
+			]);
 		});
 	});
 

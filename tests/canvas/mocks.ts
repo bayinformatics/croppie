@@ -137,6 +137,24 @@ export function restoreCanvasMocks(): void {
 }
 
 /**
+ * The drawImage calls a mock context received, with each source reduced to a label: `"IMG"`,
+ * or `"CANVAS <width>x<height>"` for a canvas. Assert on these rather than on the call
+ * itself: a failed match then prints a few numbers instead of a happy-dom element and its
+ * whole document, which once ran a CI job's log to 2.9 GB.
+ */
+export function drawCalls(
+	ctx: MockCanvasContext,
+): Array<Array<string | number>> {
+	return ctx.drawImage.mock.calls.map(([source, ...args]) => {
+		const label =
+			source instanceof HTMLCanvasElement
+				? `CANVAS ${source.width}x${source.height}`
+				: String((source as Element).tagName);
+		return [label, ...(args as number[])];
+	});
+}
+
+/**
  * The mock 2D context of a specific canvas, for code that draws through several canvases.
  *
  * @returns The context, or `undefined` if `getContext("2d")` was never called on `canvas`
