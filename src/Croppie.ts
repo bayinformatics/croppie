@@ -343,8 +343,15 @@ export class Croppie {
 	}
 
 	/**
-	 * Gets the current cropped result
+	 * Gets the current cropped result. The return type follows `options.type`:
+	 * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
 	 */
+	result(options: ResultOptions & { type: "blob" }): Promise<Blob>;
+	result(options: ResultOptions & { type: "base64" }): Promise<string>;
+	result(
+		options: ResultOptions & { type: "canvas" },
+	): Promise<HTMLCanvasElement>;
+	result(options: ResultOptions): Promise<Blob | string | HTMLCanvasElement>;
 	async result(
 		options: ResultOptions,
 	): Promise<Blob | string | HTMLCanvasElement> {
