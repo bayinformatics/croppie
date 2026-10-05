@@ -2,18 +2,27 @@
  * Mock helpers for Croppie tests
  */
 
+export interface Dimensions {
+	width: number;
+	height: number;
+}
+
+/** Fixed dimensions for every image, or a resolver that maps a src to its dimensions. */
+export type ImageDimensions =
+	| Dimensions
+	| ((src: string) => Dimensions | undefined);
+
 /**
  * Install a mock Image constructor that automatically fires onload when src is set.
  * This works around happy-dom's limitation where Image.onload doesn't fire for data URLs.
  *
  * @param dimensions - Optional natural image dimensions to expose once loaded
- *   (happy-dom reports naturalWidth/naturalHeight as 0 by default)
+ *   (happy-dom reports naturalWidth/naturalHeight as 0 by default). Pass a
+ *   function to resolve dimensions per src, e.g. `fixtureDimensions`; a src it
+ *   returns `undefined` for keeps the 0x0 default.
  * @returns A cleanup function that restores the original Image constructor
  */
-export function installImageMock(dimensions?: {
-	width: number;
-	height: number;
-}): () => void {
+export function installImageMock(dimensions?: ImageDimensions): () => void {
 	const OriginalImage = globalThis.Image;
 
 	class MockImage extends OriginalImage {
@@ -31,15 +40,17 @@ export function installImageMock(dimensions?: {
 			setTimeout(() => {
 				if (value.startsWith("data:") || value.startsWith("http")) {
 					// Simulate successful load for data URLs and http URLs
-					if (dimensions) {
+					const resolved =
+						typeof dimensions === "function" ? dimensions(value) : dimensions;
+					if (resolved) {
 						// happy-dom exposes naturalWidth/naturalHeight as readonly
 						// accessors; plain assignment throws, so define own properties
 						Object.defineProperty(this, "naturalWidth", {
-							value: dimensions.width,
+							value: resolved.width,
 							configurable: true,
 						});
 						Object.defineProperty(this, "naturalHeight", {
-							value: dimensions.height,
+							value: resolved.height,
 							configurable: true,
 						});
 					}
