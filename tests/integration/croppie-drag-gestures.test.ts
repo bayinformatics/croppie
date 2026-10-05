@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
 import {
 	createPointerEvent,
+	createTouchEvent,
 	createWheelEvent,
 	installImageMock,
 	type MockRect,
@@ -119,6 +120,52 @@ describe("Croppie drag gestures", () => {
 				createWheelEvent(-100, { clientX: 70, clientY: 75 }),
 			);
 			expect(imageXUnder(70)).toBeCloseTo(grabbed, 6);
+		});
+	});
+
+	describe("touch", () => {
+		const touchPointer = (
+			type: string,
+			pointerId: number,
+			isPrimary: boolean,
+			clientX: number,
+			clientY: number,
+		) =>
+			createPointerEvent(type, {
+				pointerType: "touch",
+				pointerId,
+				isPrimary,
+				clientX,
+				clientY,
+			});
+
+		it("pans with one finger while a thumb rests elsewhere on the page, without zooming", () => {
+			mockElementRect(boundary, { left: 0, top: 0, width: 300, height: 300 });
+			const elsewhere = document.createElement("div");
+			document.body.appendChild(elsewhere);
+			const panned: number[] = [];
+			croppie.on("update", (data) => panned.push(data.points.topLeftX));
+			const zoomHandler = mock();
+			croppie.on("zoom", zoomHandler);
+			const thumb = { clientX: 150, clientY: 700, target: elsewhere };
+
+			// The thumb goes down on the page outside the cropper
+			elsewhere.dispatchEvent(touchPointer("pointerdown", 1, true, 150, 700));
+			elsewhere.dispatchEvent(createTouchEvent("touchstart", [thumb]));
+			// A finger on the cropper (not primary: the thumb went down first) moves 30px right
+			boundary.dispatchEvent(touchPointer("pointerdown", 2, false, 150, 150));
+			boundary.dispatchEvent(
+				createTouchEvent("touchstart", [thumb, { clientX: 150, clientY: 150 }]),
+			);
+			boundary.dispatchEvent(touchPointer("pointermove", 2, false, 180, 150));
+			boundary.dispatchEvent(
+				createTouchEvent("touchmove", [thumb, { clientX: 180, clientY: 150 }]),
+			);
+			elsewhere.remove();
+
+			// The viewport now shows image x 120..220
+			expect(panned).toEqual([120]);
+			expect(zoomHandler).not.toHaveBeenCalled();
 		});
 	});
 });

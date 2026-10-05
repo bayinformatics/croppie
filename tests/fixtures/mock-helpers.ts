@@ -269,16 +269,19 @@ export function createWheelEvent(
  * Creates a TouchEvent with synthetic touch points for testing gestures such as pinch/zoom.
  *
  * @param type - The touch event type (e.g., `"touchstart"`, `"touchmove"`, `"touchend"`).
- * @param touches - Array of touch coordinates; each entry provides `clientX` and `clientY` for a touch point.
- * @returns A TouchEvent whose `touches` list contains one touch per input coordinate. Each synthetic touch has an incremental `identifier`, `target` set to `document.body`, matching `clientX`/`clientY`/`pageX`/`pageY`/`screenX`/`screenY`, and default `radiusX`/`radiusY` of `1`, `rotationAngle` of `0`, and `force` of `1`. The event is created with `bubbles: true` and `cancelable: true`.
+ * @param touches - Array of touch coordinates; each entry provides `clientX` and `clientY` for a touch point, and optionally the `target` the finger went down on.
+ * @returns A TouchEvent whose `touches` list contains one touch per input coordinate. Each synthetic touch has an incremental `identifier`, a `target` (the entry's `target`, else the element the event is dispatched to, like a finger that went down there), matching `clientX`/`clientY`/`pageX`/`pageY`/`screenX`/`screenY`, and default `radiusX`/`radiusY` of `1`, `rotationAngle` of `0`, and `force` of `1`. The event is created with `bubbles: true` and `cancelable: true`.
  */
 export function createTouchEvent(
 	type: string,
-	touches: Array<{ clientX: number; clientY: number }>,
+	touches: Array<{ clientX: number; clientY: number; target?: EventTarget }>,
 ): TouchEvent {
+	let event: TouchEvent | undefined;
 	const touchArray = touches.map((t, i) => ({
 		identifier: i,
-		target: document.body,
+		get target(): EventTarget {
+			return t.target ?? event?.target ?? document.body;
+		},
 		clientX: t.clientX,
 		clientY: t.clientY,
 		pageX: t.clientX,
@@ -296,11 +299,12 @@ export function createTouchEvent(
 		item: (index: number) => touchArray[index] ?? null,
 	});
 
-	return new TouchEvent(type, {
+	event = new TouchEvent(type, {
 		bubbles: true,
 		cancelable: true,
 		touches: touchList as unknown as Touch[],
 	});
+	return event;
 }
 
 /**
