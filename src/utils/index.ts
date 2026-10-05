@@ -19,13 +19,17 @@ export {
 	loadImage,
 } from "./image.js";
 export {
+	capCanvasSize,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
+	MAX_CANVAS_AREA,
+	MAX_CANVAS_SIDE,
 	type MinZoomInput,
 	resolveMinZoom,
 } from "./limits.js";
 export {
 	calculateTransformFromPoints,
+	intersectFrame,
 	normalizePoints,
 	type PointsArray,
 	type PointsInput,
@@ -44,4 +48,4 @@ export {
 	type ZoomAnchor,
 	zoomAboutAnchor,
 } from "./transform.js";
-export { validateOptions } from "./validate.js";
+export { positiveFinite, validateOptions } from "./validate.js";

@@ -7,6 +7,15 @@ export interface DragCallbacks {
 	onEnd?: (state: TransformState) => void;
 }
 
+export interface DragOptions {
+	/**
+	 * The element's CSS `touch-action` (default `"none"`: every touch gesture is the
+	 * cropper's). Pass `"pinch-zoom"` when nothing handles a pinch, so the page zooms instead.
+	 * The drag handler is the only writer of this property.
+	 */
+	touchAction?: string;
+}
+
 interface DragState {
 	/** The pointer driving the drag, or null when idle. */
 	pointerId: number | null;
@@ -31,9 +40,12 @@ interface DragState {
  * Only the pointer that started the drag is followed: events from other pointers are
  * ignored, except that a second pointer going down ends the drag so a two-finger
  * pinch does not also pan, and a finger put down while another finger is down on the
- * element never starts one. Fingers resting elsewhere on the page do not count. The drag
- * also ends when the pointer loses its capture, and a new press of the same pointer (its
- * pointerup was lost) starts a fresh drag.
+ * element never starts one. Fingers resting elsewhere on the page do not count. When the
+ * fingers of a pinch lift until one is left on the element, that finger pans again,
+ * starting from its next move so the image does not jump. The drag
+ * also ends when the pointer loses its capture. A new press of the same pointer, or the
+ * first finger of a new touch, while a drag is still running means that drag's pointerup
+ * was lost: it ends, and the new press starts a fresh drag.
  * Pointer capture is best-effort: when the browser or the environment lacks
  * `setPointerCapture`/`releasePointerCapture`, or they throw, dragging still works.
  *
@@ -42,6 +54,7 @@ interface DragState {
  * @param setTransform - Function to update the element's transform coordinates (`x`, `y`, in
  *   the element's layout pixels); it may clamp them, and the next move starts from the result
  * @param callbacks - Optional callbacks invoked on drag start, move, and end
+ * @param options - `touchAction`: the element's CSS `touch-action` (default `"none"`)
  * @returns A cleanup function that removes the installed event listeners
  */
 export function createDragHandler(
@@ -49,6 +62,7 @@ export function createDragHandler(
 	getTransform: () => TransformState,
 	setTransform: (x: number, y: number) => void,
 	callbacks?: DragCallbacks,
+	options: DragOptions = {},
 ): () => void {
 	const state: DragState = {
 		pointerId: null,
@@ -63,6 +77,12 @@ export function createDragHandler(
 	 * down on, and the finger that started a drag keeps this element's capture until it lifts.
 	 */
 	const fingers = new Set<number>();
+
+	/**
+	 * The finger left on the element after the other fingers of a pinch lifted, or null. Its
+	 * next move starts a fresh drag from where it is then.
+	 */
+	let resumePointerId: number | null = null;
 
 	const tryCapture = (pointerId: number) => {
 		if (typeof element.setPointerCapture !== "function") return;
@@ -93,12 +113,33 @@ export function createDragHandler(
 		callbacks?.onEnd?.(getTransform());
 	};
 
+	/** Starts a drag that follows `e`'s pointer from `e`'s position. */
+	const startDrag = (e: PointerEvent) => {
+		state.pointerId = e.pointerId;
+		state.lastClientX = e.clientX;
+		state.lastClientY = e.clientY;
+		state.scale = clientToLayoutScale(element);
+
+		tryCapture(e.pointerId);
+		element.style.cursor = "grabbing";
+
+		callbacks?.onStart?.(getTransform());
+	};
+
 	const handlePointerDown = (e: PointerEvent) => {
+		// A finger joining makes a pinch again, and any other press is a new gesture
+		resumePointerId = null;
+
 		let joinsFinger = false;
 		if (e.pointerType === "touch") {
-			// The first finger of a touch is the only one down anywhere: a finger still
-			// listed lost its pointerup
-			if (e.isPrimary) fingers.clear();
+			if (e.isPrimary) {
+				// The first finger of a touch is the only one down anywhere: a finger still
+				// listed lost its pointerup, and so did the pointer of a drag still running
+				// (a finger, or a mouse released outside the element without capture). That
+				// drag is over, and this finger starts a fresh one below
+				fingers.clear();
+				endDrag(true);
+			}
 			joinsFinger = fingers.size > 0;
 			fingers.add(e.pointerId);
 		}
@@ -122,18 +163,16 @@ export function createDragHandler(
 		// a pinch lifted and put back, say), so it does not pan
 		if (joinsFinger) return;
 
-		state.pointerId = e.pointerId;
-		state.lastClientX = e.clientX;
-		state.lastClientY = e.clientY;
-		state.scale = clientToLayoutScale(element);
-
-		tryCapture(e.pointerId);
-		element.style.cursor = "grabbing";
-
-		callbacks?.onStart?.(getTransform());
+		startDrag(e);
 	};
 
 	const handlePointerMove = (e: PointerEvent) => {
+		if (e.pointerId === resumePointerId) {
+			// The finger left after a pinch: this move is where its drag starts
+			resumePointerId = null;
+			startDrag(e);
+			return;
+		}
 		if (e.pointerId !== state.pointerId) return;
 
 		const deltaX = (e.clientX - state.lastClientX) * state.scale.x;
@@ -150,15 +189,26 @@ export function createDragHandler(
 	};
 
 	const handlePointerUp = (e: PointerEvent) => {
-		fingers.delete(e.pointerId);
-		if (e.pointerId !== state.pointerId) return;
+		const wasFinger = fingers.delete(e.pointerId);
+		if (e.pointerId === resumePointerId) resumePointerId = null;
 
-		endDrag(true);
+		if (e.pointerId === state.pointerId) {
+			endDrag(true);
+			return;
+		}
+
+		// A finger of a pinch lifted (the pan ended when the second one went down) and one
+		// finger is left on the element: it pans again from its next move
+		if (wasFinger && state.pointerId === null && fingers.size === 1) {
+			const [remaining] = fingers;
+			resumePointerId = remaining ?? null;
+		}
 	};
 
 	const handleLostPointerCapture = (e: PointerEvent) => {
 		// Its pointerup may no longer reach the element, so the finger stops counting
 		fingers.delete(e.pointerId);
+		if (e.pointerId === resumePointerId) resumePointerId = null;
 		if (e.pointerId !== state.pointerId) return;
 
 		// The capture is already gone, so there is nothing to release
@@ -173,7 +223,8 @@ export function createDragHandler(
 	element.addEventListener("lostpointercapture", handleLostPointerCapture);
 
 	element.style.cursor = "grab";
-	element.style.touchAction = "none"; // Prevent browser handling
+	// Keep touch gestures from the browser (all of them by default)
+	element.style.touchAction = options.touchAction ?? "none";
 
 	// Return cleanup function
 	return () => {
@@ -183,5 +234,6 @@ export function createDragHandler(
 		element.removeEventListener("pointercancel", handlePointerUp);
 		element.removeEventListener("lostpointercapture", handleLostPointerCapture);
 		fingers.clear();
+		resumePointerId = null;
 	};
 }

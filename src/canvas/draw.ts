@@ -1,5 +1,5 @@
 import type { CropPoints, OutputFormat, Rotation } from "../types.js";
-import { clamp } from "../utils/clamp.js";
+import { intersectFrame } from "../utils/points.js";
 import { swapDims } from "../utils/rotation.js";
 
 /**
@@ -13,13 +13,15 @@ import { swapDims } from "../utils/rotation.js";
  * instead of a stretched image. An output with the frame's shape up to rounding to whole
  * pixels (the `'viewport'` and `'original'` result sizes) is filled exactly: a frame inside
  * the image maps onto the whole output, like drawing the crop rectangle directly, and the
- * rounding leaves no sub-pixel gap at the edges.
+ * rounding leaves no sub-pixel gap at the edges. The image is drawn with its edges on whole
+ * pixels, so a letterboxed image has no blurred half-pixel seam next to the bars.
  *
  * ```
  * k = min(outW / frameW, outH / frameH)    (kx = outW / frameW, ky = outH / frameH when filled)
  * ox = (outW - frameW * k) / 2             (same for y)
- * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (same for y)
- * dx = ox + (sx0 - frame.topLeftX) * k   dw = (sx1 - sx0) * k                     (same for y)
+ * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (intersectFrame)
+ * dx0 = round(ox + (sx0 - frame.topLeftX) * k)   dx1 = round(ox + (sx1 - frame.topLeftX) * k)
+ * dw = dx1 - dx0                                                                  (same for y)
  * ```
  *
  * With a `rotation` the frame is still given in the NATURAL image frame, while the output
@@ -113,10 +115,12 @@ export function drawCroppedImage(
 	}
 
 	// Intersect the frame with the image and map the overlap into the box
-	const sourceLeft = clamp(frame.topLeftX, 0, image.naturalWidth);
-	const sourceRight = clamp(frame.bottomRightX, 0, image.naturalWidth);
-	const sourceTop = clamp(frame.topLeftY, 0, image.naturalHeight);
-	const sourceBottom = clamp(frame.bottomRightY, 0, image.naturalHeight);
+	const {
+		topLeftX: sourceLeft,
+		topLeftY: sourceTop,
+		bottomRightX: sourceRight,
+		bottomRightY: sourceBottom,
+	} = intersectFrame(frame, image.naturalWidth, image.naturalHeight);
 
 	const sourceWidth = sourceRight - sourceLeft;
 	const sourceHeight = sourceBottom - sourceTop;
@@ -126,8 +130,14 @@ export function drawCroppedImage(
 		return canvas;
 	}
 
-	const destinationLeft = offsetX + (sourceLeft - frame.topLeftX) * scaleX;
-	const destinationTop = offsetY + (sourceTop - frame.topLeftY) * scaleY;
+	// Each edge on a whole pixel of the box: a half-pixel edge blurs the seam between the
+	// image and a letterbox bar. The box's corners are the output's corners whatever the
+	// rotation, so whole pixels of the box are whole pixels of the output. A box the frame
+	// fills exactly is already 0..boxWidth, 0..boxHeight
+	const left = Math.round(offsetX + (sourceLeft - frame.topLeftX) * scaleX);
+	const right = Math.round(offsetX + (sourceRight - frame.topLeftX) * scaleX);
+	const top = Math.round(offsetY + (sourceTop - frame.topLeftY) * scaleY);
+	const bottom = Math.round(offsetY + (sourceBottom - frame.topLeftY) * scaleY);
 
 	if (rotation === 0) {
 		ctx.drawImage(
@@ -136,10 +146,10 @@ export function drawCroppedImage(
 			sourceTop,
 			sourceWidth,
 			sourceHeight,
-			destinationLeft,
-			destinationTop,
-			sourceWidth * scaleX,
-			sourceHeight * scaleY,
+			left,
+			top,
+			right - left,
+			bottom - top,
 		);
 	} else {
 		ctx.save();
@@ -151,10 +161,10 @@ export function drawCroppedImage(
 			sourceTop,
 			sourceWidth,
 			sourceHeight,
-			destinationLeft - boxWidth / 2,
-			destinationTop - boxHeight / 2,
-			sourceWidth * scaleX,
-			sourceHeight * scaleY,
+			left - boxWidth / 2,
+			top - boxHeight / 2,
+			right - left,
+			bottom - top,
 		);
 		ctx.restore();
 	}

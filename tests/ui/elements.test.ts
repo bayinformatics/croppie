@@ -336,6 +336,16 @@ describe("UI Elements", () => {
 			expect(slider.getAttribute("aria-label")).toBe("Zoom");
 		});
 
+		it("describes its initial value as a percentage", () => {
+			// Otherwise a screen reader announces the raw value ("1") until the first bind
+			expect(createZoomSlider(0.5, 2, 1).getAttribute("aria-valuetext")).toBe(
+				"100%",
+			);
+			expect(
+				createZoomSlider(0.1, 10, 0.333).getAttribute("aria-valuetext"),
+			).toBe("33%");
+		});
+
 		it("creates an input element", () => {
 			const slider = createZoomSlider(0.5, 2, 1);
 			expect(slider.tagName).toBe("INPUT");

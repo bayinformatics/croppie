@@ -168,10 +168,62 @@ describe("validateOptions", () => {
 			);
 		});
 
-		it("compares a lone max against the default min (0.1)", () => {
-			expect(() => validateOptions(options({ zoom: { max: 0.05 } }))).toThrow(
-				RangeError,
+		it("accepts a lone max below the default min (0.1): an unset min is per image", () => {
+			expect(() =>
+				validateOptions(options({ zoom: { max: 0.05 } })),
+			).not.toThrow();
+		});
+
+		it("still requires a lone max to be positive and finite", () => {
+			expect(() => validateOptions(options({ zoom: { max: 0 } }))).toThrow(
+				/zoom\.max/,
 			);
+		});
+	});
+
+	describe("numeric strings (data attributes)", () => {
+		function str(value: string): number {
+			return value as unknown as number;
+		}
+
+		it("accepts numeric strings for every dimension and zoom limit", () => {
+			expect(() =>
+				validateOptions({
+					viewport: { width: str("200"), height: str(" 5 "), type: "square" },
+					boundary: { width: str("300"), height: str("300") },
+					zoom: { min: str("0.5"), max: str(" 5 ") },
+				}),
+			).not.toThrow();
+		});
+
+		for (const value of ["", " ", "abc"]) {
+			it(`throws a RangeError for ${JSON.stringify(value)}`, () => {
+				expect(() =>
+					validateOptions(
+						options({
+							viewport: { width: str(value), height: 100, type: "square" },
+						}),
+					),
+				).toThrow(/viewport\.width/);
+				expect(() =>
+					validateOptions(
+						options({ boundary: { width: 300, height: str(value) } }),
+					),
+				).toThrow(/boundary\.height/);
+				expect(() =>
+					validateOptions(options({ zoom: { min: str(value) } })),
+				).toThrow(/zoom\.min/);
+			});
+		}
+
+		it("compares string zoom limits as numbers", () => {
+			// As strings, "5" > "10"
+			expect(() =>
+				validateOptions(options({ zoom: { min: str("5"), max: str("10") } })),
+			).not.toThrow();
+			expect(() =>
+				validateOptions(options({ zoom: { min: str("10"), max: str("5") } })),
+			).toThrow(/zoom\.min.*zoom\.max/);
 		});
 	});
 });

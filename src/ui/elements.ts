@@ -148,7 +148,8 @@ export function createPreview(): HTMLImageElement {
 }
 
 /**
- * Creates a range input element configured as the zoom slider.
+ * Creates a range input element configured as the zoom slider, named "Zoom" and with its
+ * value spoken as a percentage (`aria-valuetext`) from the start.
  *
  * @param min - Minimum slider value
  * @param max - Maximum slider value
@@ -169,6 +170,8 @@ export function createZoomSlider(
 			step: "0.01",
 			value: String(value),
 			"aria-label": "Zoom",
+			// Spoken as a percentage from the start, not as the raw value until the first bind
+			"aria-valuetext": `${Math.round(value * 100)}%`,
 		},
 	});
 	return element;

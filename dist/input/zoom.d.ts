@@ -9,18 +9,27 @@ export type ZoomRequest = (zoom: number, anchor: ZoomAnchor) => void;
 export declare const WHEEL_FACTOR_PER_NOTCH = 1.1;
 /** Pixel delta that counts as one notch. */
 export declare const WHEEL_NOTCH_PX = 100;
-/** Pixels per line when `deltaMode` is `DOM_DELTA_LINE`. */
-export declare const WHEEL_LINE_PX = 16;
+/**
+ * Pixels per line when `deltaMode` is `DOM_DELTA_LINE`. A line-mode mouse reports one notch
+ * as 3 lines, so 3 lines make one notch.
+ */
+export declare const WHEEL_LINE_PX: number;
 /** Pixels per page when `deltaMode` is `DOM_DELTA_PAGE`. */
 export declare const WHEEL_PAGE_PX = 800;
 /** Largest delta used from a single wheel event, so a fling cannot jump the zoom. */
 export declare const WHEEL_MAX_PX = 100;
 /**
+ * The vertical distance of one wheel event in pixels: `deltaY` converted from `deltaMode`
+ * (lines, pages) to pixels, then capped to one notch either way.
+ */
+export declare function wheelDeltaPx(event: Pick<WheelEvent, "deltaY" | "deltaMode">): number;
+/**
  * The zoom factor for one wheel event: multiplicative, scaled by how far the wheel moved.
  *
- * The delta is normalised to pixels from `deltaMode`, capped to one notch, and then
- * `1.1 ** (-px / 100)`: a mouse notch zooms by 1.1 (up) or 1/1.1 (down) and a
- * trackpad's small deltas zoom smoothly. Scrolling up (negative `deltaY`) zooms in.
+ * The delta is normalized to pixels from `deltaMode`, capped to one notch, and then
+ * `1.1 ** (-px / 100)`: a mouse notch (100px, or 3 lines) zooms by 1.1 (up) or 1/1.1
+ * (down) and a trackpad's small deltas zoom smoothly. Scrolling up (negative `deltaY`)
+ * zooms in.
  */
 export declare function wheelZoomFactor(event: Pick<WheelEvent, "deltaY" | "deltaMode">): number;
 /**
@@ -47,7 +56,8 @@ export declare function createWheelZoomHandler(element: HTMLElement, getZoom: ()
  *
  * When exactly two such fingers are down, their distance and the current zoom are
  * captured; every move then proposes `initialZoom * distance / initialDistance`, anchored
- * at their midpoint. A zoom changed by something else mid-pinch (`bind()`, `reset()`,
+ * at their midpoint. When a lift leaves exactly two fingers down (a third finger landed
+ * and lifted), they are measured again and the pinch carries on. A zoom changed by something else mid-pinch (`bind()`, `reset()`,
  * `setZoom()`) becomes the new starting point instead of being overwritten by the next
  * move. Like the wheel handler it neither clamps nor emits.
  *

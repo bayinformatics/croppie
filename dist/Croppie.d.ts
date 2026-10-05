@@ -33,12 +33,23 @@ export declare class Croppie {
      * `undefined` counts as unset.
      */
     private readonly zoomConfig;
+    /**
+     * The lowest zoom the user may reach: resolved per image on bind (see `resolveMinZoom`);
+     * before that, the configured or default minimum, capped at `zoom.max`.
+     */
     private effectiveMinZoom;
+    /**
+     * The zoom at which the bound image just covers the viewport, stored with the zoom limits
+     * by `updateZoomLimits()`: where `bind()` starts by default and `reset()` returns to.
+     */
+    private coverage;
     private eventHandlers;
     private cleanupFns;
     private destroyed;
     private bindGeneration;
-    constructor(element: HTMLElement, options: CroppieOptions);
+    /** The transform before any image is bound, and again after `destroy()`. */
+    private static initialTransform;
+    constructor(element: HTMLElement, givenOptions: CroppieOptions);
     /**
      * Creates all DOM elements
      */
@@ -55,6 +66,12 @@ export declare class Croppie {
      * Malformed `points` (an array without exactly 4 entries, a coordinate that is not a
      * number, a rect without width or height) are ignored with a console warning, and the
      * image gets its default framing.
+     *
+     * Only the newest bind applies its image. A bind that a later `bind()` or `bindFile()`
+     * supersedes while it loads rejects with a `DOMException` named `AbortError`
+     * ("bind() was superseded by a later bind() call"), and so does one whose instance is
+     * destroyed meanwhile ("instance destroyed during bind()"). A call on a destroyed instance
+     * rejects at once without superseding anything.
      */
     bind(options: BindOptions | string): Promise<void>;
     /**
@@ -66,17 +83,44 @@ export declare class Croppie {
      */
     private resolveBindRotation;
     /**
-     * Loads and applies an image for a bind that claimed `generation`, with the `rotation` and
-     * the (natural-frame) `points` that `bind()` resolved from `bindOptions` before claiming it
-     * (`points` is `undefined` when malformed). If the instance was destroyed or a newer bind
-     * started meanwhile, resolves without applying or emitting anything, and without surfacing
-     * a load error nobody is waiting for any more.
+     * The asynchronous part of every bind, for the bind that claimed `generation` (`bind()`
+     * and `bindFile()` validate their arguments before claiming it, so a call they reject
+     * supersedes nothing): produces the image URL (`bindFile()` reads it from the file), loads
+     * the image, then hands it and its URL to `apply`.
+     *
+     * Only the newest bind applies anything. Once a later bind claimed a generation, or the
+     * instance was destroyed, the next step rejects with an `AbortError` instead, whether it
+     * succeeded or failed: the caller learns that its image was not applied, and a load error
+     * nobody waits for any more is not reported as such.
+     *
+     * @param generation - The generation the bind claimed
+     * @param produceUrl - Gives the URL of the image to load
+     * @param apply - Applies the loaded image; runs only while the bind is the newest
+     */
+    private runBind;
+    /**
+     * Settles like `step` while the bind that claimed `generation` is still the newest, and
+     * rejects with an `AbortError` once it is not (see `runBind()`).
+     */
+    private whileNewest;
+    /**
+     * Throws an `AbortError` `DOMException` if the instance was destroyed or a later bind
+     * claimed a generation after the bind that claimed `generation`.
+     */
+    private assertNewestBind;
+    /**
+     * Applies a loaded image with the bind's `bindOptions` (its URL, zoom and points), and the
+     * `rotation` and (natural-frame) `points` resolved from them before the bind claimed its
+     * generation (`points` is `undefined` when malformed).
+     *
+     * @throws Error if the image has no intrinsic size
      */
     private load;
     /**
      * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
      * empty file input) rejects with a `TypeError` before anything changes, so it does not
-     * cancel a bind that is still loading.
+     * cancel a bind that is still loading. Like `bind()`, it rejects with an `AbortError`
+     * when a later bind supersedes it or the instance is destroyed while the file loads.
      */
     bindFile(file: File | Blob): Promise<void>;
     /**
@@ -84,9 +128,11 @@ export declare class Croppie {
      * `"blob"` gives a `Blob`, `"base64"` a data URL string and `"canvas"` the canvas.
      *
      * The image keeps its proportions at every `size`: a size of another shape than the
-     * viewport centres the crop and leaves the rest transparent (or `backgroundColor`). With
-     * `size: "original"`, a crop zoomed out past the image is scaled down to at most the area
-     * of the image part it shows or 4096x4096 px, whichever is larger.
+     * viewport centers the crop and leaves the rest transparent (or `backgroundColor`). An
+     * `"original"` or custom size is scaled down, keeping its shape, to at most 16,777,216 px
+     * (4096x4096) and 16,384 px a side, so the canvas stays within what browsers can allocate
+     * (iOS Safari draws nothing on a larger one), and rounded to whole pixels. A custom
+     * width or height that is not a positive finite number rejects with a `RangeError`.
      */
     result(options: ResultOptions & {
         type: "blob";
@@ -114,7 +160,7 @@ export declare class Croppie {
      * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
      * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
      * A numeric string (such as a range input's `value`) is converted to a number;
-     * a value that is then not finite is ignored.
+     * a value that is then not finite, a blank string included, is ignored.
      */
     setZoom(value: number): void;
     /**
@@ -128,6 +174,7 @@ export declare class Croppie {
      *
      * @param requested - Requested zoom level; not clamped by the caller
      * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
+     * @returns Whether the zoom changed, in which case `update` was emitted
      */
     private applyZoom;
     /**
@@ -147,7 +194,11 @@ export declare class Croppie {
      */
     rotate(degrees: number): void;
     /**
-     * Resets the cropper to initial state
+     * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+     *
+     * The zoom goes through the same path as `setZoom()`, so the events follow the same
+     * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
+     * position did, and no stale `zoom` when an `update` listener zooms again.
      */
     reset(): void;
     /**
@@ -167,12 +218,10 @@ export declare class Croppie {
      */
     private assertNotDestroyed;
     /**
-     * Whether a bind that claimed `generation` was destroyed or superseded in the meantime
-     */
-    private isStaleBind;
-    /**
      * Resolves the effective minimum zoom for an image shown at `rotation` (see
-     * `resolveMinZoom`) and syncs the slider's `min`, so the slider range is never inverted.
+     * `resolveMinZoom`), stores it with the coverage zoom of the image as displayed (the one
+     * place both are computed), and syncs the slider's `min`, so the slider range is never
+     * inverted.
      *
      * @returns The zoom at which the displayed image covers the viewport
      */
@@ -183,6 +232,11 @@ export declare class Croppie {
      * @param rotation - Defaults to the current rotation
      */
     private displayedSize;
+    /**
+     * The smallest zoom at which the image, displayed at `rotation`, covers the viewport
+     * (computed for `updateZoomLimits()`, which stores it as `coverage`).
+     */
+    private coverageZoom;
     /**
      * Updates the CSS transform on the preview element.
      *

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "bun:test";
 import {
+	capCanvasSize,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
+	MAX_CANVAS_AREA,
+	MAX_CANVAS_SIDE,
 	type MinZoomInput,
 	resolveMinZoom,
 } from "../../src/utils/limits.ts";
@@ -130,5 +133,40 @@ describe("resolveMinZoom", () => {
 				}
 			}
 		}
+	});
+});
+
+describe("capCanvasSize", () => {
+	it("only rounds a size within the caps", () => {
+		expect(capCanvasSize(200.4, 99.6)).toEqual({ width: 200, height: 100 });
+		expect(capCanvasSize(4096, 4096)).toEqual({ width: 4096, height: 4096 });
+	});
+
+	it("scales a size over the area cap down to it, keeping its shape", () => {
+		expect(capCanvasSize(6048, 6048)).toEqual({ width: 4096, height: 4096 });
+		expect(capCanvasSize(8192, 4096)).toEqual({ width: 5793, height: 2896 });
+	});
+
+	it("caps each side at 16,384 px", () => {
+		expect(capCanvasSize(20000, 100)).toEqual({ width: 16384, height: 82 });
+		expect(capCanvasSize(100, 40000)).toEqual({ width: 41, height: 16384 });
+	});
+
+	it("rounds down when rounding to the nearest pixel would exceed the area cap", () => {
+		// 9158.93 x 1831.79 rounds to 9159 x 1832 = 16,779,288 px
+		const size = capCanvasSize(40320, 8064);
+
+		expect(size).toEqual({ width: 9158, height: 1831 });
+		expect(size.width * size.height).toBeLessThanOrEqual(MAX_CANVAS_AREA);
+	});
+
+	it("never returns a side below 1 px", () => {
+		expect(capCanvasSize(0.2, 0.2)).toEqual({ width: 1, height: 1 });
+		expect(capCanvasSize(1_000_000, 1)).toEqual({ width: 16384, height: 1 });
+	});
+
+	it("exposes the caps", () => {
+		expect(MAX_CANVAS_AREA).toBe(4096 * 4096);
+		expect(MAX_CANVAS_SIDE).toBe(16384);
 	});
 });
