@@ -12,6 +12,11 @@ export type ImageDimensions =
 	| Dimensions
 	| ((src: string) => Dimensions | undefined);
 
+export interface ImageMockOptions {
+	/** Milliseconds before load/error fires, fixed or per src (default: 0, a macrotask). */
+	delay?: number | ((src: string) => number);
+}
+
 /**
  * Install a mock Image constructor that automatically fires onload when src is set.
  * This works around happy-dom's limitation where Image.onload doesn't fire for data URLs.
@@ -20,9 +25,13 @@ export type ImageDimensions =
  *   (happy-dom reports naturalWidth/naturalHeight as 0 by default). Pass a
  *   function to resolve dimensions per src, e.g. `fixtureDimensions`; a src it
  *   returns `undefined` for keeps the 0x0 default.
+ * @param options - `delay`: how long loading takes (fixed or per src), to test overlapping loads
  * @returns A cleanup function that restores the original Image constructor
  */
-export function installImageMock(dimensions?: ImageDimensions): () => void {
+export function installImageMock(
+	dimensions?: ImageDimensions,
+	options: ImageMockOptions = {},
+): () => void {
 	const OriginalImage = globalThis.Image;
 
 	class MockImage extends OriginalImage {
@@ -37,6 +46,10 @@ export function installImageMock(dimensions?: ImageDimensions): () => void {
 		override set src(value: string) {
 			this._src = value;
 			// Schedule onload/onerror to fire asynchronously (like real browsers)
+			const delay =
+				typeof options.delay === "function"
+					? options.delay(value)
+					: (options.delay ?? 0);
 			setTimeout(() => {
 				if (value.startsWith("data:") || value.startsWith("http")) {
 					// Simulate successful load for data URLs and http URLs
@@ -63,7 +76,7 @@ export function installImageMock(dimensions?: ImageDimensions): () => void {
 						this._onerror(new Event("error"));
 					}
 				}
-			}, 0);
+			}, delay);
 		}
 
 		override get onload(): ((event: Event) => void) | null {
