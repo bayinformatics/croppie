@@ -24,6 +24,9 @@
       --wall: #e7c1b6;
       --sky: #d3dedd;
       --red: #c23f28;
+      /* Darker shades for text on the pink wall and code panels (WCAG AA, 4.5:1) */
+      --red-deep: #97311f;
+      --ink-soft: #4c423c;
       --hair: 1px solid var(--ink);
       --serif: 'Bodoni Moda', 'Didot', Georgia, serif;
       --sans: 'Archivo', system-ui, sans-serif;
@@ -264,7 +267,12 @@
     .send:hover, .send:focus-visible { color: var(--red); border-color: var(--red); outline: none; }
 
     /* ---------- II: the interactive ---------- */
-    .room { background: var(--wall); padding: 28px 0 104px; }
+    .room {
+      --red: var(--red-deep);
+      --muted: #5a544c;
+      background: var(--wall);
+      padding: 28px 0 104px;
+    }
     .room .grid { row-gap: 40px; align-items: start; }
 
     .steps { list-style: none; border-top: var(--hair); margin-top: 24px; counter-reset: s; }
@@ -294,7 +302,7 @@
 
     #file-input { display: none; }
 
-    .stage-col .caption { margin-top: 20px; color: var(--ink); opacity: 0.75; }
+    .stage-col .caption { margin-top: 20px; color: var(--ink-soft); }
 
     .result {
       width: 128px;
@@ -314,7 +322,7 @@
     .result.has-img { border-color: transparent; }
     .result.has-img img { display: block; animation: develop 0.8s ease-out; }
     .result.has-img span { display: none; }
-    .result-col .caption { color: var(--ink); opacity: 0.75; max-width: 24ch; }
+    .result-col .caption { color: var(--ink-soft); max-width: 24ch; }
 
     @keyframes develop { from { opacity: 0; filter: saturate(0) contrast(0.6); } to { opacity: 1; filter: none; } }
 
@@ -355,9 +363,9 @@
       overflow-x: auto;
     }
 
-    .k { color: var(--red); }
+    .k { color: var(--red-deep); }
     .s { color: #2d5a74; }
-    .co { color: #6f7d79; font-style: italic; }
+    .co { color: #586360; font-style: italic; }
     .f { font-weight: 500; }
 
     /* ---------- Colophon ---------- */
