@@ -9,9 +9,15 @@ import { installImageMock } from "../fixtures/mock-helpers.ts";
 import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
 const PHOTO = "https://example.com/photo.jpg"; // 400x300
+const OTHER = "https://example.com/other.jpg"; // 800x400
+const SLOW = "https://example.com/slow.jpg"; // 600x600, loads after 20ms
 
-// PHOTO and every data URL (SMALL_PNG)
-const DIMENSIONS = { width: 400, height: 300 };
+function dimensions(src: string): { width: number; height: number } {
+	if (src === OTHER) return { width: 800, height: 400 };
+	if (src === SLOW) return { width: 600, height: 600 };
+	// PHOTO and every data URL (SMALL_PNG)
+	return { width: 400, height: 300 };
+}
 
 // A 400x300 image in a 100x100 viewport covers it at a zoom of 1/3
 const COVERAGE_ZOOM = 1 / 3;
@@ -61,7 +67,9 @@ describe("Croppie bind and zoom inputs", () => {
 
 	beforeEach(() => {
 		mounted = [];
-		cleanupImageMock = installImageMock(DIMENSIONS);
+		cleanupImageMock = installImageMock(dimensions, {
+			delay: (src) => (src === SLOW ? 20 : 0),
+		});
 		originalWarn = console.warn;
 		warn = mock();
 		console.warn = warn;
@@ -208,6 +216,39 @@ describe("Croppie bind and zoom inputs", () => {
 	});
 
 	describe("bind({ points })", () => {
+		it("rejects a malformed points array before replacing the image, transform or slider", async () => {
+			const { croppie, root } = mount();
+			await croppie.bind(PHOTO);
+			croppie.setZoom(2);
+			const before = observe({ croppie, root });
+			const onUpdate = mock();
+			croppie.on("update", onUpdate);
+
+			await expect(
+				croppie.bind({
+					url: OTHER,
+					points: [0, 0, 10] as unknown as PointsArray,
+				}),
+			).rejects.toThrow("PointsArray must have exactly 4 elements");
+
+			expect(preview(root).src).toBe(PHOTO);
+			expect(observe({ croppie, root })).toEqual(before);
+			expect(onUpdate).not.toHaveBeenCalled();
+		});
+
+		it("does not let a malformed points array cancel a bind that is still loading", async () => {
+			const { croppie, root } = mount();
+
+			const good = croppie.bind({ url: SLOW, zoom: 2 });
+			await expect(
+				croppie.bind({ url: PHOTO, points: [] as unknown as PointsArray }),
+			).rejects.toThrow("PointsArray must have exactly 4 elements");
+			await good;
+
+			expect(preview(root).src).toBe(SLOW);
+			expect(croppie.zoom).toBe(2);
+		});
+
 		it("binds v2-style string points (as v2's get() returned them) like numbers", async () => {
 			const { croppie } = mount();
 
