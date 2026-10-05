@@ -649,11 +649,15 @@ export class Croppie {
 	}
 
 	/**
-	 * Updates the slider value to match current zoom
+	 * Updates the slider value to match current zoom, and its spoken value ("150%")
 	 */
 	private updateSlider(): void {
 		if (this.sliderEl) {
 			this.sliderEl.value = String(this.transform.scale);
+			this.sliderEl.setAttribute(
+				"aria-valuetext",
+				`${Math.round(this.transform.scale * 100)}%`,
+			);
 		}
 	}
 

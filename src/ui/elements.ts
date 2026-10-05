@@ -168,6 +168,7 @@ export function createZoomSlider(
 			max: String(max),
 			step: "0.01",
 			value: String(value),
+			"aria-label": "Zoom",
 		},
 	});
 	return element;

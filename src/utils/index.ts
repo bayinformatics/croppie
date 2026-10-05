@@ -11,6 +11,7 @@ export {
 	aspectRatio,
 	calculateContainZoom,
 	calculateInitialZoom,
+	describeUrl,
 	fileToDataUrl,
 	getImageDimensions,
 	loadImage,
