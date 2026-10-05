@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
+import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 
 describe("Croppie bind({ points })", () => {
 	let container: HTMLDivElement;

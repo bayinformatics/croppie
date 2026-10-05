@@ -1,7 +1,7 @@
-import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { TINY_PNG, SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 import { createWheelEvent } from "../fixtures/mock-helpers.ts";
+import { SMALL_PNG, TINY_PNG } from "../fixtures/test-image-data-url.ts";
 
 // Note: Most zoom tests are skipped because happy-dom's Image doesn't trigger onload for data URLs
 // These tests would work in a real browser environment

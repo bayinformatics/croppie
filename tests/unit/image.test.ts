@@ -1,13 +1,17 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
-	loadImage,
-	fileToDataUrl,
-	getImageDimensions,
 	aspectRatio,
 	calculateInitialZoom,
+	fileToDataUrl,
+	getImageDimensions,
+	loadImage,
 } from "../../src/utils/image.ts";
-import { TINY_PNG, RED_PNG, SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 import { createMockImage, installImageMock } from "../fixtures/mock-helpers.ts";
+import {
+	RED_PNG,
+	SMALL_PNG,
+	TINY_PNG,
+} from "../fixtures/test-image-data-url.ts";
 
 describe("Image utilities", () => {
 	describe("loadImage", () => {
@@ -75,7 +79,9 @@ describe("Image utilities", () => {
 		});
 
 		it("converts File object to data URL", async () => {
-			const file = new File(["hello world"], "test.txt", { type: "text/plain" });
+			const file = new File(["hello world"], "test.txt", {
+				type: "text/plain",
+			});
 			const result = await fileToDataUrl(file);
 
 			expect(result).toMatch(/^data:text\/plain;base64,/);
@@ -123,7 +129,10 @@ describe("Image utilities", () => {
 			const portrait = createMockImage(300, 600);
 
 			expect(getImageDimensions(square)).toEqual({ width: 200, height: 200 });
-			expect(getImageDimensions(landscape)).toEqual({ width: 800, height: 400 });
+			expect(getImageDimensions(landscape)).toEqual({
+				width: 800,
+				height: 400,
+			});
 			expect(getImageDimensions(portrait)).toEqual({ width: 300, height: 600 });
 		});
 

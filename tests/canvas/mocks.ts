@@ -55,22 +55,18 @@ export function setupCanvasMocks(): void {
 	}
 
 	// Mock toBlob (async like the real implementation)
-	HTMLCanvasElement.prototype.toBlob = function (
+	HTMLCanvasElement.prototype.toBlob = (
 		callback: BlobCallback,
 		type?: string,
 		_quality?: number,
-	) {
+	) => {
 		const blob = new Blob(["mock-canvas-data"], { type: type || "image/png" });
 		queueMicrotask(() => callback(blob));
 	};
 
 	// Mock toDataURL
-	HTMLCanvasElement.prototype.toDataURL = function (
-		type?: string,
-		_quality?: number,
-	) {
-		return `data:${type || "image/png"};base64,mockbase64data`;
-	};
+	HTMLCanvasElement.prototype.toDataURL = (type?: string, _quality?: number) =>
+		`data:${type || "image/png"};base64,mockbase64data`;
 }
 
 /**

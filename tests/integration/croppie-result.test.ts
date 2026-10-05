@@ -1,7 +1,7 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { setupCanvasMocks, restoreCanvasMocks } from "../canvas/mocks.ts";
-import { TINY_PNG, SMALL_PNG } from "../fixtures/test-image-data-url.ts";
+import { restoreCanvasMocks, setupCanvasMocks } from "../canvas/mocks.ts";
+import { SMALL_PNG, TINY_PNG } from "../fixtures/test-image-data-url.ts";
 
 // Note: Most result tests are skipped because happy-dom's Image doesn't trigger onload for data URLs
 // These tests would work in a real browser environment

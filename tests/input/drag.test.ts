@@ -1,7 +1,7 @@
-import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { createDragHandler } from "../../src/input/drag.ts";
-import { createPointerEvent } from "../fixtures/mock-helpers.ts";
 import type { TransformState } from "../../src/types.ts";
+import { createPointerEvent } from "../fixtures/mock-helpers.ts";
 
 describe("Drag Handler", () => {
 	let element: HTMLDivElement;
@@ -97,7 +97,9 @@ describe("Drag Handler", () => {
 			element.setPointerCapture = setPointerCapture;
 
 			createDragHandler(element, getTransform, setTransform);
-			element.dispatchEvent(createPointerEvent("pointerdown", { pointerId: 42 }));
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 42 }),
+			);
 
 			expect(setPointerCapture).toHaveBeenCalledWith(42);
 		});
@@ -225,7 +227,9 @@ describe("Drag Handler", () => {
 
 			createDragHandler(element, getTransform, setTransform);
 
-			element.dispatchEvent(createPointerEvent("pointerdown", { pointerId: 42 }));
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { pointerId: 42 }),
+			);
 			element.dispatchEvent(createPointerEvent("pointerup", { pointerId: 42 }));
 
 			expect(releasePointerCapture).toHaveBeenCalledWith(42);

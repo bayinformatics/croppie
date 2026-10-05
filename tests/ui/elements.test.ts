@@ -1,12 +1,12 @@
 import { describe, expect, it } from "bun:test";
 import {
-	createContainer,
 	createBoundary,
-	createViewport,
+	createContainer,
 	createOverlay,
 	createPreview,
-	createZoomSlider,
 	createSliderContainer,
+	createViewport,
+	createZoomSlider,
 } from "../../src/ui/elements.ts";
 
 describe("UI Elements", () => {
@@ -230,7 +230,11 @@ describe("UI Elements", () => {
 		});
 
 		it("sets mask image for circle viewport", () => {
-			const circleViewport = { width: 200, height: 200, type: "circle" as const };
+			const circleViewport = {
+				width: 200,
+				height: 200,
+				type: "circle" as const,
+			};
 			const overlay = createOverlay(boundary, circleViewport);
 
 			expect(overlay.style.maskImage).toBeTruthy();
@@ -240,7 +244,9 @@ describe("UI Elements", () => {
 		it("sets webkit mask image for compatibility", () => {
 			// happy-dom >= 20.14 does not implement -webkit-mask-image and silently drops
 			// the assignment, so record it through a temporary accessor on the prototype.
-			const proto = Object.getPrototypeOf(document.createElement("div").style) as object;
+			const proto = Object.getPrototypeOf(
+				document.createElement("div").style,
+			) as object;
 			let assigned: unknown;
 			Object.defineProperty(proto, "webkitMaskImage", {
 				configurable: true,
