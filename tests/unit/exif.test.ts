@@ -60,6 +60,35 @@ describe("readJpegOrientation", () => {
 			});
 		}
 
+		for (const littleEndian of [false, true]) {
+			const order = littleEndian ? "little-endian (II)" : "big-endian (MM)";
+
+			for (const orientation of [3, 6, 8]) {
+				it(`reads ${orientation} stored as a LONG in ${order} EXIF`, () => {
+					expect(
+						readJpegOrientation(
+							buildJpegHeader(orientation, { littleEndian, type: 4 }),
+						),
+					).toBe(orientation);
+				});
+			}
+
+			it(`ignores an Orientation of another type (BYTE) in ${order} EXIF`, () => {
+				expect(
+					readJpegOrientation(buildJpegHeader(6, { littleEndian, type: 1 })),
+				).toBe(1);
+			});
+
+			it(`returns 1 for a LONG outside 1-8 in ${order} EXIF`, () => {
+				// 0x10006 has 6 in its low half
+				expect(
+					readJpegOrientation(
+						buildJpegHeader(0x10006, { littleEndian, type: 4 }),
+					),
+				).toBe(1);
+			});
+		}
+
 		it("returns 1 for the out-of-range values 0 and 9", () => {
 			expect(readJpegOrientation(buildJpegHeader(0))).toBe(1);
 			expect(readJpegOrientation(buildJpegHeader(9))).toBe(1);

@@ -20,13 +20,19 @@ function concat(parts) {
 
 /**
  * An APP1 (EXIF) segment of 36 bytes with a single IFD0 entry: tag 0x0112 (Orientation),
- * type SHORT, count 1. Layout: marker (2) | length (2) | "Exif\0\0" (6) | TIFF header (8) |
- * entry count (2) | entry (12) | next IFD offset (4).
+ * count 1, of type SHORT (3) unless `type` says otherwise. Layout: marker (2) | length (2) |
+ * "Exif\0\0" (6) | TIFF header (8) | entry count (2) | entry (12) | next IFD offset (4).
+ * The value sits at the start of the entry's 4-byte value field: two bytes for SHORT, four for
+ * LONG (4), one for any other type.
  *
  * @param {number} orientation - The value stored in the tag (use 1-8, or 0/9 for invalid)
- * @param {{ littleEndian?: boolean }} [options] - Byte order of the TIFF structure ("II" vs "MM")
+ * @param {{ littleEndian?: boolean, type?: number }} [options] - Byte order of the TIFF
+ *   structure ("II" vs "MM") and the TIFF type of the entry
  */
-export function buildExifApp1(orientation, { littleEndian = false } = {}) {
+export function buildExifApp1(
+	orientation,
+	{ littleEndian = false, type = 3 } = {},
+) {
 	const bytes = new Uint8Array(36);
 	const view = new DataView(bytes.buffer);
 	const le = littleEndian;
@@ -43,9 +49,12 @@ export function buildExifApp1(orientation, { littleEndian = false } = {}) {
 	// IFD0 at offset 18
 	view.setUint16(18, 1, le); // one entry
 	view.setUint16(20, 0x0112, le); // Orientation
-	view.setUint16(22, 3, le); // SHORT
+	view.setUint16(22, type, le); // SHORT (3) by default
 	view.setUint32(24, 1, le); // count
-	view.setUint16(28, orientation, le); // value, in the first two bytes of the value field
+	// The value, at the start of the value field
+	if (type === 3) view.setUint16(28, orientation, le);
+	else if (type === 4) view.setUint32(28, orientation, le);
+	else bytes[28] = orientation;
 	// bytes 32-35: offset of the next IFD, 0
 
 	return bytes;
@@ -91,16 +100,16 @@ export function buildXmpApp1() {
  * a header parser, not a decodable image.
  *
  * @param {number} orientation
- * @param {{ jfifFirst?: boolean, littleEndian?: boolean }} [options]
+ * @param {{ jfifFirst?: boolean, littleEndian?: boolean, type?: number }} [options]
  */
 export function buildJpegHeader(
 	orientation,
-	{ jfifFirst = false, littleEndian = false } = {},
+	{ jfifFirst = false, littleEndian = false, type = 3 } = {},
 ) {
 	return concat([
 		SOI,
 		jfifFirst ? buildJfifApp0() : [],
-		buildExifApp1(orientation, { littleEndian }),
+		buildExifApp1(orientation, { littleEndian, type }),
 		SOS,
 	]);
 }
@@ -111,7 +120,7 @@ export function buildJpegHeader(
  *
  * @param {Uint8Array} jpegBytes
  * @param {number} orientation
- * @param {{ littleEndian?: boolean }} [options]
+ * @param {{ littleEndian?: boolean, type?: number }} [options]
  */
 export function injectExifOrientation(jpegBytes, orientation, options = {}) {
 	if (jpegBytes[0] !== 0xff || jpegBytes[1] !== 0xd8) {

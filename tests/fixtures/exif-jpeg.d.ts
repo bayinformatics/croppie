@@ -1,6 +1,8 @@
 export interface ExifBuildOptions {
 	/** Byte order of the TIFF structure: "II" (little endian) instead of "MM" (default). */
 	littleEndian?: boolean;
+	/** TIFF type of the Orientation entry: 3 (SHORT, default), 4 (LONG) or any other. */
+	type?: number;
 }
 
 export function buildExifApp1(
