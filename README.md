@@ -203,7 +203,7 @@ Getter and setter for the current zoom level. Setting it clamps to the zoom limi
 
 #### `reset(): void`
 
-Re-centres the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
+Re-centers the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
 
 #### `on(event, handler): void` / `off(event, handler): void`
 
@@ -264,7 +264,7 @@ cropper.on('rotate', ({ rotation, previousRotation }) => {
 
 `rotate()` with 0 or a full turn, before an image is bound or after `destroy()` does nothing and emits nothing. When an `update` listener zooms again, its own `zoom` event reports the final zoom and the change that caused the `update` emits none, so `zoom` never reports a value that was already replaced.
 
-Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport centre (slider, `setZoom()`) fixed. One mouse-wheel notch (100px, or 3 lines for a mouse that scrolls by lines) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan; when the fingers of a pinch lift until one is left, that finger pans again.
+Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport center (slider, `setZoom()`) fixed. One mouse-wheel notch (100px, or 3 lines for a mouse that scrolls by lines) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan; when the fingers of a pinch lift until one is left, that finger pans again.
 
 ### Zoom and accessibility
 
@@ -274,7 +274,7 @@ Zooming keeps the point under the cursor (mouse wheel), between the fingers (pin
 
 ## Theming
 
-The colours are CSS custom properties, set on `:root` by `croppie.css`. Override them anywhere in your own stylesheet:
+The colors are CSS custom properties, set on `:root` by `croppie.css`. Override them anywhere in your own stylesheet:
 
 ```css
 .my-cropper {

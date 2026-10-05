@@ -302,13 +302,13 @@ describe("Image utilities", () => {
 			expect(described.endsWith("…")).toBe(true);
 		});
 
-		it("summarises a data URL by type and size instead of embedding it", () => {
+		it("summarizes a data URL by type and size instead of embedding it", () => {
 			const url = `data:image/png;base64,${"A".repeat(5000)}`;
 
 			expect(describeUrl(url)).toBe(`data:image/png;…(${url.length} chars)`);
 		});
 
-		it("summarises a data URL without a media type", () => {
+		it("summarizes a data URL without a media type", () => {
 			expect(describeUrl("data:,hello")).toBe("data:;…(11 chars)");
 		});
 	});

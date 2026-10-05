@@ -183,7 +183,7 @@ describe("Pinch Zoom Handler", () => {
 	});
 
 	describe("anchor", () => {
-		it("anchors at the finger midpoint, relative to the element centre", () => {
+		it("anchors at the finger midpoint, relative to the element center", () => {
 			mockElementRect(element, { left: 0, top: 0, width: 300, height: 300 });
 			createPinchZoomHandler(element, getZoom, requestZoom);
 
@@ -198,7 +198,7 @@ describe("Pinch Zoom Handler", () => {
 				{ clientX: 300, clientY: 100 },
 			);
 
-			// Midpoint (200, 100) is 50px right of and 50px above the centre (150, 150)
+			// Midpoint (200, 100) is 50px right of and 50px above the center (150, 150)
 			expect(lastRequest().anchor).toEqual({ x: 50, y: -50 });
 		});
 
@@ -222,7 +222,7 @@ describe("Pinch Zoom Handler", () => {
 			expect(lastRequest().zoom).toBeCloseTo(1, 9);
 		});
 
-		it("falls back to the centre when the element has no layout box", () => {
+		it("falls back to the center when the element has no layout box", () => {
 			createPinchZoomHandler(element, getZoom, requestZoom);
 
 			touch(

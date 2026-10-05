@@ -101,7 +101,7 @@ function createMaskImage(boundary: Boundary, viewport: Viewport): string {
 
 	if (viewport.type === "circle") {
 		// An ellipse matches the viewport's border-radius: 50% outline (a circle when square).
-		// Colour stops are measured along the horizontal radius.
+		// Color stops are measured along the horizontal radius.
 		const radiusX = viewport.width / 2;
 		const radiusY = viewport.height / 2;
 		return `radial-gradient(ellipse ${radiusX}px ${radiusY}px at ${centerX}px ${centerY}px, transparent ${radiusX}px, black ${radiusX}px)`;

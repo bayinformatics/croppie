@@ -275,7 +275,7 @@ describe("Croppie bind and zoom inputs", () => {
 		];
 
 		for (const [label, value] of invalid) {
-			it(`rejects ${label} with a TypeError without cancelling a bind that is still loading`, async () => {
+			it(`rejects ${label} with a TypeError without canceling a bind that is still loading`, async () => {
 				const { croppie, root } = mount();
 
 				const good = croppie.bind({ url: SLOW, zoom: 2 });

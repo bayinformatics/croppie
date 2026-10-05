@@ -199,7 +199,7 @@ describe("canvas draw", () => {
 
 				const ctx = lastContext();
 				expect(ctx.drawImage).toHaveBeenCalledTimes(1);
-				// 400x300 scaled by 100/1000 = 40x30, centred at (30, 35): never stretched
+				// 400x300 scaled by 100/1000 = 40x30, centered at (30, 35): never stretched
 				expect(ctx.drawImage).toHaveBeenCalledWith(
 					image,
 					0,
@@ -555,7 +555,7 @@ describe("canvas draw", () => {
 			bottomRightY: 70,
 		};
 
-		it("keeps the image's proportions and centres it between two bars", () => {
+		it("keeps the image's proportions and centers it between two bars", () => {
 			// Scale 1 in a 2:1 output: 50x50, not stretched to 100x50, with 25px either side
 			drawCroppedImage(image, square, 100, 50);
 
@@ -588,7 +588,7 @@ describe("canvas draw", () => {
 			);
 		});
 
-		it("clips a circle, not an ellipse, around the centred frame", () => {
+		it("clips a circle, not an ellipse, around the centered frame", () => {
 			drawCroppedImage(image, square, 100, 50, { circle: true });
 
 			expect(lastContext().ellipse).toHaveBeenCalledWith(
@@ -602,7 +602,7 @@ describe("canvas draw", () => {
 			);
 		});
 
-		it("fills the whole output, bars included, with the background colour", () => {
+		it("fills the whole output, bars included, with the background color", () => {
 			drawCroppedImage(image, square, 100, 50, { backgroundColor: "#fff" });
 
 			const ctx = lastContext();
@@ -635,7 +635,7 @@ describe("canvas draw", () => {
 			);
 		});
 
-		it("centres a frame that extends past the image too", () => {
+		it("centers a frame that extends past the image too", () => {
 			// The 1000x1000 frame at scale 0.1 is 100x100 in the middle of the 200x100 output,
 			// and the 400x300 image 40x30 in the middle of that
 			drawCroppedImage(

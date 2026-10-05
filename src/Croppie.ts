@@ -671,7 +671,7 @@ export class Croppie {
 
 	/**
 	 * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
-	 * viewport centre. Emits `update` then `zoom` only when the clamped zoom changed.
+	 * viewport center. Emits `update` then `zoom` only when the clamped zoom changed.
 	 * A numeric string (such as a range input's `value`) is converted to a number;
 	 * a value that is then not finite, a blank string included, is ignored.
 	 */
@@ -689,7 +689,7 @@ export class Croppie {
 	 * so `zoom` never reports a value that has already been replaced.
 	 *
 	 * @param requested - Requested zoom level; not clamped by the caller
-	 * @param anchor - Offset from the boundary centre to keep fixed (default: the viewport centre)
+	 * @param anchor - Offset from the boundary center to keep fixed (default: the viewport center)
 	 * @returns Whether the zoom changed, in which case `update` was emitted
 	 */
 	private applyZoom(

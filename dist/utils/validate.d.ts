@@ -18,7 +18,7 @@ export declare function positiveFinite(name: string, value: unknown): number;
  * A viewport or boundary dimension and `zoom.min` / `zoom.max` may be numbers or numeric
  * strings (as read from data attributes: `"200"`, `" 5 "`); the returned options hold them
  * as numbers, so no string reaches the arithmetic. Throws a `RangeError` for values that
- * would silently produce NaN/Infinity maths or an unusable slider: a dimension that is not
+ * would silently produce NaN/Infinity math or an unusable slider: a dimension that is not
  * a positive finite number (a blank or non-numeric string is not), a `zoom.min` /
  * `zoom.max` that is not, or a configured `zoom.min` greater than `zoom.max` (a lone `min`
  * is compared with the default max). A lone `max` only has to be positive and finite: an
