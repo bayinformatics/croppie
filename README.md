@@ -153,7 +153,12 @@ Load an image from a File input. `options` are those of `bind()` without `url` (
 const input = document.querySelector('input[type="file"]')
 input.addEventListener('change', async (e) => {
   const file = (e.target as HTMLInputElement).files?.[0]
-  if (file) await cropper.bindFile(file)
+  if (!file) return
+  try {
+    await cropper.bindFile(file)
+  } catch (error) {
+    if ((error as Error).name !== 'AbortError') throw error
+  }
 })
 ```
 
