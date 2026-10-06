@@ -854,15 +854,11 @@ export class Croppie {
 	 * Calculates the crop points based on current transform, clamped to the image
 	 */
 	private getPoints(): CropPoints {
-		if (!this.image) {
-			return { topLeftX: 0, topLeftY: 0, bottomRightX: 0, bottomRightY: 0 };
-		}
-
-		return intersectFrame(
-			this.getViewportRect(),
-			this.image.naturalWidth,
-			this.image.naturalHeight,
-		);
+		const frame = this.getViewportRect();
+		// Without an image the frame is already the empty rectangle
+		return this.image
+			? intersectFrame(frame, this.image.naturalWidth, this.image.naturalHeight)
+			: frame;
 	}
 
 	/**
