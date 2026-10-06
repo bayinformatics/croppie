@@ -203,7 +203,7 @@ Getter and setter for the current zoom level. Setting it clamps to the zoom limi
 
 #### `reset(): void`
 
-Re-centers the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Always emits `update`, and then `zoom` when the zoom changed. Does nothing before an image is bound.
+Restores the rotation `bind()` started with, re-centers the image and returns the zoom to the coverage zoom of that rotation (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `rotate` when the rotation changed, always emits `update`, and then `zoom` when the zoom changed. Does nothing before an image is bound.
 
 #### `on(event, handler): void` / `off(event, handler): void`
 

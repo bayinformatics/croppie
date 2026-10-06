@@ -902,7 +902,10 @@ export class Croppie {
 		this.previewEl = null;
 		this.sliderEl = null;
 		this.image = null;
-		// get() and the zoom getter report the initial zoom next to the zeroed points
+		// get() and the zoom getter report the initial zoom next to the zeroed points, and no
+		// EXIF orientation: that tag belonged to the image that is gone
+		this.exifOrientation = undefined;
+		this.initialRotation = 0;
 		this.transform = Croppie.initialTransform();
 	}
 
@@ -965,7 +968,12 @@ export class Croppie {
 		// Coverage and fit depend on the image as displayed, i.e. after the rotation
 		const [displayedWidth, displayedHeight] = this.displayedSize(rotation);
 		const { width, height } = this.options.viewport;
-		const coverage = this.coverageZoom(rotation);
+		const coverage = calculateInitialZoom(
+			displayedWidth,
+			displayedHeight,
+			width,
+			height,
+		);
 		this.coverage = coverage;
 
 		this.effectiveMinZoom = resolveMinZoom({
@@ -1000,20 +1008,6 @@ export class Croppie {
 			this.image?.naturalWidth ?? 0,
 			this.image?.naturalHeight ?? 0,
 			rotation,
-		);
-	}
-
-	/**
-	 * The smallest zoom at which the image, displayed at `rotation`, covers the viewport
-	 * (computed for `updateZoomLimits()`, which stores it as `coverage`).
-	 */
-	private coverageZoom(rotation: Rotation): number {
-		const [displayedWidth, displayedHeight] = this.displayedSize(rotation);
-		return calculateInitialZoom(
-			displayedWidth,
-			displayedHeight,
-			this.options.viewport.width,
-			this.options.viewport.height,
 		);
 	}
 

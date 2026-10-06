@@ -125,6 +125,20 @@ describe("Croppie EXIF orientation", () => {
 			expect(croppie.get().orientation).toBeUndefined();
 		});
 
+		it("reports no tag after destroy(), next to the zeroed points", async () => {
+			create({ enableExif: true });
+			await croppie.bindFile(jpegBlob(6));
+			croppie.rotate(90);
+
+			croppie.destroy();
+
+			expect(croppie.get()).toEqual({
+				points: { topLeftX: 0, topLeftY: 0, bottomRightX: 0, bottomRightY: 0 },
+				zoom: 1,
+				rotation: 0,
+			});
+		});
+
 		it("does not warn when the file has no conflicting explicit orientation", async () => {
 			create({ enableExif: true });
 
