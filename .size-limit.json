@@ -1,0 +1,14 @@
+[
+	{
+		"name": "dist/croppie.js",
+		"path": "dist/croppie.js",
+		"limit": "8.5 kB",
+		"gzip": true
+	},
+	{
+		"name": "dist/croppie.css",
+		"path": "dist/croppie.css",
+		"limit": "1.5 kB",
+		"gzip": true
+	}
+]
