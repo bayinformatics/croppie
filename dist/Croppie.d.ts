@@ -256,11 +256,6 @@ export declare class Croppie {
      */
     private displayedSize;
     /**
-     * The smallest zoom at which the image, displayed at `rotation`, covers the viewport
-     * (computed for `updateZoomLimits()`, which stores it as `coverage`).
-     */
-    private coverageZoom;
-    /**
      * Updates the CSS transform on the preview element.
      *
      * The `<img>` keeps its natural size with transform-origin 0 0, so the transform is
