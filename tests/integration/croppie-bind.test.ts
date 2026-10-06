@@ -83,6 +83,9 @@ describe("Croppie bind", () => {
 		);
 
 		it("binds a Blob", async () => {
+			// bindFile() shows the file through an object URL, which the default mock cannot size
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 100, height: 100 });
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
 			});
@@ -91,10 +94,13 @@ describe("Croppie bind", () => {
 			await croppie.bindFile(blob);
 
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;
-			expect(preview.src).toBe(TINY_PNG);
+			expect(preview.src.startsWith("blob:")).toBe(true);
 		});
 
 		it("binds a File", async () => {
+			// bindFile() shows the file through an object URL, which the default mock cannot size
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 100, height: 100 });
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
 			});
@@ -103,7 +109,7 @@ describe("Croppie bind", () => {
 			await croppie.bindFile(file);
 
 			const preview = container.querySelector(".cr-image") as HTMLImageElement;
-			expect(preview.src).toBe(TINY_PNG);
+			expect(preview.src.startsWith("blob:")).toBe(true);
 		});
 	});
 

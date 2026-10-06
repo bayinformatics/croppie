@@ -83,8 +83,8 @@ export interface CroppieOptions {
      */
     enableZoom?: boolean;
     /**
-     * Read the EXIF Orientation tag of JPEGs bound as data URLs (which includes `bindFile()`)
-     * and report it as `get().orientation`. Browsers already display such images upright, so
+     * Read the EXIF Orientation tag of JPEGs bound with `bindFile()` or as data URLs and
+     * report it as `get().orientation`. Browsers already display such images upright, so
      * this never rotates anything. Remote URLs are not read; use the exported
      * `readJpegOrientation()` on bytes you fetched yourself.
      */

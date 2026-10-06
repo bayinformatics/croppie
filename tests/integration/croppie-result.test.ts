@@ -10,7 +10,9 @@ import {
 import { Croppie } from "../../src/Croppie.ts";
 import type { ResultOptions } from "../../src/types.ts";
 import {
-	getLastMockContext,
+	drawCalls,
+	getMockContext,
+	type MockCanvasContext,
 	restoreCanvasMocks,
 	setupCanvasMocks,
 } from "../canvas/mocks.ts";
@@ -20,6 +22,13 @@ import {
 	SMALL_PNG,
 	TINY_PNG,
 } from "../fixtures/test-image-data-url.ts";
+
+/** The mock context of the canvas result() returned, not of a downscaling step. */
+function outputContext(canvas: HTMLCanvasElement): MockCanvasContext {
+	const ctx = getMockContext(canvas);
+	if (!ctx) throw new Error("result() drew nothing into its canvas");
+	return ctx;
+}
 
 describe("Croppie result", () => {
 	let container: HTMLDivElement;
@@ -202,10 +211,10 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			await croppie.result({ type: "canvas" });
+			const canvas = await croppie.result({ type: "canvas" });
 
-			const ctx = getLastMockContext();
-			expect(ctx?.ellipse).toHaveBeenCalledWith(
+			const ctx = outputContext(canvas);
+			expect(ctx.ellipse).toHaveBeenCalledWith(
 				50,
 				50,
 				50,
@@ -214,7 +223,7 @@ describe("Croppie result", () => {
 				0,
 				Math.PI * 2,
 			);
-			expect(ctx?.clip).toHaveBeenCalledTimes(1);
+			expect(ctx.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("uses square output for square viewport by default", async () => {
@@ -223,9 +232,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			await croppie.result({ type: "canvas" });
+			const canvas = await croppie.result({ type: "canvas" });
 
-			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
+			expect(outputContext(canvas).clip).not.toHaveBeenCalled();
 		});
 
 		it("can override circle option", async () => {
@@ -234,9 +243,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			await croppie.result({ type: "canvas", circle: true });
+			const canvas = await croppie.result({ type: "canvas", circle: true });
 
-			expect(getLastMockContext()?.clip).toHaveBeenCalledTimes(1);
+			expect(outputContext(canvas).clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("can force square output on circle viewport", async () => {
@@ -245,9 +254,9 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			await croppie.result({ type: "canvas", circle: false });
+			const canvas = await croppie.result({ type: "canvas", circle: false });
 
-			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
+			expect(outputContext(canvas).clip).not.toHaveBeenCalled();
 		});
 	});
 
@@ -260,26 +269,29 @@ describe("Croppie result", () => {
 		});
 
 		it("fills the output with the background color", async () => {
-			await croppie.result({ type: "canvas", backgroundColor: "#ff0000" });
+			const canvas = await croppie.result({
+				type: "canvas",
+				backgroundColor: "#ff0000",
+			});
 
-			const ctx = getLastMockContext();
-			expect(ctx?.fillStyle).toBe("#ff0000");
-			expect(ctx?.fillRect).toHaveBeenCalledWith(0, 0, 100, 100);
+			const ctx = outputContext(canvas);
+			expect(ctx.fillStyle).toBe("#ff0000");
+			expect(ctx.fillRect).toHaveBeenCalledWith(0, 0, 100, 100);
 		});
 
 		it("accepts rgba background color", async () => {
-			await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				backgroundColor: "rgba(255, 0, 0, 0.5)",
 			});
 
-			expect(getLastMockContext()?.fillStyle).toBe("rgba(255, 0, 0, 0.5)");
+			expect(outputContext(canvas).fillStyle).toBe("rgba(255, 0, 0, 0.5)");
 		});
 
 		it("leaves the background transparent by default", async () => {
-			await croppie.result({ type: "canvas" });
+			const canvas = await croppie.result({ type: "canvas" });
 
-			expect(getLastMockContext()?.fillRect).not.toHaveBeenCalled();
+			expect(outputContext(canvas).fillRect).not.toHaveBeenCalled();
 		});
 	});
 
@@ -343,20 +355,13 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind({ url: TINY_PNG, zoom: 0.1 });
 
-			await croppie.result({ type: "canvas" });
+			const canvas = await croppie.result({ type: "canvas" });
 
-			// The 400x300 image is drawn at 40x30 in the middle of the 100x100 output
-			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				0,
-				0,
-				400,
-				300,
-				30,
-				35,
-				40,
-				30,
-			);
+			// The 400x300 image is drawn at 40x30 in the middle of the 100x100 output,
+			// from the 50x38 step it was halved to first
+			expect(drawCalls(outputContext(canvas))).toEqual([
+				["CANVAS 50x38", 0, 0, 50, 38, 30, 35, 40, 30],
+			]);
 		});
 
 		it("returns an integer-sized canvas for size 'original'", async () => {
@@ -385,22 +390,15 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind({ url: TINY_PNG, zoom: 0.1 });
 
-			await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				size: { width: 200, height: 200 },
 			});
 
-			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				0,
-				0,
-				400,
-				300,
-				60,
-				70,
-				80,
-				60,
-			);
+			// 80x60 in the middle of 200x200, from the 100x75 step it was halved to first
+			expect(drawCalls(outputContext(canvas))).toEqual([
+				["CANVAS 100x75", 0, 0, 100, 75, 60, 70, 80, 60],
+			]);
 		});
 	});
 
@@ -414,22 +412,14 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			await croppie.result({ type: "canvas" });
+			const canvas = await croppie.result({ type: "canvas" });
 
 			// Covering the viewport would take a zoom of 5: at the maximum of 2 the 20x20 image
 			// is drawn at 40x40 in the middle of the 100x100 output, as it is shown
 			expect(croppie.zoom).toBe(2);
-			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				0,
-				0,
-				20,
-				20,
-				30,
-				30,
-				40,
-				40,
-			);
+			expect(drawCalls(outputContext(canvas))).toEqual([
+				["IMG", 0, 0, 20, 20, 30, 30, 40, 40],
+			]);
 		});
 	});
 
@@ -492,17 +482,10 @@ describe("Croppie result", () => {
 
 			// The 200x100 crop at half size is 100x50, with a 25px bar above and below
 			expect([canvas.width, canvas.height]).toEqual([100, 100]);
-			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				200,
-				150,
-				200,
-				100,
-				0,
-				25,
-				100,
-				50,
-			);
+			// The 2x shrink goes through one step canvas; the last draw into the output places it
+			expect(drawCalls(outputContext(canvas)).at(-1)?.slice(-4)).toEqual([
+				0, 25, 100, 50,
+			]);
 		});
 
 		it("masks a circle viewport with a circle, not an ellipse", async () => {
@@ -513,12 +496,12 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind({ url: TINY_PNG, zoom: 0.5 });
 
-			await croppie.result({
+			const canvas = await croppie.result({
 				type: "canvas",
 				size: { width: 200, height: 100 },
 			});
 
-			expect(getLastMockContext()?.ellipse).toHaveBeenCalledWith(
+			expect(outputContext(canvas).ellipse).toHaveBeenCalledWith(
 				100,
 				50,
 				50,
@@ -563,7 +546,7 @@ describe("Croppie result", () => {
 			// Scaled by 4096 / 40000, the image is 204.8 px square in the middle, from 1945.6
 			// to 2150.4: drawn on whole pixels, 1946 to 2150
 			const [, , , , , dx, dy, dw, dh] =
-				getLastMockContext()?.drawImage.mock.calls[0] ?? [];
+				outputContext(canvas).drawImage.mock.calls[0] ?? [];
 			expect([dx, dy, dw, dh]).toEqual([1946, 1946, 204, 204]);
 		});
 

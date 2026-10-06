@@ -42,13 +42,13 @@ import {
 	DEFAULT_MIN_ZOOM,
 	describeUrl,
 	exifOrientationToRotation,
-	fileToDataUrl,
 	intersectFrame,
 	loadImage,
 	naturalRectToRotated,
 	normalizePoints,
 	normalizeRotation,
 	positiveFinite,
+	readBlobOrientation,
 	readDataUrlOrientation,
 	resolveMinZoom,
 	rotatedRectToNatural,
@@ -127,6 +127,8 @@ export class Croppie {
 	private initialRotation: Rotation = 0;
 	/** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
 	private exifOrientation: number | undefined;
+	/** The object URL `bindFile()` made for the bound image; revoked once nothing shows it. */
+	private objectUrl: string | undefined;
 	/**
 	 * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
 	 * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
@@ -441,6 +443,7 @@ export class Croppie {
 		bindOptions: BindOptions,
 		rotation: Rotation,
 		points?: CropPoints,
+		file?: { orientation: number | undefined },
 	): void {
 		// A 0x0 image (e.g. an SVG without a size) would make every zoom calculation Infinity
 		if (!(image.naturalWidth > 0 && image.naturalHeight > 0)) {
@@ -449,6 +452,10 @@ export class Croppie {
 			);
 		}
 		this.image = image;
+
+		// The previous file's object URL is no longer shown or cropped from
+		this.revokeObjectUrl();
+		if (file) this.objectUrl = bindOptions.url;
 
 		if (this.previewEl) {
 			// Show the image we crop from. In the loader's CORS mode the browser can reuse the image
@@ -459,10 +466,12 @@ export class Croppie {
 			this.previewEl.src = this.image.src;
 		}
 
-		// Read the tag from the data URL's prefix; the browser has already oriented the pixels,
-		// so it is only reported, never applied
+		// A file's tag was read from its first bytes, a data URL's comes from its prefix. The
+		// browser has already oriented the pixels, so it is only reported, never applied
 		this.exifOrientation = this.options.enableExif
-			? readDataUrlOrientation(bindOptions.url)
+			? file
+				? file.orientation
+				: readDataUrlOrientation(bindOptions.url)
 			: undefined;
 		// Warn only when the turn came from `orientation`: an explicit `rotation` wins over it,
 		// and orientation 1 or an ignored value turns nothing
@@ -568,11 +577,33 @@ export class Croppie {
 
 		// Claim the generation before reading, so a bind() started while the file is
 		// still being read supersedes this one
-		await this.runBind(
-			++this.bindGeneration,
-			() => fileToDataUrl(file),
-			(image, url) => this.load(image, { ...options, url }, rotation, points),
-		);
+		let orientation: number | undefined;
+		let objectUrl: string | undefined;
+		try {
+			await this.runBind(
+				++this.bindGeneration,
+				async () => {
+					// Only the first 256 KiB of the file, and only for enableExif
+					if (this.options.enableExif) {
+						orientation = await readBlobOrientation(file);
+					}
+					// An object URL hands the browser the file itself. A base64 data URL of a large
+					// photo is a string of tens of megabytes that WebKit pays for on every repaint,
+					// which made dragging a 48 MP photo take ~600 ms per frame in Safari.
+					objectUrl = URL.createObjectURL(file);
+					return objectUrl;
+				},
+				(image, url) =>
+					this.load(image, { ...options, url }, rotation, points, {
+						orientation,
+					}),
+			);
+		} finally {
+			// Superseded, failed, or destroyed before it was shown: nothing else will revoke it
+			if (objectUrl !== undefined && this.objectUrl !== objectUrl) {
+				URL.revokeObjectURL(objectUrl);
+			}
+		}
 	}
 
 	/**
@@ -848,6 +879,7 @@ export class Croppie {
 		this.destroyed = true;
 		// Invalidate any bind that is still loading
 		this.bindGeneration++;
+		this.revokeObjectUrl();
 
 		// Run all cleanup functions
 		for (const cleanup of this.cleanupFns) {
@@ -913,6 +945,15 @@ export class Croppie {
 				`[@bayinformatics/croppie] ${method}() called on a destroyed instance`,
 			);
 		}
+	}
+
+	/**
+	 * Revokes the object URL of a bound file, if there is one
+	 */
+	private revokeObjectUrl(): void {
+		if (this.objectUrl === undefined) return;
+		URL.revokeObjectURL(this.objectUrl);
+		this.objectUrl = undefined;
 	}
 
 	/**

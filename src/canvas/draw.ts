@@ -1,6 +1,80 @@
 import type { CropPoints, OutputFormat, Rotation } from "../types.js";
+import { capCanvasSize } from "../utils/limits.js";
 import { intersectFrame } from "../utils/points.js";
 import { swapDims } from "../utils/rotation.js";
+
+/** A source for drawImage and the rectangle of it to draw. */
+interface SourceRect {
+	source: CanvasImageSource;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+/**
+ * Shrink a source rectangle by repeated halving until one more halving would undershoot the
+ * size it will finally be drawn at.
+ *
+ * A single drawImage that shrinks by much more than 2x samples too few source pixels in
+ * WebKit (even at imageSmoothingQuality "high"), so a 48 MP photo cropped to an avatar came
+ * out jagged and speckled. Each halving stays within the 2x that bilinear filtering handles
+ * well. A step is never larger than the canvas `result()` renders (see `capCanvasSize`: the
+ * area iOS Safari will still draw into), so the first one may shrink by more.
+ *
+ * @param rect - The image and the rectangle of it to draw
+ * @param targetWidth - The width the result will be drawn at
+ * @param targetHeight - The height the result will be drawn at
+ * @returns The rectangle to draw: `rect` itself when it shrinks by less than 2x or the
+ *   target is empty, otherwise the whole of the last step canvas
+ */
+function downsample(
+	rect: SourceRect,
+	targetWidth: number,
+	targetHeight: number,
+): SourceRect {
+	// Nothing is drawn into an empty target (a sliver of image that rounds to no pixel), and
+	// halving toward it would never stop: a 1x1 step halves to 1x1 again
+	if (!(targetWidth > 0 && targetHeight > 0)) return rect;
+
+	let current = rect;
+	while (
+		current.width / 2 >= targetWidth &&
+		current.height / 2 >= targetHeight
+	) {
+		// Half the size, rounded so that the step never exceeds the canvas caps
+		const size = capCanvasSize(current.width / 2, current.height / 2);
+		const step = document.createElement("canvas");
+		step.width = size.width;
+		step.height = size.height;
+
+		const ctx = step.getContext("2d");
+		// Without a context, draw what we have in one go rather than fail the crop
+		if (!ctx) break;
+		ctx.imageSmoothingEnabled = true;
+		ctx.imageSmoothingQuality = "high";
+		ctx.drawImage(
+			current.source,
+			current.x,
+			current.y,
+			current.width,
+			current.height,
+			0,
+			0,
+			step.width,
+			step.height,
+		);
+
+		current = {
+			source: step,
+			x: 0,
+			y: 0,
+			width: step.width,
+			height: step.height,
+		};
+	}
+	return current;
+}
 
 /**
  * Create a new canvas showing the viewport `frame` of an image, scaled to given dimensions and optionally masked or filled.
@@ -138,33 +212,48 @@ export function drawCroppedImage(
 	const right = Math.round(offsetX + (sourceRight - frame.topLeftX) * scaleX);
 	const top = Math.round(offsetY + (sourceTop - frame.topLeftY) * scaleY);
 	const bottom = Math.round(offsetY + (sourceBottom - frame.topLeftY) * scaleY);
+	const destinationWidth = right - left;
+	const destinationHeight = bottom - top;
+
+	// The box is in the image's own orientation, so the steps are the same for any rotation
+	const { source, x, y, width, height } = downsample(
+		{
+			source: image,
+			x: sourceLeft,
+			y: sourceTop,
+			width: sourceWidth,
+			height: sourceHeight,
+		},
+		destinationWidth,
+		destinationHeight,
+	);
 
 	if (rotation === 0) {
 		ctx.drawImage(
-			image,
-			sourceLeft,
-			sourceTop,
-			sourceWidth,
-			sourceHeight,
+			source,
+			x,
+			y,
+			width,
+			height,
 			left,
 			top,
-			right - left,
-			bottom - top,
+			destinationWidth,
+			destinationHeight,
 		);
 	} else {
 		ctx.save();
 		ctx.translate(outputWidth / 2, outputHeight / 2);
 		ctx.rotate((rotation * Math.PI) / 180);
 		ctx.drawImage(
-			image,
-			sourceLeft,
-			sourceTop,
-			sourceWidth,
-			sourceHeight,
+			source,
+			x,
+			y,
+			width,
+			height,
 			left - boxWidth / 2,
 			top - boxHeight / 2,
-			right - left,
-			bottom - top,
+			destinationWidth,
+			destinationHeight,
 		);
 		ctx.restore();
 	}

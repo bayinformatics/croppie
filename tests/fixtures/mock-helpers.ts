@@ -51,8 +51,12 @@ export function installImageMock(
 					? options.delay(value)
 					: (options.delay ?? 0);
 			setTimeout(() => {
-				if (value.startsWith("data:") || value.startsWith("http")) {
-					// Simulate successful load for data URLs and http URLs
+				if (
+					value.startsWith("data:") ||
+					value.startsWith("blob:") ||
+					value.startsWith("http")
+				) {
+					// Simulate successful load for data, object (blob:), and http URLs
 					const resolved =
 						typeof dimensions === "function" ? dimensions(value) : dimensions;
 					if (resolved) {

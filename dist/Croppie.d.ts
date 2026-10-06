@@ -27,6 +27,8 @@ export declare class Croppie {
     private initialRotation;
     /** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
     private exifOrientation;
+    /** The object URL `bindFile()` made for the bound image; revoked once nothing shows it. */
+    private objectUrl;
     /**
      * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
      * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
@@ -234,6 +236,10 @@ export declare class Croppie {
      * Throws if the instance was destroyed, naming the method that was called
      */
     private assertNotDestroyed;
+    /**
+     * Revokes the object URL of a bound file, if there is one
+     */
+    private revokeObjectUrl;
     /**
      * Resolves the effective minimum zoom for the bound image shown at `rotation` (see
      * `resolveMinZoom`), stores it with the coverage zoom of the image as displayed (the one

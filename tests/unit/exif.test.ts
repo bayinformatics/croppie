@@ -1,6 +1,7 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, spyOn } from "bun:test";
 import { readJpegOrientation as readFromPublicApi } from "../../src/index.ts";
 import {
+	readBlobOrientation,
 	readDataUrlOrientation,
 	readJpegOrientation,
 } from "../../src/utils/exif.ts";
@@ -364,5 +365,60 @@ describe("readDataUrlOrientation", () => {
 
 		expect(orientation).toBe(6);
 		expect(performance.now() - started).toBeLessThan(500);
+	});
+});
+
+describe("readBlobOrientation", () => {
+	it("reads the orientation of a JPEG Blob or File", async () => {
+		const jpeg = buildJpegHeader(6);
+
+		expect(
+			await readBlobOrientation(new Blob([jpeg], { type: "image/jpeg" })),
+		).toBe(6);
+		expect(
+			await readBlobOrientation(
+				new File([jpeg], "a.jpg", { type: "image/jpeg" }),
+			),
+		).toBe(6);
+	});
+
+	it("reads a JPEG whatever its declared type, since it looks at the bytes", async () => {
+		expect(await readBlobOrientation(new Blob([buildJpegHeader(8)]))).toBe(8);
+	});
+
+	it("returns 1 for a file that is not a JPEG and for an empty one", async () => {
+		const png = new Blob([Uint8Array.of(0x89, 0x50, 0x4e, 0x47)], {
+			type: "image/png",
+		});
+
+		expect(await readBlobOrientation(png)).toBe(1);
+		expect(await readBlobOrientation(new Blob([]))).toBe(1);
+	});
+
+	it("reads only the first 256 KiB of the file", async () => {
+		// EXIF after 300 KiB of padding segments is never reached, and the rest of the file
+		// is never read either
+		const padding = new Uint8Array(4 + 65531);
+		padding.set([0xff, 0xe2, 0xff, 0xfd]);
+		const jpeg = concat(
+			SOI,
+			padding,
+			padding,
+			padding,
+			padding,
+			padding,
+			buildExifApp1(6),
+			SOS,
+		);
+		// A copy typed as backed by a plain ArrayBuffer, which is what BlobPart accepts
+		const blob = new Blob([new Uint8Array(jpeg)], { type: "image/jpeg" });
+		const slice = spyOn(blob, "slice");
+
+		const orientation = await readBlobOrientation(blob);
+
+		expect(blob.size).toBeGreaterThan(300 * 1024);
+		expect(orientation).toBe(1);
+		expect(slice).toHaveBeenCalledTimes(1);
+		expect(slice).toHaveBeenCalledWith(0, 256 * 1024);
 	});
 });
