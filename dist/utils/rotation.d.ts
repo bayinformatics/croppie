@@ -21,8 +21,9 @@ import type { CropPoints, Rotation } from "../types.js";
  * | 180 | `(W - px, H - py)`  | `(W - qx, H - qy)`  |
  * | 270 | `(py, W - px)`      | `(W - qy, qx)`      |
  *
- * Axis-aligned rectangles stay axis-aligned, so the rect maps below are exact (for integer
- * dimensions and in floating point alike) and `inverse(forward(rect)) === rect`:
+ * Axis-aligned rectangles stay axis-aligned, so the rect maps below are plain subtractions and
+ * swaps, and `inverse(forward(rect))` is `rect` for integer coordinates; fractional ones
+ * come back within floating-point rounding (`H - (H - y)` is not always `y`):
  *
  * - `naturalRectToRotated`: 90 -> `{tlX: H-brY, tlY: tlX, brX: H-tlY, brY: brX}`;
  *   180 -> `{W-brX, H-brY, W-tlX, H-tlY}`; 270 -> `{tlX: tlY, tlY: W-brX, brX: brY, brY: W-tlX}`
