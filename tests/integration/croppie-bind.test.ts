@@ -360,6 +360,27 @@ describe("Croppie bind", () => {
 			expect(sliderMin()).toBeCloseTo(0.05, 9);
 		});
 
+		it("keeps the zoom before any bind within a lone zoom.max below 1", () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+				zoom: { max: 0.05 },
+			});
+
+			// Not the initial 1: above max, with a slider that cannot show it ("100%")
+			expect(croppie.zoom).toBeCloseTo(0.05, 9);
+			const slider = container.querySelector(".cr-slider") as HTMLInputElement;
+			expect(slider.getAttribute("aria-valuetext")).toBe("5%");
+		});
+
+		it("keeps the zoom before any bind within a configured min above 1", () => {
+			croppie = new Croppie(container, {
+				viewport: { width: 200, height: 200, type: "square" },
+				zoom: { min: 2, max: 4 },
+			});
+
+			expect(croppie.zoom).toBe(2);
+		});
+
 		it("re-resolves the limits for every image", async () => {
 			croppie = new Croppie(container, {
 				viewport: { width: 200, height: 200, type: "square" },

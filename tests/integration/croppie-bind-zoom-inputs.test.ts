@@ -292,6 +292,34 @@ describe("Croppie bind and zoom inputs", () => {
 				expect(croppie.zoom).toBe(2);
 			});
 		}
+
+		it("does not embed a long string, such as a data URL, in the message", async () => {
+			const { croppie } = mount();
+			const dataUrl = `data:image/png;base64,${"A".repeat(100_000)}`;
+
+			const error = await croppie
+				.bindFile(dataUrl as unknown as Blob)
+				.catch((caught: unknown) => caught);
+
+			expect(error).toBeInstanceOf(TypeError);
+			expect((error as Error).message).toContain(
+				"bindFile() expects a File or Blob",
+			);
+			expect((error as Error).message.length).toBeLessThan(200);
+		});
+
+		it("names an object that String() cannot convert instead of throwing from it", async () => {
+			const { croppie } = mount();
+
+			const error = await croppie
+				.bindFile(Object.create(null) as Blob)
+				.catch((caught: unknown) => caught);
+
+			expect(error).toBeInstanceOf(TypeError);
+			expect((error as Error).message).toContain(
+				"bindFile() expects a File or Blob (got [object Object])",
+			);
+		});
 	});
 
 	describe("string zoom values: blank and non-numeric strings are ignored", () => {
