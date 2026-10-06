@@ -45,6 +45,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Pinch zoom only counts fingers that went down on the cropper: a finger resting elsewhere on the page (a thumb, the zoom slider, another cropper) no longer turns a one-finger pan into pan plus zoom, and no longer blocks a two-finger pinch.
 - A `bind()`, `bindFile()`, `reset()` or `setZoom()` that lands during a pinch is no longer overwritten by the next finger move; the pinch carries on from the new zoom.
 - A third finger that lands and lifts during a pinch no longer stops the two fingers still down from zooming.
+- A mouse drag whose button was released where no `pointerup` reached the cropper (outside the window, where pointer capture is unavailable) ends at the next move without a button, instead of the image following the hovering cursor.
+- A wheel or pinch zoom whose pointer position is missing or not finite (an event built by hand without `clientX`/`clientY`) zooms about the viewport center instead of setting the image position to `NaN`.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
 
 ### Internal
