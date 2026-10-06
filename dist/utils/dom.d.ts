@@ -1,4 +1,4 @@
-import type { ZoomAnchor } from "./transform.js";
+import { type ZoomAnchor } from "./transform.js";
 /**
  * Create an HTML element of the given tag and apply optional class, attributes, and styles.
  *
@@ -40,12 +40,15 @@ export declare function setTransform(element: HTMLElement, x: number, y: number,
  *
  * Works for CSS-scaled elements: the displayed box (`getBoundingClientRect`) is mapped
  * back to layout pixels through `offsetWidth`/`offsetHeight`. Without a layout box
- * (detached or `display: none`) it falls back to the center.
+ * (detached or `display: none`), or with a coordinate that is not finite (an event built
+ * by hand without `clientX`/`clientY`), it falls back to the center: a NaN anchor would
+ * make the zoomed position NaN, which no later zoom could repair.
  *
  * @param element - The element the offset is relative to
  * @param clientX - X in viewport coordinates (e.g. `event.clientX`)
  * @param clientY - Y in viewport coordinates (e.g. `event.clientY`)
- * @returns The offset from the element center; `{ x: 0, y: 0 }` when it has no layout box
+ * @returns The offset from the element center; `{ x: 0, y: 0 }` when it has no layout box or
+ *   the point is not finite
  */
 export declare function anchorFromClientPoint(element: HTMLElement, clientX: number, clientY: number): ZoomAnchor;
 /**

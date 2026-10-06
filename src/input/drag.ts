@@ -175,6 +175,14 @@ export function createDragHandler(
 		}
 		if (e.pointerId !== state.pointerId) return;
 
+		// A mouse move with no button down means the button was released where no pointerup
+		// reached the element (outside the window, with no capture to deliver it): that drag is
+		// over, so the image must not follow a cursor that is only hovering
+		if (e.pointerType === "mouse" && e.buttons === 0) {
+			endDrag(true);
+			return;
+		}
+
 		const deltaX = (e.clientX - state.lastClientX) * state.scale.x;
 		const deltaY = (e.clientY - state.lastClientY) * state.scale.y;
 		state.lastClientX = e.clientX;
