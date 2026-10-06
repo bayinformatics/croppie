@@ -402,6 +402,35 @@ describe("Croppie result", () => {
 		});
 	});
 
+	describe("an image that cannot cover the viewport at zoom.max (coverage enforced)", () => {
+		it("also letterboxes an image whose coverage zoom is above zoom.max, with coverage enforced", async () => {
+			cleanupImageMock();
+			cleanupImageMock = installImageMock({ width: 20, height: 20 });
+			croppie = new Croppie(container, {
+				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { max: 2 },
+			});
+			await croppie.bind(TINY_PNG);
+
+			await croppie.result({ type: "canvas" });
+
+			// Covering the viewport would take a zoom of 5: at the maximum of 2 the 20x20 image
+			// is drawn at 40x40 in the middle of the 100x100 output, as it is shown
+			expect(croppie.zoom).toBe(2);
+			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
+				expect.anything(),
+				0,
+				0,
+				20,
+				20,
+				30,
+				30,
+				40,
+				40,
+			);
+		});
+	});
+
 	describe("result() typing", () => {
 		beforeEach(async () => {
 			croppie = new Croppie(container, {
