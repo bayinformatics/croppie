@@ -39,6 +39,34 @@ function contextOf(canvas: HTMLCanvasElement): MockCanvasContext {
 	return ctx;
 }
 
+/**
+ * Runs `draw` and returns the canvases it created, in creation order. The spy is restored
+ * even when `draw` throws, and `limit` turns a runaway loop into a failure instead of a hang.
+ */
+function canvasesCreatedDuring(
+	draw: () => void,
+	limit = 100,
+): HTMLCanvasElement[] {
+	const created: HTMLCanvasElement[] = [];
+	const createElement = document.createElement.bind(document);
+	const spy = spyOn(document, "createElement").mockImplementation(((
+		tag: string,
+	) => {
+		if (tag === "canvas" && created.length >= limit) {
+			throw new Error(`More than ${limit} canvases were created`);
+		}
+		const el = createElement(tag);
+		if (tag === "canvas") created.push(el as HTMLCanvasElement);
+		return el;
+	}) as typeof document.createElement);
+	try {
+		draw();
+	} finally {
+		spy.mockRestore();
+	}
+	return created;
+}
+
 /** Global invocation index of a mock's first call, for ordering assertions. */
 function firstCall(fn: ReturnType<typeof mock>): number {
 	return fn.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY;
@@ -445,28 +473,20 @@ describe("canvas draw", () => {
 
 		it("starts the first step from the crop rectangle, not the whole image", () => {
 			sizeImage(4000, 3000);
-			const created: HTMLCanvasElement[] = [];
-			const createElement = document.createElement.bind(document);
-			const spy = spyOn(document, "createElement").mockImplementation(((
-				tag: string,
-			) => {
-				const el = createElement(tag);
-				if (tag === "canvas") created.push(el as HTMLCanvasElement);
-				return el;
-			}) as typeof document.createElement);
 
-			drawCroppedImage(
-				image,
-				{
-					topLeftX: 1000,
-					topLeftY: 500,
-					bottomRightX: 1800,
-					bottomRightY: 1100,
-				},
-				100,
-				75,
+			const created = canvasesCreatedDuring(() =>
+				drawCroppedImage(
+					image,
+					{
+						topLeftX: 1000,
+						topLeftY: 500,
+						bottomRightX: 1800,
+						bottomRightY: 1100,
+					},
+					100,
+					75,
+				),
 			);
-			spy.mockRestore();
 
 			// created[0] is the output canvas; created[1] is the first step
 			const first = created[1];
@@ -479,18 +499,10 @@ describe("canvas draw", () => {
 
 		it("smooths every step at high quality", () => {
 			sizeImage(4000, 3000);
-			const created: HTMLCanvasElement[] = [];
-			const createElement = document.createElement.bind(document);
-			const spy = spyOn(document, "createElement").mockImplementation(((
-				tag: string,
-			) => {
-				const el = createElement(tag);
-				if (tag === "canvas") created.push(el as HTMLCanvasElement);
-				return el;
-			}) as typeof document.createElement);
 
-			drawCroppedImage(image, whole(4000, 3000), 100, 75);
-			spy.mockRestore();
+			const created = canvasesCreatedDuring(() =>
+				drawCroppedImage(image, whole(4000, 3000), 100, 75),
+			);
 
 			expect(created.length).toBe(6);
 			for (const canvas of created) {
@@ -500,24 +512,61 @@ describe("canvas draw", () => {
 
 		it("never makes a step canvas larger than 16,777,216 pixels (the iOS canvas limit)", () => {
 			sizeImage(12000, 12000);
-			const created: HTMLCanvasElement[] = [];
-			const createElement = document.createElement.bind(document);
-			const spy = spyOn(document, "createElement").mockImplementation(((
-				tag: string,
-			) => {
-				const el = createElement(tag);
-				if (tag === "canvas") created.push(el as HTMLCanvasElement);
-				return el;
-			}) as typeof document.createElement);
 
-			drawCroppedImage(image, whole(12000, 12000), 100, 100);
-			spy.mockRestore();
+			const created = canvasesCreatedDuring(() =>
+				drawCroppedImage(image, whole(12000, 12000), 100, 100),
+			);
 
 			// Halving 12000x12000 would give 36 MP; the first step is capped instead
 			for (const canvas of created) {
 				expect(canvas.width * canvas.height).toBeLessThanOrEqual(16_777_216);
 			}
 			expect(created.length).toBeGreaterThan(2);
+		});
+
+		it("keeps a step canvas within the pixel cap when rounding to whole pixels would exceed it", () => {
+			// Halving 17043x9000 gives 76.7 MP. Scaled to the cap and rounded to the nearest
+			// pixel that is 5637x2977 = 16,781,349 px, 4,133 over: iOS Safari draws nothing on it
+			sizeImage(17043, 9000);
+
+			const created = canvasesCreatedDuring(() =>
+				drawCroppedImage(image, whole(17043, 9000), 100, 53),
+			);
+
+			expect(created.length).toBeGreaterThan(2);
+			for (const canvas of created) {
+				expect(canvas.width * canvas.height).toBeLessThanOrEqual(16_777_216);
+			}
+		});
+
+		it("draws a sliver of image that rounds to no pixel without halving forever", () => {
+			sizeImage(4000, 3000);
+			let canvas: HTMLCanvasElement | undefined;
+
+			// The frame overlaps the image's corner by 0.001 px on each axis, less than half a
+			// pixel of the 100x100 output, so the destination is 0x0. A 1x1 step halves to 1x1
+			// again, so halving toward an empty destination never stops (the limit fails the
+			// test instead of hanging it)
+			const created = canvasesCreatedDuring(() => {
+				canvas = drawCroppedImage(
+					image,
+					{
+						topLeftX: 3999.999,
+						topLeftY: 2999.999,
+						bottomRightX: 4099.999,
+						bottomRightY: 3099.999,
+					},
+					100,
+					100,
+				);
+			}, 20);
+
+			// Only the output canvas, drawn into straight from the image: no step for nothing
+			expect(created).toHaveLength(1);
+			if (!canvas) throw new Error("drawCroppedImage returned no canvas");
+			for (const [source] of drawCalls(contextOf(canvas))) {
+				expect(source).toBe("IMG");
+			}
 		});
 
 		it("halves the source the same way under a rotation", () => {
