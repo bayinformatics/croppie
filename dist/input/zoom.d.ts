@@ -1,4 +1,4 @@
-import type { ZoomAnchor } from "../utils/transform.js";
+import { type ZoomAnchor } from "../utils/transform.js";
 /**
  * Proposes a zoom level and the screen point to zoom about. The receiver (the Croppie
  * instance) owns clamping, the position constraint and events, so handlers never clamp
