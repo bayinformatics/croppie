@@ -412,22 +412,14 @@ describe("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			await croppie.result({ type: "canvas" });
+			const canvas = await croppie.result({ type: "canvas" });
 
 			// Covering the viewport would take a zoom of 5: at the maximum of 2 the 20x20 image
 			// is drawn at 40x40 in the middle of the 100x100 output, as it is shown
 			expect(croppie.zoom).toBe(2);
-			expect(getLastMockContext()?.drawImage).toHaveBeenCalledWith(
-				expect.anything(),
-				0,
-				0,
-				20,
-				20,
-				30,
-				30,
-				40,
-				40,
-			);
+			expect(drawCalls(outputContext(canvas))).toEqual([
+				["IMG", 0, 0, 20, 20, 30, 30, 40, 40],
+			]);
 		});
 	});
 
