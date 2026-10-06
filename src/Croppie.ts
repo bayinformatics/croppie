@@ -40,6 +40,7 @@ import {
 	clamp,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
+	describeUrl,
 	exifOrientationToRotation,
 	fileToDataUrl,
 	intersectFrame,
@@ -70,6 +71,22 @@ function readPoints(points: BindOptions["points"]): CropPoints | undefined {
 	} catch {
 		return undefined;
 	}
+}
+
+/**
+ * A value for an error message, never the whole of it: a string (such as a data URL passed
+ * where a File belongs) is summarized like the URL of a failed image load, and an object or
+ * function is named by its tag, since `String()` of one can be huge or throw.
+ */
+function describeValue(value: unknown): string {
+	if (typeof value === "string") return describeUrl(value);
+	if (
+		(typeof value === "object" && value !== null) ||
+		typeof value === "function"
+	) {
+		return Object.prototype.toString.call(value);
+	}
+	return String(value);
 }
 
 /**
@@ -181,6 +198,13 @@ export class Croppie {
 		// capped at max), so the placeholder until the first bind is capped at max too
 		this.effectiveMinZoom = Math.min(
 			this.zoomConfig.min ?? DEFAULT_MIN_ZOOM,
+			this.zoomConfig.max,
+		);
+		// The zoom before any bind (what the slider starts at and zoom reports) stays within
+		// those limits too: a zoom.max of 0.05 must not leave it at 1
+		this.transform.scale = clamp(
+			this.transform.scale,
+			this.effectiveMinZoom,
 			this.zoomConfig.max,
 		);
 
@@ -534,7 +558,7 @@ export class Croppie {
 			tag !== "[object File]"
 		) {
 			throw new TypeError(
-				`[@bayinformatics/croppie] bindFile() expects a File or Blob (got ${String(file)})`,
+				`[@bayinformatics/croppie] bindFile() expects a File or Blob (got ${describeValue(file)})`,
 			);
 		}
 
@@ -1022,14 +1046,14 @@ export class Croppie {
 	 * is clamped to the displayed image and then mapped back through the rotation.
 	 */
 	private getPoints(): CropPoints {
-		if (!this.image) {
-			return { topLeftX: 0, topLeftY: 0, bottomRightX: 0, bottomRightY: 0 };
-		}
+		const frame = this.getViewportRect();
+		// Without an image the frame is already the empty rectangle
+		if (!this.image) return frame;
 
 		const [displayedWidth, displayedHeight] = this.displayedSize();
 
 		return rotatedRectToNatural(
-			intersectFrame(this.getViewportRect(), displayedWidth, displayedHeight),
+			intersectFrame(frame, displayedWidth, displayedHeight),
 			this.image.naturalWidth,
 			this.image.naturalHeight,
 			this.transform.rotation,
