@@ -1,6 +1,6 @@
 import { clamp } from "../utils/clamp.js";
 import { anchorFromClientPoint } from "../utils/dom.js";
-import type { ZoomAnchor } from "../utils/transform.js";
+import { CENTER_ANCHOR, type ZoomAnchor } from "../utils/transform.js";
 
 /**
  * Proposes a zoom level and the screen point to zoom about. The receiver (the Croppie
@@ -39,11 +39,6 @@ export function wheelDeltaPx(
 	return clamp(event.deltaY * unit, -WHEEL_MAX_PX, WHEEL_MAX_PX);
 }
 
-/** The zoom factor for a wheel distance in pixels (see {@link wheelDeltaPx}). */
-function zoomFactorForPx(px: number): number {
-	return WHEEL_FACTOR_PER_NOTCH ** (-px / WHEEL_NOTCH_PX);
-}
-
 /**
  * The zoom factor for one wheel event: multiplicative, scaled by how far the wheel moved.
  *
@@ -55,7 +50,7 @@ function zoomFactorForPx(px: number): number {
 export function wheelZoomFactor(
 	event: Pick<WheelEvent, "deltaY" | "deltaMode">,
 ): number {
-	return zoomFactorForPx(wheelDeltaPx(event));
+	return WHEEL_FACTOR_PER_NOTCH ** (-wheelDeltaPx(event) / WHEEL_NOTCH_PX);
 }
 
 /**
@@ -80,14 +75,15 @@ export function createWheelZoomHandler(
 		// Check for ctrl requirement
 		if (options.requireCtrl && !e.ctrlKey) return;
 
-		// Convert to pixels first, then ignore an event that does not scroll vertically
-		const px = wheelDeltaPx(e);
-		if (px === 0) return;
+		// A factor of exactly 1 is an event that does not scroll vertically (a horizontal
+		// scroll, say): leave it to the page
+		const factor = wheelZoomFactor(e);
+		if (factor === 1) return;
 
 		e.preventDefault();
 
 		requestZoom(
-			getZoom() * zoomFactorForPx(px),
+			getZoom() * factor,
 			anchorFromClientPoint(element, e.clientX, e.clientY),
 		);
 	};
@@ -144,7 +140,7 @@ export function createPinchZoomHandler(
 
 	const getMidpointAnchor = (touches: Touch[]): ZoomAnchor => {
 		const [touch1, touch2] = touches;
-		if (!touch1 || !touch2) return { x: 0, y: 0 };
+		if (!touch1 || !touch2) return CENTER_ANCHOR;
 		return anchorFromClientPoint(
 			element,
 			(touch1.clientX + touch2.clientX) / 2,
