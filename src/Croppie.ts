@@ -38,6 +38,7 @@ import {
 	clamp,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
+	describeUrl,
 	fileToDataUrl,
 	intersectFrame,
 	loadImage,
@@ -61,6 +62,22 @@ function readPoints(points: BindOptions["points"]): CropPoints | undefined {
 	} catch {
 		return undefined;
 	}
+}
+
+/**
+ * A value for an error message, never the whole of it: a string (such as a data URL passed
+ * where a File belongs) is summarized like the URL of a failed image load, and an object or
+ * function is named by its tag, since `String()` of one can be huge or throw.
+ */
+function describeValue(value: unknown): string {
+	if (typeof value === "string") return describeUrl(value);
+	if (
+		(typeof value === "object" && value !== null) ||
+		typeof value === "function"
+	) {
+		return Object.prototype.toString.call(value);
+	}
+	return String(value);
 }
 
 /**
@@ -464,7 +481,7 @@ export class Croppie {
 			tag !== "[object File]"
 		) {
 			throw new TypeError(
-				`[@bayinformatics/croppie] bindFile() expects a File or Blob (got ${String(file)})`,
+				`[@bayinformatics/croppie] bindFile() expects a File or Blob (got ${describeValue(file)})`,
 			);
 		}
 
