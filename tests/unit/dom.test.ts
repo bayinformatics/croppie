@@ -385,6 +385,26 @@ describe("DOM utilities", () => {
 			expect(anchorFromClientPoint(element, 120, 80)).toEqual({ x: 0, y: 0 });
 		});
 
+		it("returns the center when a coordinate is not finite", () => {
+			mockElementRect(element, { left: 10, top: 20, width: 200, height: 100 });
+
+			expect(anchorFromClientPoint(element, Number.NaN, 70)).toEqual({
+				x: 0,
+				y: 0,
+			});
+			expect(anchorFromClientPoint(element, 110, Number.NaN)).toEqual({
+				x: 0,
+				y: 0,
+			});
+			expect(
+				anchorFromClientPoint(element, Number.POSITIVE_INFINITY, 70),
+			).toEqual({ x: 0, y: 0 });
+			// A property a hand-built event does not have reads as undefined
+			expect(
+				anchorFromClientPoint(element, undefined as unknown as number, 70),
+			).toEqual({ x: 0, y: 0 });
+		});
+
 		it("returns the offset from the element center", () => {
 			mockElementRect(element, { left: 10, top: 20, width: 200, height: 100 });
 
