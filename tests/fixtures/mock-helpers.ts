@@ -207,7 +207,7 @@ export function mockElementRect(element: HTMLElement, rect: MockRect): void {
  * Create a PointerEvent configured for simulating pointer-based drag interactions in tests.
  *
  * @param type - The event type (e.g., "pointerdown", "pointermove", "pointerup").
- * @param options - Partial PointerEventInit values that override the following defaults: bubbles = true, cancelable = true, clientX = 100, clientY = 100, button = 0, pointerId = 1, pointerType = "mouse".
+ * @param options - Partial PointerEventInit values that override the following defaults: bubbles = true, cancelable = true, clientX = 100, clientY = 100, button = 0, buttons = 1 for `pointerdown` and `pointermove` (the button is held) and 0 otherwise, pointerId = 1, pointerType = "mouse".
  * @returns The constructed PointerEvent with the merged defaults and provided overrides.
  */
 export function createPointerEvent(
@@ -220,6 +220,7 @@ export function createPointerEvent(
 		clientX: 100,
 		clientY: 100,
 		button: 0,
+		buttons: type === "pointerdown" || type === "pointermove" ? 1 : 0,
 		pointerId: 1,
 		pointerType: "mouse",
 		...options,
