@@ -559,6 +559,71 @@ describe("Drag Handler", () => {
 
 			expect(onEnd).toHaveBeenCalledTimes(1);
 		});
+
+		it("ends the drag when a mouse move arrives with no button down", () => {
+			// Without capture, a button released outside the window never sends a pointerup
+			// here, and the next move over the element has no button down
+			Object.assign(element, { setPointerCapture: undefined });
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, { onEnd });
+
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", { clientX: 100, clientY: 100 }),
+			);
+			element.dispatchEvent(
+				createPointerEvent("pointermove", { clientX: 120, clientY: 100 }),
+			);
+			expect(transformState.x).toBe(20);
+
+			element.dispatchEvent(
+				createPointerEvent("pointermove", {
+					clientX: 180,
+					clientY: 100,
+					buttons: 0,
+				}),
+			);
+
+			expect(onEnd).toHaveBeenCalledTimes(1);
+			expect(element.style.cursor).toBe("grab");
+			// The hovering cursor did not drag the image
+			expect(transformState.x).toBe(20);
+
+			element.dispatchEvent(
+				createPointerEvent("pointermove", {
+					clientX: 200,
+					clientY: 100,
+					buttons: 0,
+				}),
+			);
+			expect(transformState.x).toBe(20);
+		});
+
+		it("keeps dragging a touch whose moves report no buttons", () => {
+			// Only a mouse can be mistaken for released by its buttons
+			const onEnd = mock();
+			createDragHandler(element, getTransform, setTransform, { onEnd });
+
+			element.dispatchEvent(
+				createPointerEvent("pointerdown", {
+					pointerType: "touch",
+					isPrimary: true,
+					clientX: 100,
+					clientY: 100,
+				}),
+			);
+			element.dispatchEvent(
+				createPointerEvent("pointermove", {
+					pointerType: "touch",
+					isPrimary: true,
+					buttons: 0,
+					clientX: 130,
+					clientY: 100,
+				}),
+			);
+
+			expect(onEnd).not.toHaveBeenCalled();
+			expect(transformState.x).toBe(30);
+		});
 	});
 
 	describe("complete drag workflow", () => {
