@@ -109,6 +109,47 @@ describe("Croppie bindFile object URLs", () => {
 		expect(preview().src).toBe(TINY_PNG);
 	});
 
+	it("revokes the object URL of a file whose instance is destroyed before it loads", async () => {
+		create();
+		const created = spyOn(URL, "createObjectURL");
+
+		const file = croppie.bindFile(photo()).then(
+			() => undefined,
+			(caught: unknown) => caught,
+		);
+		croppie.destroy();
+		const error = await file;
+
+		const url = created.mock.results[0]?.value as string;
+		created.mockRestore();
+		expect((error as DOMException).name).toBe("AbortError");
+		expect(revoke).toHaveBeenCalledWith(url);
+	});
+
+	it("revokes the object URL of a file superseded while its EXIF tag is read", async () => {
+		croppie = new Croppie(container, {
+			viewport: { width: 100, height: 100, type: "square" },
+			boundary: { width: 300, height: 300 },
+			enableExif: true,
+		});
+		const created = spyOn(URL, "createObjectURL");
+
+		// The tag is read first (asynchronously), so the later bind claims its generation
+		// before this file has an object URL
+		const file = croppie.bindFile(photo()).then(
+			() => undefined,
+			(caught: unknown) => caught,
+		);
+		await croppie.bind(TINY_PNG);
+		const error = await file;
+
+		const url = created.mock.results[0]?.value as string;
+		created.mockRestore();
+		expect((error as DOMException).name).toBe("AbortError");
+		expect(revoke).toHaveBeenCalledWith(url);
+		expect(preview().src).toBe(TINY_PNG);
+	});
+
 	it("revokes the object URL of a file that fails to load and keeps the old image", async () => {
 		cleanupImageMock();
 		// Files load as 0x0, which bind rejects; the data URL keeps its size
