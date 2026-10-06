@@ -1,21 +1,41 @@
 import type { CropPoints, OutputFormat } from "../types.js";
+import { intersectFrame } from "../utils/points.js";
 
 /**
- * Create a new canvas containing the specified rectangular region of an image, scaled to given dimensions and optionally masked or filled.
+ * Create a new canvas showing the viewport `frame` of an image, scaled to given dimensions and optionally masked or filled.
+ *
+ * The frame is the unclamped viewport rectangle in source-image pixels, so it can extend
+ * past the image when the user zoomed out (coverage not enforced). It is scaled by one factor
+ * for both axes and centered in the output: the part that overlaps the image is drawn into the
+ * proportional sub-rectangle, and the rest of the output stays transparent (or
+ * `backgroundColor`). An output of another shape than the frame therefore gets empty bars
+ * instead of a stretched image. An output with the frame's shape up to rounding to whole
+ * pixels (the `'viewport'` and `'original'` result sizes) is filled exactly: a frame inside
+ * the image maps onto the whole output, like drawing the crop rectangle directly, and the
+ * rounding leaves no sub-pixel gap at the edges. The image is drawn with its edges on whole
+ * pixels, so a letterboxed image has no blurred half-pixel seam next to the bars.
+ *
+ * ```
+ * k = min(outW / frameW, outH / frameH)    (kx = outW / frameW, ky = outH / frameH when filled)
+ * ox = (outW - frameW * k) / 2             (same for y)
+ * sx0 = clamp(frame.topLeftX, 0, iw)     sx1 = clamp(frame.bottomRightX, 0, iw)   (intersectFrame)
+ * dx0 = round(ox + (sx0 - frame.topLeftX) * k)   dx1 = round(ox + (sx1 - frame.topLeftX) * k)
+ * dw = dx1 - dx0                                                                  (same for y)
+ * ```
  *
  * @param image - Source HTMLImageElement to draw from.
- * @param points - Crop rectangle in source-image pixels; must provide `topLeftX`, `topLeftY`, `bottomRightX`, and `bottomRightY`.
+ * @param frame - Viewport rectangle in source-image pixels; may extend past the image.
  * @param outputWidth - Width of the resulting canvas in pixels.
  * @param outputHeight - Height of the resulting canvas in pixels.
  * @param options - Optional rendering options.
- * @param options.circle - If true, apply a circular clipping mask centered in the output canvas.
+ * @param options.circle - If true, clip to the ellipse inscribed in the drawn frame (a circle for a square viewport); that is the output's inscribed ellipse when the output has the frame's shape.
  * @param options.backgroundColor - If provided, fill the canvas background with this CSS color before drawing the image.
- * @returns An HTMLCanvasElement containing the cropped (and optionally masked) image scaled to `outputWidth` x `outputHeight`.
+ * @returns An HTMLCanvasElement containing the framed image scaled to `outputWidth` x `outputHeight`.
  * @throws If the 2D rendering context cannot be obtained from the created canvas.
  */
 export function drawCroppedImage(
 	image: HTMLImageElement,
-	points: CropPoints,
+	frame: CropPoints,
 	outputWidth: number,
 	outputHeight: number,
 	options?: {
@@ -32,38 +52,106 @@ export function drawCroppedImage(
 		throw new Error("Failed to get 2D context");
 	}
 
+	// Downscaling a large photo to the viewport size looks much better with high quality
+	ctx.imageSmoothingEnabled = true;
+	ctx.imageSmoothingQuality = "high";
+
 	// Fill background if specified
 	if (options?.backgroundColor) {
 		ctx.fillStyle = options.backgroundColor;
 		ctx.fillRect(0, 0, outputWidth, outputHeight);
 	}
 
-	// Apply circular mask if needed
+	const frameWidth = frame.bottomRightX - frame.topLeftX;
+	const frameHeight = frame.bottomRightY - frame.topLeftY;
+	if (!(frameWidth > 0 && frameHeight > 0)) {
+		return canvas;
+	}
+
+	// One scale keeps the image's proportions, with the frame centered in the output; an
+	// output that is the frame's shape rounded to whole pixels is filled exactly instead
+	const fill = isRoundedShape(
+		outputWidth,
+		outputHeight,
+		frameWidth,
+		frameHeight,
+	);
+	const scale = Math.min(outputWidth / frameWidth, outputHeight / frameHeight);
+	const scaleX = fill ? outputWidth / frameWidth : scale;
+	const scaleY = fill ? outputHeight / frameHeight : scale;
+	const offsetX = (outputWidth - frameWidth * scaleX) / 2;
+	const offsetY = (outputHeight - frameHeight * scaleY) / 2;
+
+	// Apply elliptical mask if needed: the ellipse inscribed in the scaled frame (a circle
+	// when the frame is square)
 	if (options?.circle) {
+		const maskWidth = frameWidth * scaleX;
+		const maskHeight = frameHeight * scaleY;
 		ctx.beginPath();
-		ctx.arc(outputWidth / 2, outputHeight / 2, outputWidth / 2, 0, Math.PI * 2);
+		ctx.ellipse(
+			outputWidth / 2,
+			outputHeight / 2,
+			maskWidth / 2,
+			maskHeight / 2,
+			0,
+			0,
+			Math.PI * 2,
+		);
 		ctx.closePath();
 		ctx.clip();
 	}
 
-	// Calculate source dimensions from points
-	const sourceWidth = points.bottomRightX - points.topLeftX;
-	const sourceHeight = points.bottomRightY - points.topLeftY;
+	// Intersect the frame with the image and map the overlap into the output
+	const {
+		topLeftX: sourceLeft,
+		topLeftY: sourceTop,
+		bottomRightX: sourceRight,
+		bottomRightY: sourceBottom,
+	} = intersectFrame(frame, image.naturalWidth, image.naturalHeight);
 
-	// Draw the cropped region
-	ctx.drawImage(
-		image,
-		points.topLeftX,
-		points.topLeftY,
-		sourceWidth,
-		sourceHeight,
-		0,
-		0,
-		outputWidth,
-		outputHeight,
-	);
+	const sourceWidth = sourceRight - sourceLeft;
+	const sourceHeight = sourceBottom - sourceTop;
+
+	// A frame that misses the image entirely leaves only the background
+	if (sourceWidth > 0 && sourceHeight > 0) {
+		// Each edge on a whole pixel: a half-pixel edge blurs the seam between the image and
+		// a letterbox bar. An output the frame fills exactly is already 0..outW, 0..outH
+		const left = Math.round(offsetX + (sourceLeft - frame.topLeftX) * scaleX);
+		const right = Math.round(offsetX + (sourceRight - frame.topLeftX) * scaleX);
+		const top = Math.round(offsetY + (sourceTop - frame.topLeftY) * scaleY);
+		const bottom = Math.round(
+			offsetY + (sourceBottom - frame.topLeftY) * scaleY,
+		);
+		ctx.drawImage(
+			image,
+			sourceLeft,
+			sourceTop,
+			sourceWidth,
+			sourceHeight,
+			left,
+			top,
+			right - left,
+			bottom - top,
+		);
+	}
 
 	return canvas;
+}
+
+/**
+ * Whether a `width` x `height` box is the frame's shape rounded to whole pixels: some scale
+ * of the frame lies within half a pixel of the box on both axes.
+ */
+function isRoundedShape(
+	width: number,
+	height: number,
+	frameWidth: number,
+	frameHeight: number,
+): boolean {
+	return (
+		Math.max((width - 0.5) / frameWidth, (height - 0.5) / frameHeight) <=
+		Math.min((width + 0.5) / frameWidth, (height + 0.5) / frameHeight)
+	);
 }
 
 /**

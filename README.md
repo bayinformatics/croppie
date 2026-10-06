@@ -100,11 +100,13 @@ new Croppie(element: HTMLElement, options: CroppieOptions)
 | `showZoomer` | `boolean` | `true` | Show zoom slider |
 | `mouseWheelZoom` | `boolean \| 'ctrl'` | `true` | Enable scroll zoom (optionally require Ctrl key) |
 | `enableZoom` | `boolean` | `true` | Let the user zoom with the slider, wheel and pinch. `false` removes all three (the slider is not rendered even with `showZoomer`); `setZoom()` and `zoom =` still work |
-| `zoom` | `{ min, max, enforceMinimumCoverage? }` | `{ min: 0.1, max: 10 }` | Zoom limits and coverage enforcement |
+| `zoom` | `{ min?, max?, enforceMinimumCoverage? }` | `{ max: 10 }`, `min` per image | Zoom limits and coverage enforcement. When `min` is not set, the minimum is the zoom at which the image just covers the viewport, so a large photo can zoom out further than 0.1; with `enforceMinimumCoverage: false` it is `min(0.1, the zoom at which the whole image fits)`. A configured `min` is a floor. The effective minimum never exceeds `max` |
 | `customClass` | `string` | — | Extra class for the container |
 | `enableExif` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
 | `enableResize` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
 | `enableOrientation` | `boolean` | `false` | Deprecated v2 option (no-op) |
+
+A viewport or boundary dimension, `zoom.min` and `zoom.max` may also be numeric strings (such as data attribute values: `"200"`); they are converted to numbers. Invalid options throw a `RangeError` from the constructor: a viewport or boundary dimension, `zoom.min` or `zoom.max` that is not a positive finite number (a blank or non-numeric string is not), or a configured `zoom.min` greater than `zoom.max` (or than the default max of 10). A lone `zoom.max` below 0.1 is fine: the minimum is then per image and capped at `zoom.max`. A boundary smaller than the viewport only logs a warning.
 
 > **Known limitations:** `enableExif` and `rotate()` are not implemented yet ([#21](https://github.com/bayinformatics/croppie/issues/21), [#20](https://github.com/bayinformatics/croppie/issues/20)).
 
@@ -128,6 +130,17 @@ await cropper.bind({
 
 `points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`. Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 
+`bind()` rejects with an error for an image that has no intrinsic size (0×0, for example an SVG without width and height). Only the newest bind applies its image and fulfills: if you call `bind()` or `bindFile()` again before the previous image has loaded, the earlier call rejects with a `DOMException` named `AbortError` (message `bind() was superseded by a later bind() call`) without applying anything, also when the later call then fails to load. A bind that is still loading when you call `destroy()` rejects the same way (`instance destroyed during bind()`). A call rejected before it starts loading changes nothing and supersedes nothing: `bindFile()` given something that is not a File or Blob (a `TypeError`), and `bind()` or `bindFile()` on a destroyed instance. Malformed `points` do not make `bind()` fail (see above), so such a bind still wins like any other. `bind()` emits one `update` when it completes.
+
+```typescript
+try {
+  await cropper.bind(url)
+} catch (error) {
+  // A later bind replaced this one, or the cropper was destroyed: nothing to report
+  if ((error as Error).name !== 'AbortError') throw error
+}
+```
+
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
 through `get()` while the derived zoom stays within `zoom.min`/`zoom.max`;
@@ -142,13 +155,25 @@ Load an image from a File input.
 const input = document.querySelector('input[type="file"]')
 input.addEventListener('change', async (e) => {
   const file = (e.target as HTMLInputElement).files?.[0]
-  await cropper.bindFile(file)
+  if (!file) return
+  try {
+    await cropper.bindFile(file)
+  } catch (error) {
+    if ((error as Error).name !== 'AbortError') throw error
+  }
 })
 ```
 
-#### `result(options: ResultOptions): Promise<Blob | string | HTMLCanvasElement>`
+#### `result(options: ResultOptions)`
 
-Get the cropped result.
+Get the cropped result. The return type follows `options.type`:
+
+```typescript
+result(options: ResultOptions & { type: 'blob' }): Promise<Blob>
+result(options: ResultOptions & { type: 'base64' }): Promise<string>
+result(options: ResultOptions & { type: 'canvas' }): Promise<HTMLCanvasElement>
+result(options: ResultOptions): Promise<Blob | string | HTMLCanvasElement>  // type only known at runtime
+```
 
 ```typescript
 // Get as Blob (for uploading)
@@ -193,14 +218,14 @@ Present for v2 compatibility but **not implemented**: it logs a warning and does
 
 #### `destroy(): void`
 
-Clean up and remove the cropper.
+Clean up and remove the cropper. It is safe to call more than once. Afterwards `bind()`, `bindFile()` and `result()` reject with a `... called on a destroyed instance` error, `setZoom()`, `zoom =` and `reset()` do nothing, and `get()` returns zeroed points with the initial zoom of 1.
 
 ### Result Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `type` | `'blob' \| 'base64' \| 'canvas'` | Required | Output type |
-| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size |
+| `size` | `{ width, height } \| 'viewport' \| 'original'` | `'viewport'` | Output size. `'original'` is the viewport area at image resolution. An `'original'` or custom size is scaled down, keeping its shape, to at most 16,777,216 px (4096×4096) and 16,384 px a side, so the canvas stays within what browsers can allocate (iOS Safari draws nothing on a larger one), then rounded to whole pixels; a custom width or height that is not a positive finite number rejects with a `RangeError`. A size of another shape than the viewport keeps the proportions, with transparent or `backgroundColor` bars |
 | `format` | `'png' \| 'jpeg' \| 'webp'` | `'png'` | Output format for blob/base64 |
 | `quality` | `number` | `0.92` | JPEG/WebP quality (0-1) |
 | `circle` | `boolean` | `viewport.type === 'circle'` | Apply circular mask |
@@ -228,6 +253,12 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 | `reset()` | always | only when the zoom changed |
 
 Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport center (slider, `setZoom()`) fixed. One mouse-wheel notch (100px, or 3 lines for a mouse that scrolls by lines) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan; when the fingers of a pinch lift until one is left, that finger pans again.
+
+### Zoom and accessibility
+
+- The zoom slider has the accessible name "Zoom" and announces its value as a percentage (`aria-valuetext`, for example "150%"), also before the first image is bound. Keyboard focus shows a visible ring in every browser.
+- If the image does not cover the viewport (zoomed out that far with `enforceMinimumCoverage: false`, or so small that the zoom it needs to cover it is above `zoom.max`), `result()` keeps the image's proportions: the image is drawn at its true scale, and the rest of the output is transparent or `backgroundColor`. `get().points` stays clamped to the image.
+- A `'circle'` viewport that is not square is an ellipse, in the overlay and in the output mask.
 
 ## Theming
 
@@ -315,7 +346,13 @@ export default class extends Controller {
 
   async selectFile(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) await this.croppie?.bindFile(file)
+    if (!file) return
+    try {
+      await this.croppie?.bindFile(file)
+    } catch (error) {
+      // Another file was chosen, or the controller disconnected, before this one loaded
+      if ((error as Error).name !== 'AbortError') throw error
+    }
   }
 
   async crop() {
@@ -343,7 +380,10 @@ function ImageCropper({ src, onCrop }) {
       croppieRef.current = new Croppie(containerRef.current, {
         viewport: { width: 200, height: 200, type: 'circle' }
       })
-      croppieRef.current.bind(src)
+      croppieRef.current.bind(src).catch((error) => {
+        // The effect was cleaned up (src changed, or unmount) before the image loaded
+        if (error.name !== 'AbortError') console.error(error)
+      })
     }
     return () => croppieRef.current?.destroy()
   }, [src])

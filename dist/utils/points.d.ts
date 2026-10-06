@@ -18,6 +18,20 @@ export type PointsInput = CropPoints | PointsArray;
  */
 export declare function normalizePoints(points: PointsInput | undefined): CropPoints | undefined;
 /**
+ * The part of `frame` that lies inside the image: each coordinate clamped to the image.
+ *
+ * `frame` is a rectangle in image pixels that may extend past the image (the viewport
+ * zoomed out further than the image covers). The result is what `get()` reports as the
+ * points and what `result()` draws from; a frame that misses the image gives a rectangle
+ * without area.
+ *
+ * @param frame - Rectangle in image pixels
+ * @param imageWidth - Width of the image
+ * @param imageHeight - Height of the image
+ * @returns The intersection of `frame` and the image
+ */
+export declare function intersectFrame(frame: CropPoints, imageWidth: number, imageHeight: number): CropPoints;
+/**
  * Converts a CropPoints object into a PointsArray.
  *
  * @param points - Object with `topLeftX`, `topLeftY`, `bottomRightX`, and `bottomRightY` coordinates

@@ -4,9 +4,13 @@ import type { CropPoints, CroppieOptions } from "../../src/types.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
 
 const PHOTO = "https://example.com/photo.jpg"; // 400x300
+const SLOW = "https://example.com/slow.jpg"; // 600x600, loads after 20ms
 
-// Every image the tests bind
-const DIMENSIONS = { width: 400, height: 300 };
+function dimensions(src: string): { width: number; height: number } {
+	if (src === SLOW) return { width: 600, height: 600 };
+	// PHOTO and every other image
+	return { width: 400, height: 300 };
+}
 
 // A 400x300 image in a 100x100 viewport covers it at a zoom of 1/3
 const COVERAGE_ZOOM = 1 / 3;
@@ -37,13 +41,28 @@ describe("Croppie bind and zoom inputs", () => {
 		return root.querySelector(".cr-slider") as HTMLInputElement;
 	}
 
+	/** Everything a user can observe: the data, the rendered transform and the slider. */
+	function observe({ croppie, root }: { croppie: Croppie; root: HTMLElement }) {
+		return {
+			data: croppie.get(),
+			transform: preview(root).style.transform,
+			slider: {
+				min: slider(root).min,
+				max: slider(root).max,
+				value: slider(root).value,
+			},
+		};
+	}
+
 	function expectFinitePoints(points: CropPoints): void {
 		expect(Object.values(points).every(Number.isFinite)).toBe(true);
 	}
 
 	beforeEach(() => {
 		mounted = [];
-		cleanupImageMock = installImageMock(DIMENSIONS);
+		cleanupImageMock = installImageMock(dimensions, {
+			delay: (src) => (src === SLOW ? 20 : 0),
+		});
 		originalWarn = console.warn;
 		warn = mock();
 		console.warn = warn;
@@ -56,6 +75,49 @@ describe("Croppie bind and zoom inputs", () => {
 			root.remove();
 		}
 		cleanupImageMock();
+	});
+
+	describe("zoom options given as undefined", () => {
+		it("treats zoom: { max: undefined } as the default max of 10", async () => {
+			// A wrapper forwarding an optional prop: zoom: { max: props.maxZoom }
+			const { croppie, root } = mount({ zoom: { max: undefined } });
+			expect(slider(root).max).toBe("10");
+
+			await croppie.bind(PHOTO);
+
+			expect(croppie.zoom).toBeCloseTo(COVERAGE_ZOOM, 9);
+			expectFinitePoints(croppie.get().points);
+			croppie.setZoom(50);
+			expect(croppie.zoom).toBe(10);
+			expect(preview(root).style.transform).not.toContain("NaN");
+		});
+
+		it("behaves exactly like unset options when every field is undefined", async () => {
+			const unset = mount();
+			const undefinedFields = mount({
+				zoom: {
+					min: undefined,
+					max: undefined,
+					enforceMinimumCoverage: undefined,
+				},
+			});
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+
+			for (const { croppie } of [unset, undefinedFields]) {
+				await croppie.bind(PHOTO);
+			}
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+
+			for (const { croppie } of [unset, undefinedFields]) {
+				croppie.setZoom(50);
+			}
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+
+			for (const { croppie } of [unset, undefinedFields]) {
+				croppie.setZoom(0.01);
+			}
+			expect(observe(undefinedFields)).toEqual(observe(unset));
+		});
 	});
 
 	describe("bind({ zoom }) that is not a finite number", () => {
@@ -146,6 +208,62 @@ describe("Croppie bind and zoom inputs", () => {
 		});
 	});
 
+	describe("bindFile() with something that is not a File or Blob", () => {
+		const invalid: Array<[string, unknown]> = [
+			["undefined (an empty file input)", undefined],
+			["null", null],
+			["a URL string", "photo.jpg"],
+			["a plain object", {}],
+		];
+
+		for (const [label, value] of invalid) {
+			it(`rejects ${label} with a TypeError without canceling a bind that is still loading`, async () => {
+				const { croppie, root } = mount();
+
+				const good = croppie.bind({ url: SLOW, zoom: 2 });
+				const error = await croppie
+					.bindFile(value as Blob)
+					.catch((caught: unknown) => caught);
+				await good;
+
+				expect(error).toBeInstanceOf(TypeError);
+				expect((error as Error).message).toContain(
+					"bindFile() expects a File or Blob",
+				);
+				expect(preview(root).src).toBe(SLOW);
+				expect(croppie.zoom).toBe(2);
+			});
+		}
+
+		it("does not embed a long string, such as a data URL, in the message", async () => {
+			const { croppie } = mount();
+			const dataUrl = `data:image/png;base64,${"A".repeat(100_000)}`;
+
+			const error = await croppie
+				.bindFile(dataUrl as unknown as Blob)
+				.catch((caught: unknown) => caught);
+
+			expect(error).toBeInstanceOf(TypeError);
+			expect((error as Error).message).toContain(
+				"bindFile() expects a File or Blob",
+			);
+			expect((error as Error).message.length).toBeLessThan(200);
+		});
+
+		it("names an object that String() cannot convert instead of throwing from it", async () => {
+			const { croppie } = mount();
+
+			const error = await croppie
+				.bindFile(Object.create(null) as Blob)
+				.catch((caught: unknown) => caught);
+
+			expect(error).toBeInstanceOf(TypeError);
+			expect((error as Error).message).toContain(
+				"bindFile() expects a File or Blob (got [object Object])",
+			);
+		});
+	});
+
 	describe("string zoom values: blank and non-numeric strings are ignored", () => {
 		// [value, zoom after setZoom()/zoom = from 2, zoom after bind()]. A blank string is not
 		// a number, although Number("") and Number(" ") are 0
@@ -180,7 +298,7 @@ describe("Croppie bind and zoom inputs", () => {
 			});
 
 			it(`bind({ zoom: ${label} }) starts at ${bindStart}`, async () => {
-				// Coverage not enforced, so the coverage zoom is not the min (0.1) that 0 clamps to
+				// Coverage not enforced, so the coverage zoom is not the minimum zoom that 0 clamps to
 				const { croppie } = mount({ zoom: { enforceMinimumCoverage: false } });
 
 				await croppie.bind({ url: PHOTO, zoom: value as unknown as number });

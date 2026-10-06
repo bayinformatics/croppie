@@ -38,7 +38,8 @@ export declare function createOverlay(boundary: Boundary, viewport: Viewport): H
  */
 export declare function createPreview(): HTMLImageElement;
 /**
- * Creates a range input element configured as the zoom slider.
+ * Creates a range input element configured as the zoom slider, named "Zoom" and with its
+ * value spoken as a percentage (`aria-valuetext`) from the start.
  *
  * @param min - Minimum slider value
  * @param max - Maximum slider value

@@ -34,11 +34,21 @@ export interface Boundary {
  * Zoom configuration
  */
 export interface ZoomConfig {
-    /** Minimum zoom level (default: 0.1) */
+    /**
+     * Minimum zoom level. When unset, the minimum is derived per image: with
+     * `enforceMinimumCoverage` (the default) it is the zoom at which the image just covers
+     * the viewport, so a large photo can zoom out further than 0.1; without it, it is
+     * `min(0.1, the zoom at which the whole image fits)`. When set, it is a floor, and
+     * with `enforceMinimumCoverage` the effective minimum is `max(min, coverage zoom)`.
+     * The effective minimum never exceeds `max`.
+     */
     min: number;
     /** Maximum zoom level (default: 10) */
     max: number;
-    /** Initial zoom level */
+    /**
+     * @deprecated No effect: pass `bind({ url, zoom })` to start at a given zoom. Kept so
+     * existing configuration still compiles.
+     */
     initial?: number;
     /**
      * Automatically enforce minimum zoom to ensure image covers viewport.
@@ -127,7 +137,13 @@ export interface BindOptions {
 export interface ResultOptions {
     /** Output type */
     type: OutputType;
-    /** Output dimensions */
+    /**
+     * Output dimensions (default `"viewport"`). The image keeps its proportions: a size of
+     * another shape than the viewport centers the crop and leaves the rest transparent (or
+     * `backgroundColor`). `"original"` is the viewport area at image resolution. An
+     * `"original"` or custom size is scaled down, keeping its shape, to at most 16,777,216 px
+     * (4096x4096) and 16,384 px a side, then rounded to whole pixels.
+     */
     size?: {
         width: number;
         height: number;

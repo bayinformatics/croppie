@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
 	aspectRatio,
 	calculateInitialZoom,
+	describeUrl,
 	fileToDataUrl,
 	getImageDimensions,
 	loadImage,
@@ -25,6 +26,17 @@ describe("Image utilities", () => {
 		afterEach(() => {
 			cleanupImageMock();
 		});
+		it("keeps the error message short for a very long invalid URL", async () => {
+			const longUrl = `broken://${"a".repeat(2000)}`;
+
+			const error = await loadImage(longUrl).catch((e: Error) => e);
+
+			expect(error).toBeInstanceOf(Error);
+			expect((error as Error).message).toStartWith("Failed to load image: ");
+			expect((error as Error).message.length).toBeLessThan(200);
+			expect((error as Error).message).not.toContain("a".repeat(200));
+		});
+
 		it("loads a data URL image", async () => {
 			const img = await loadImage(TINY_PNG);
 
@@ -263,6 +275,41 @@ describe("Image utilities", () => {
 			// heightRatio = 200/600 = 0.333...
 			const zoom = calculateInitialZoom(1000, 600, 300, 200);
 			expect(zoom).toBeCloseTo(1 / 3, 5);
+		});
+	});
+
+	describe("describeUrl", () => {
+		it("returns a short URL unchanged", () => {
+			expect(describeUrl("https://example.com/photo.jpg")).toBe(
+				"https://example.com/photo.jpg",
+			);
+		});
+
+		it("keeps a URL of exactly 120 characters whole", () => {
+			const url = `https://x.test/${"a".repeat(105)}`;
+
+			expect(url).toHaveLength(120);
+			expect(describeUrl(url)).toBe(url);
+		});
+
+		it("truncates a longer URL to 120 characters plus an ellipsis", () => {
+			const url = `https://x.test/${"a".repeat(2000)}`;
+
+			const described = describeUrl(url);
+
+			expect(described).toHaveLength(121);
+			expect(described.startsWith(url.slice(0, 120))).toBe(true);
+			expect(described.endsWith("…")).toBe(true);
+		});
+
+		it("summarizes a data URL by type and size instead of embedding it", () => {
+			const url = `data:image/png;base64,${"A".repeat(5000)}`;
+
+			expect(describeUrl(url)).toBe(`data:image/png;…(${url.length} chars)`);
+		});
+
+		it("summarizes a data URL without a media type", () => {
+			expect(describeUrl("data:,hello")).toBe("data:;…(11 chars)");
 		});
 	});
 });

@@ -244,6 +244,50 @@ describe("Croppie bind({ points })", () => {
 				expect(ignored.sliderMin).toBe("50");
 			});
 		}
+
+		it("emits one update for a bind whose malformed points are ignored, with nothing half-applied", async () => {
+			croppie = createCroppie();
+			await croppie.bind({ url: SMALL_PNG, points: [2, 3, 7, 8] });
+			const onUpdate = mock();
+			croppie.on("update", onUpdate);
+
+			await croppie.bind({
+				url: RED_PNG,
+				points: [0, 0, 10] as unknown as PointsArray,
+			});
+
+			expect(warn).toHaveBeenCalledTimes(1);
+			expect(onUpdate).toHaveBeenCalledTimes(1);
+			expect(onUpdate.mock.calls[0]?.[0]).toEqual(croppie.get());
+		});
+
+		it("treats a bind with malformed points as the last bind: it supersedes one still loading", async () => {
+			// The 10x10 image loads after 20ms, the 2x2 one at once
+			cleanupImageMock();
+			cleanupImageMock = installImageMock(fixtureDimensions, {
+				delay: (src) => (src === SMALL_PNG ? 20 : 0),
+			});
+			croppie = createCroppie();
+
+			// Observed at once: the superseded bind rejects as soon as the later bind starts
+			const slow = croppie.bind({ url: SMALL_PNG, zoom: 30 }).then(
+				() => undefined,
+				(caught: unknown) => caught,
+			);
+			await croppie.bind({
+				url: RED_PNG,
+				points: [] as unknown as PointsArray,
+			});
+
+			const error = await slow;
+			expect(error).toBeInstanceOf(DOMException);
+			expect((error as DOMException).name).toBe("AbortError");
+
+			expect(warn).toHaveBeenCalledTimes(1);
+			const preview = container.querySelector(".cr-image") as HTMLImageElement;
+			expect(preview.src).toBe(RED_PNG);
+			expect(croppie.zoom).toBeCloseTo(50, 9);
+		});
 	});
 
 	describe("warning behavior", () => {

@@ -93,16 +93,18 @@ export function createOverlay(
  *
  * @param boundary - Dimensions of the bounding container used to center the cutout.
  * @param viewport - Viewport dimensions and type ("circle" for circular cutouts, otherwise rectangular).
- * @returns A CSS `mask-image` value: a `radial-gradient` for circular viewports or two overlapping `linear-gradient`s for rectangular viewports that together produce a transparent hole where the viewport is located.
+ * @returns A CSS `mask-image` value: an elliptical `radial-gradient` for circular viewports or two overlapping `linear-gradient`s for rectangular viewports that together produce a transparent hole where the viewport is located.
  */
 function createMaskImage(boundary: Boundary, viewport: Viewport): string {
 	const centerX = boundary.width / 2;
 	const centerY = boundary.height / 2;
 
 	if (viewport.type === "circle") {
-		const radius = viewport.width / 2;
-		// Create a radial gradient that's transparent in the center
-		return `radial-gradient(circle ${radius}px at ${centerX}px ${centerY}px, transparent ${radius}px, black ${radius}px)`;
+		// An ellipse matches the viewport's border-radius: 50% outline (a circle when square).
+		// Color stops are measured along the horizontal radius.
+		const radiusX = viewport.width / 2;
+		const radiusY = viewport.height / 2;
+		return `radial-gradient(ellipse ${radiusX}px ${radiusY}px at ${centerX}px ${centerY}px, transparent ${radiusX}px, black ${radiusX}px)`;
 	}
 
 	// For square, use a more complex gradient
@@ -146,7 +148,8 @@ export function createPreview(): HTMLImageElement {
 }
 
 /**
- * Creates a range input element configured as the zoom slider.
+ * Creates a range input element configured as the zoom slider, named "Zoom" and with its
+ * value spoken as a percentage (`aria-valuetext`) from the start.
  *
  * @param min - Minimum slider value
  * @param max - Maximum slider value
@@ -166,6 +169,9 @@ export function createZoomSlider(
 			max: String(max),
 			step: "0.01",
 			value: String(value),
+			"aria-label": "Zoom",
+			// Spoken as a percentage from the start, not as the raw value until the first bind
+			"aria-valuetext": `${Math.round(value * 100)}%`,
 		},
 	});
 	return element;
