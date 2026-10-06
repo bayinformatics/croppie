@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.1](https://github.com/bayinformatics/croppie/compare/v3.2.0...v3.2.1) (2026-10-06)
+
+
+### Documentation
+
+* date 3.2.0 and document trusted publishing in the changelog and release steps ([c43e84f](https://github.com/bayinformatics/croppie/commit/c43e84ff495833742f10344d76feb630a204851e))
+* installs are npm-only, build output is not committed, releases come from release-please ([2ea6173](https://github.com/bayinformatics/croppie/commit/2ea6173a8efa34213ce6fad2a5c8966dab7f0584))
+
 ## [3.2.0] - 2026-10-06
 
 ### Added
