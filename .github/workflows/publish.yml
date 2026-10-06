@@ -68,6 +68,8 @@ jobs:
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    # Trusted publishing: npm exchanges the workflow's OIDC token for a short-lived publish
+    # credential, so there is no NPM_TOKEN, and provenance is attached automatically
     permissions:
       contents: read
       id-token: write
@@ -83,41 +85,20 @@ jobs:
           name: dist
           path: dist/
 
+      # Node 24 bundles npm 11, which trusted publishing needs (11.5.1 or newer)
       - uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Require npm 11.5.1 or newer
+        run: |
+          NPM_VERSION="$(npm --version)"
+          echo "npm $NPM_VERSION"
+          if [ "$(printf '%s\n' 11.5.1 "$NPM_VERSION" | sort -V | head -n 1)" != "11.5.1" ]; then
+            echo "::error::npm $NPM_VERSION is older than 11.5.1, which trusted publishing needs"
+            exit 1
+          fi
+
       - name: Publish to npm
-        run: npm publish --provenance --access public --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-github:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-      packages: write
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Clear committed dist before downloading the built one
-        run: rm -rf dist
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: dist
-          path: dist/
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-
-      - name: Publish to GitHub Packages
-        run: npm publish --provenance --access public --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish --access public --ignore-scripts
