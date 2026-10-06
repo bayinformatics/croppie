@@ -252,7 +252,7 @@ Zooming keeps the point under the cursor (mouse wheel), between the fingers (pin
 ### Zoom and accessibility
 
 - The zoom slider has the accessible name "Zoom" and announces its value as a percentage (`aria-valuetext`, for example "150%"), also before the first image is bound. Keyboard focus shows a visible ring in every browser.
-- If the image is zoomed out so far that it no longer covers the viewport (`enforceMinimumCoverage: false`), `result()` keeps the image's proportions: the image is drawn at its true scale, and the rest of the output is transparent or `backgroundColor`. `get().points` stays clamped to the image.
+- If the image does not cover the viewport (zoomed out that far with `enforceMinimumCoverage: false`, or so small that the zoom it needs to cover it is above `zoom.max`), `result()` keeps the image's proportions: the image is drawn at its true scale, and the rest of the output is transparent or `backgroundColor`. `get().points` stays clamped to the image.
 - A `'circle'` viewport that is not square is an ellipse, in the overlay and in the output mask.
 
 ## Theming
