@@ -1,6 +1,3 @@
 * text=auto eol=lf
 *.png binary
 *.jpg binary
-dist/** linguist-generated=true
-docs/croppie.js linguist-generated=true
-docs/croppie.js.map linguist-generated=true
