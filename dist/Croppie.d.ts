@@ -1,4 +1,4 @@
-import type { BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from "./types.ts";
+import type { BindOptions, CroppieData, CroppieEventHandler, CroppieEvents, CroppieOptions, ResultOptions } from "./types.js";
 /**
  * Modern, TypeScript-first image cropper.
  *
@@ -37,7 +37,11 @@ export declare class Croppie {
      */
     private attachEventHandlers;
     /**
-     * Loads an image into the cropper
+     * Loads an image into the cropper.
+     *
+     * Malformed `points` (an array without exactly 4 entries, a coordinate that is not a
+     * number, a rect without width or height) are ignored with a console warning, and the
+     * image gets its default framing.
      */
     bind(options: BindOptions | string): Promise<void>;
     /**
@@ -109,4 +113,3 @@ export declare class Croppie {
      */
     private emitEvent;
 }
-//# sourceMappingURL=Croppie.d.ts.map

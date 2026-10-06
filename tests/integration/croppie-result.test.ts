@@ -1,15 +1,24 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { setupCanvasMocks, restoreCanvasMocks } from "../canvas/mocks.ts";
-import { TINY_PNG, SMALL_PNG } from "../fixtures/test-image-data-url.ts";
+import {
+	getLastMockContext,
+	restoreCanvasMocks,
+	setupCanvasMocks,
+} from "../canvas/mocks.ts";
+import { installImageMock } from "../fixtures/mock-helpers.ts";
+import {
+	fixtureDimensions,
+	SMALL_PNG,
+	TINY_PNG,
+} from "../fixtures/test-image-data-url.ts";
 
-// Note: Most result tests are skipped because happy-dom's Image doesn't trigger onload for data URLs
-// These tests would work in a real browser environment
-describe.skip("Croppie result", () => {
+describe("Croppie result", () => {
 	let container: HTMLDivElement;
 	let croppie: Croppie;
+	let cleanupImageMock: () => void;
 
 	beforeEach(() => {
+		cleanupImageMock = installImageMock(fixtureDimensions);
 		container = document.createElement("div");
 		document.body.appendChild(container);
 		setupCanvasMocks();
@@ -19,6 +28,7 @@ describe.skip("Croppie result", () => {
 		croppie?.destroy();
 		container.remove();
 		restoreCanvasMocks();
+		cleanupImageMock();
 	});
 
 	describe("without bound image", () => {
@@ -152,6 +162,9 @@ describe.skip("Croppie result", () => {
 		});
 
 		it("applies quality to blob", async () => {
+			const toBlob = mock(HTMLCanvasElement.prototype.toBlob);
+			HTMLCanvasElement.prototype.toBlob = toBlob;
+
 			const blob = (await croppie.result({
 				type: "blob",
 				format: "jpeg",
@@ -159,6 +172,17 @@ describe.skip("Croppie result", () => {
 			})) as Blob;
 
 			expect(blob.type).toBe("image/jpeg");
+			expect(toBlob.mock.calls[0]?.[1]).toBe("image/jpeg");
+			expect(toBlob.mock.calls[0]?.[2]).toBe(0.5);
+		});
+
+		it("applies quality to base64", async () => {
+			const toDataURL = mock(HTMLCanvasElement.prototype.toDataURL);
+			HTMLCanvasElement.prototype.toDataURL = toDataURL;
+
+			await croppie.result({ type: "base64", format: "jpeg", quality: 0.5 });
+
+			expect(toDataURL).toHaveBeenCalledWith("image/jpeg", 0.5);
 		});
 	});
 
@@ -173,8 +197,9 @@ describe.skip("Croppie result", () => {
 				type: "canvas",
 			})) as HTMLCanvasElement;
 
-			// Circle rendering is applied (we can't easily verify the content in tests)
 			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			// The circle mask clips the drawing once
+			expect(getLastMockContext()?.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("uses square output for square viewport by default", async () => {
@@ -183,11 +208,9 @@ describe.skip("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = (await croppie.result({
-				type: "canvas",
-			})) as HTMLCanvasElement;
+			await croppie.result({ type: "canvas" });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
 		});
 
 		it("can override circle option", async () => {
@@ -196,12 +219,9 @@ describe.skip("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = (await croppie.result({
-				type: "canvas",
-				circle: true,
-			})) as HTMLCanvasElement;
+			await croppie.result({ type: "canvas", circle: true });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).toHaveBeenCalledTimes(1);
 		});
 
 		it("can force square output on circle viewport", async () => {
@@ -210,12 +230,9 @@ describe.skip("Croppie result", () => {
 			});
 			await croppie.bind(TINY_PNG);
 
-			const canvas = (await croppie.result({
-				type: "canvas",
-				circle: false,
-			})) as HTMLCanvasElement;
+			await croppie.result({ type: "canvas", circle: false });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.clip).not.toHaveBeenCalled();
 		});
 	});
 
@@ -227,29 +244,37 @@ describe.skip("Croppie result", () => {
 			await croppie.bind(TINY_PNG);
 		});
 
-		it("accepts background color", async () => {
-			const canvas = (await croppie.result({
-				type: "canvas",
-				backgroundColor: "#ff0000",
-			})) as HTMLCanvasElement;
+		it("fills the output with the background color", async () => {
+			await croppie.result({ type: "canvas", backgroundColor: "#ff0000" });
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			const ctx = getLastMockContext();
+			expect(ctx?.fillStyle).toBe("#ff0000");
+			expect(ctx?.fillRect).toHaveBeenCalledWith(0, 0, 100, 100);
 		});
 
 		it("accepts rgba background color", async () => {
-			const canvas = (await croppie.result({
+			await croppie.result({
 				type: "canvas",
 				backgroundColor: "rgba(255, 0, 0, 0.5)",
-			})) as HTMLCanvasElement;
+			});
 
-			expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+			expect(getLastMockContext()?.fillStyle).toBe("rgba(255, 0, 0, 0.5)");
+		});
+
+		it("leaves the background transparent by default", async () => {
+			await croppie.result({ type: "canvas" });
+
+			expect(getLastMockContext()?.fillRect).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("get() method", () => {
 		it("returns current crop data", async () => {
+			// A 1x1 image needs 100x to cover the viewport, so coverage is turned off
+			// and the max raised for the explicit zoom of 2 to be reachable.
 			croppie = new Croppie(container, {
 				viewport: { width: 100, height: 100, type: "square" },
+				zoom: { min: 0.1, max: 100, enforceMinimumCoverage: false },
 			});
 			await croppie.bind({ url: TINY_PNG, zoom: 2 });
 

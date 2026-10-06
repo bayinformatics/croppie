@@ -5,17 +5,26 @@
  * to enable testing canvas-related functionality.
  */
 
+import { mock } from "bun:test";
+
 // Store original methods for restoration
 let originalToBlob: typeof HTMLCanvasElement.prototype.toBlob | undefined;
 let originalToDataURL: typeof HTMLCanvasElement.prototype.toDataURL | undefined;
+let originalGetContext:
+	| typeof HTMLCanvasElement.prototype.getContext
+	| undefined;
+
+// One context per canvas (like a real canvas), plus the most recently created one
+let mockContexts = new WeakMap<HTMLCanvasElement, MockCanvasContext>();
+let lastMockContext: MockCanvasContext | undefined;
 
 export interface MockCanvasContext {
-	fillRect: ReturnType<typeof Bun.jest.fn>;
-	beginPath: ReturnType<typeof Bun.jest.fn>;
-	arc: ReturnType<typeof Bun.jest.fn>;
-	closePath: ReturnType<typeof Bun.jest.fn>;
-	clip: ReturnType<typeof Bun.jest.fn>;
-	drawImage: ReturnType<typeof Bun.jest.fn>;
+	fillRect: ReturnType<typeof mock>;
+	beginPath: ReturnType<typeof mock>;
+	arc: ReturnType<typeof mock>;
+	closePath: ReturnType<typeof mock>;
+	clip: ReturnType<typeof mock>;
+	drawImage: ReturnType<typeof mock>;
 	fillStyle: string;
 }
 
@@ -28,12 +37,12 @@ export interface MockCanvasContext {
  */
 export function createMockCanvasContext(): MockCanvasContext {
 	return {
-		fillRect: Bun.jest.fn(),
-		beginPath: Bun.jest.fn(),
-		arc: Bun.jest.fn(),
-		closePath: Bun.jest.fn(),
-		clip: Bun.jest.fn(),
-		drawImage: Bun.jest.fn(),
+		fillRect: mock(),
+		beginPath: mock(),
+		arc: mock(),
+		closePath: mock(),
+		clip: mock(),
+		drawImage: mock(),
 		fillStyle: "",
 	};
 }
@@ -42,6 +51,7 @@ export function createMockCanvasContext(): MockCanvasContext {
  * Install test-friendly mocks on HTMLCanvasElement prototypes.
  *
  * Mocks:
+ * - `getContext("2d")` — returns a `MockCanvasContext` (the same one for repeated calls on a canvas; happy-dom returns `null`). Other context ids go to the original `getContext`, as in `createMockCanvas()`.
  * - `toBlob(callback, type, quality)` — invokes `callback` with a `Blob` whose data is `"mock-canvas-data"` and whose MIME type is `type` or `"image/png"`.
  * - `toDataURL(type, quality)` — returns a data URL of the form `data:<type or "image/png">;base64,mockbase64data`.
  */
@@ -53,24 +63,48 @@ export function setupCanvasMocks(): void {
 	if (originalToDataURL === undefined) {
 		originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
 	}
+	if (originalGetContext === undefined) {
+		originalGetContext = HTMLCanvasElement.prototype.getContext;
+	}
+
+	mockContexts = new WeakMap();
+	lastMockContext = undefined;
+	const realGetContext = originalGetContext as (
+		this: HTMLCanvasElement,
+		contextId: string,
+		...options: unknown[]
+	) => RenderingContext | null;
+	HTMLCanvasElement.prototype.getContext = function (
+		this: HTMLCanvasElement,
+		contextId: string,
+		...options: unknown[]
+	) {
+		if (contextId !== "2d") {
+			// Only "2d" is mocked; other context ids get the original, like createMockCanvas
+			return realGetContext.call(this, contextId, ...options);
+		}
+		let ctx = mockContexts.get(this);
+		if (!ctx) {
+			ctx = createMockCanvasContext();
+			mockContexts.set(this, ctx);
+		}
+		lastMockContext = ctx;
+		return ctx as unknown as CanvasRenderingContext2D;
+	} as typeof HTMLCanvasElement.prototype.getContext;
 
 	// Mock toBlob (async like the real implementation)
-	HTMLCanvasElement.prototype.toBlob = function (
+	HTMLCanvasElement.prototype.toBlob = (
 		callback: BlobCallback,
 		type?: string,
 		_quality?: number,
-	) {
+	) => {
 		const blob = new Blob(["mock-canvas-data"], { type: type || "image/png" });
 		queueMicrotask(() => callback(blob));
 	};
 
 	// Mock toDataURL
-	HTMLCanvasElement.prototype.toDataURL = function (
-		type?: string,
-		_quality?: number,
-	) {
-		return `data:${type || "image/png"};base64,mockbase64data`;
-	};
+	HTMLCanvasElement.prototype.toDataURL = (type?: string, _quality?: number) =>
+		`data:${type || "image/png"};base64,mockbase64data`;
 }
 
 /**
@@ -85,8 +119,22 @@ export function restoreCanvasMocks(): void {
 	if (originalToDataURL) {
 		HTMLCanvasElement.prototype.toDataURL = originalToDataURL;
 	}
+	if (originalGetContext) {
+		HTMLCanvasElement.prototype.getContext = originalGetContext;
+	}
 	originalToBlob = undefined;
 	originalToDataURL = undefined;
+	originalGetContext = undefined;
+	lastMockContext = undefined;
+}
+
+/**
+ * The mock 2D context most recently handed out by the mocked `getContext("2d")`.
+ *
+ * @returns The context, or `undefined` if none was requested since `setupCanvasMocks()`
+ */
+export function getLastMockContext(): MockCanvasContext | undefined {
+	return lastMockContext;
 }
 
 /**

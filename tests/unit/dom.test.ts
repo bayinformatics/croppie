@@ -1,5 +1,9 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
-import { createElement, getTransformValues, setTransform } from "../../src/utils/dom.ts";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import {
+	createElement,
+	getTransformValues,
+	setTransform,
+} from "../../src/utils/dom.ts";
 import { installGetComputedStyleMock } from "../fixtures/mock-helpers.ts";
 
 describe("DOM utilities", () => {
@@ -212,7 +216,9 @@ describe("DOM utilities", () => {
 		it("sets transform with translation and scale", () => {
 			setTransform(element, 100, 200, 1.5);
 
-			expect(element.style.transform).toBe("translate(100px, 200px) scale(1.5)");
+			expect(element.style.transform).toBe(
+				"translate(100px, 200px) scale(1.5)",
+			);
 		});
 
 		it("sets transform with zero values", () => {
@@ -224,7 +230,9 @@ describe("DOM utilities", () => {
 		it("sets transform with negative values", () => {
 			setTransform(element, -50, -25, 0.5);
 
-			expect(element.style.transform).toBe("translate(-50px, -25px) scale(0.5)");
+			expect(element.style.transform).toBe(
+				"translate(-50px, -25px) scale(0.5)",
+			);
 		});
 
 		it("sets transform with fractional values", () => {

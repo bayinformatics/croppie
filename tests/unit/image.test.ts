@@ -1,13 +1,18 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
-	loadImage,
-	fileToDataUrl,
-	getImageDimensions,
 	aspectRatio,
 	calculateInitialZoom,
+	fileToDataUrl,
+	getImageDimensions,
+	loadImage,
 } from "../../src/utils/image.ts";
-import { TINY_PNG, RED_PNG, SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 import { createMockImage, installImageMock } from "../fixtures/mock-helpers.ts";
+import {
+	EXTERNAL_URL,
+	RED_PNG,
+	SMALL_PNG,
+	TINY_PNG,
+} from "../fixtures/test-image-data-url.ts";
 
 describe("Image utilities", () => {
 	describe("loadImage", () => {
@@ -44,10 +49,12 @@ describe("Image utilities", () => {
 			expect(small.src).toBe(SMALL_PNG);
 		});
 
-		// Note: crossOrigin behavior for external URLs is best verified by inspecting
-		// the source code at src/utils/image.ts:loadImage, as external URLs cannot be
-		// tested in happy-dom. The implementation sets crossOrigin = "anonymous" for
-		// non-data-URL sources.
+		it("sets crossOrigin to anonymous for remote URLs", async () => {
+			// Without it a cross-origin image taints the canvas and result() cannot encode it
+			const img = await loadImage(EXTERNAL_URL);
+
+			expect(img.crossOrigin).toBe("anonymous");
+		});
 
 		it("rejects when image fails to load", async () => {
 			// In happy-dom, invalid data URLs may or may not trigger error
@@ -75,7 +82,9 @@ describe("Image utilities", () => {
 		});
 
 		it("converts File object to data URL", async () => {
-			const file = new File(["hello world"], "test.txt", { type: "text/plain" });
+			const file = new File(["hello world"], "test.txt", {
+				type: "text/plain",
+			});
 			const result = await fileToDataUrl(file);
 
 			expect(result).toMatch(/^data:text\/plain;base64,/);
@@ -123,7 +132,10 @@ describe("Image utilities", () => {
 			const portrait = createMockImage(300, 600);
 
 			expect(getImageDimensions(square)).toEqual({ width: 200, height: 200 });
-			expect(getImageDimensions(landscape)).toEqual({ width: 800, height: 400 });
+			expect(getImageDimensions(landscape)).toEqual({
+				width: 800,
+				height: 400,
+			});
 			expect(getImageDimensions(portrait)).toEqual({ width: 300, height: 600 });
 		});
 

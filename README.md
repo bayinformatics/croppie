@@ -4,8 +4,11 @@
 [![npm downloads](https://img.shields.io/npm/dm/@bayinformatics/croppie.svg)](https://www.npmjs.com/package/@bayinformatics/croppie)
 [![license](https://img.shields.io/npm/l/@bayinformatics/croppie.svg)](LICENSE)
 [![ci](https://github.com/bayinformatics/croppie/actions/workflows/ci.yml/badge.svg)](https://github.com/bayinformatics/croppie/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/bayinformatics/croppie/branch/main/graph/badge.svg)](https://codecov.io/gh/bayinformatics/croppie)
 
 A modern, TypeScript-first image cropper for the web. Fork of [Foliotek/Croppie](https://github.com/Foliotek/Croppie).
+
+**Live demo: https://bayinformatics.github.io/croppie/**
 
 ## Highlights
 
@@ -34,28 +37,29 @@ bun add @bayinformatics/croppie
 
 ## Compatibility
 
-This is an **ESM-only** package. It works with modern bundlers like Vite, Webpack, Rollup, Next.js, and Bun.
+This is an **ESM-only** package for **Node 20 or newer**. It works with modern bundlers like Vite, Webpack, Rollup, Next.js, and Bun.
 
-**Breaking Change in v3:** CommonJS `require()` is not supported in most environments. Node 22+ can load ESM from CJS with the experimental `--experimental-require-module` flag, but bundlers and older Node versions will still fail. If you need CommonJS, continue using [Croppie v2.x](https://github.com/Foliotek/Croppie).
+**Breaking Change in v3:** v2 shipped UMD (AMD, CommonJS and a global); v3 is ES modules only.
 
 ```diff
 - const Croppie = require('croppie')
 + import Croppie from '@bayinformatics/croppie'
 ```
 
-If you are using CommonJS, use dynamic `import()`:
+CommonJS `require()` works natively on **Node 20.19+ and 22.12+**, which can load an ES module from CommonJS, through the package's `default` export condition. The result is the module namespace:
+
+```js
+const { Croppie } = require('@bayinformatics/croppie')
+// or: const Croppie = require('@bayinformatics/croppie').default
+```
+
+Older runtimes and bundlers that cannot `require()` an ES module should use a dynamic `import()`:
 
 ```js
 (async () => {
   const { default: Croppie } = await import('@bayinformatics/croppie')
   // use Croppie here
 })()
-```
-
-Node 22+ can also load ESM from CJS with `--experimental-require-module`:
-
-```bash
-node --experimental-require-module your-script.cjs
 ```
 
 **For `<script>` tag usage without a bundler, this fork is not for you** — use the original [Croppie v2.x](https://github.com/Foliotek/Croppie) instead.
@@ -76,6 +80,8 @@ await cropper.bind({ url: 'photo.jpg' })
 // Get the cropped result
 const blob = await cropper.result({ type: 'blob' })
 ```
+
+The stylesheet is also available as `@bayinformatics/croppie/style.css`, an alias of `croppie.css`.
 
 ## API
 
@@ -99,6 +105,8 @@ new Croppie(element: HTMLElement, options: CroppieOptions)
 | `enableResize` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
 | `enableOrientation` | `boolean` | `false` | Deprecated v2 option (no-op) |
 
+> **Known limitations:** `enableExif` and `rotate()` are not implemented yet ([#21](https://github.com/bayinformatics/croppie/issues/21), [#20](https://github.com/bayinformatics/croppie/issues/20)).
+
 ### Methods
 
 #### `bind(options: BindOptions | string): Promise<void>`
@@ -116,6 +124,8 @@ await cropper.bind({
   points: { topLeftX: 0, topLeftY: 0, bottomRightX: 200, bottomRightY: 200 }
 })
 ```
+
+`points` can be an object (`{ topLeftX, topLeftY, bottomRightX, bottomRightY }`) or the v2-style array `[x1, y1, x2, y2]`. Malformed points (an array without exactly 4 entries, a coordinate that is not a number, a rect without width or height) are ignored with a console warning, and the image gets its default framing.
 
 Note: initial `points` are applied on bind — the transform is derived so the
 viewport shows the requested region. Aspect-matched points round-trip exactly
@@ -164,9 +174,21 @@ Get current crop data (points and zoom).
 
 Set the zoom level programmatically.
 
+#### `zoom: number`
+
+Getter and setter for the current zoom level. Setting it clamps to the zoom limits, like `setZoom()`.
+
 #### `reset(): void`
 
-Reset to initial state.
+Re-centers the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
+
+#### `on(event, handler): void` / `off(event, handler): void`
+
+Subscribe to or unsubscribe from [events](#events).
+
+#### `rotate(degrees): void`
+
+Present for v2 compatibility but **not implemented**: it logs a warning and does nothing ([#20](https://github.com/bayinformatics/croppie/issues/20)).
 
 #### `destroy(): void`
 
@@ -195,6 +217,30 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 })
 ```
 
+- `update` (payload: the same data as `get()`) fires while dragging, when the zoom actually changes (slider, wheel, pinch, `setZoom()` or `zoom =`), and on `reset()`. It does **not** fire when `bind()` completes.
+- `zoom` (payload: `{ zoom, previousZoom }`) fires for slider, mouse wheel and pinch interactions only, not for `setZoom()` or the `zoom` setter.
+
+## Theming
+
+The colors are CSS custom properties, set on `:root` by `croppie.css`. Override them anywhere in your own stylesheet:
+
+```css
+.my-cropper {
+  --croppie-boundary-bg: #202020;
+  --croppie-slider-start: #0ea5e9;
+  --croppie-slider-end: #7dd3fc;
+}
+```
+
+| Property | Default | Used for |
+|----------|---------|----------|
+| `--croppie-boundary-bg` | `#1a1a2e` (`#0f0f1a` in dark mode) | Background of the crop area |
+| `--croppie-slider-start` / `--croppie-slider-end` | `#4f46e5` / `#818cf8` | Zoom slider gradient |
+| `--croppie-slider-thumb` | `#ffffff` | Slider thumb |
+| `--croppie-slider-shadow`, `--croppie-slider-shadow-hover`, `--croppie-slider-shadow-focus` | translucent indigo | Slider thumb glow in its normal, hover and focus states |
+
+Dark mode: `--croppie-boundary-bg` switches to `#0f0f1a` under `@media (prefers-color-scheme: dark)` and under `[data-theme="dark"]` (for DaisyUI and similar frameworks).
+
 ## Migrating from Croppie v2
 
 ### Quick Reference
@@ -203,7 +249,9 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 |---------------|----------------|
 | `$('#el').croppie({...})` | `new Croppie(element, {...})` |
 | `croppie.bind(url)` | `await croppie.bind(url)` |
-| `croppie.bind({ url, points: [x1,y1,x2,y2] })` | `await croppie.bind({ url, points: {topLeftX, topLeftY, bottomRightX, bottomRightY} })` |
+| `croppie.bind({ url, points: [x1,y1,x2,y2] })` | `await croppie.bind({ url, points: [x1,y1,x2,y2] })` (an object `{topLeftX, topLeftY, bottomRightX, bottomRightY}` also works) |
+| `enforceBoundary` | `zoom: { enforceMinimumCoverage }` |
+| `minZoom` / `maxZoom` | `zoom: { min, max }` |
 | `croppie.result({...}).then(cb)` | `const result = await croppie.result({...})` |
 | `$el.on('update', cb)` | `croppie.on('update', cb)` |
 | `import 'croppie/croppie.css'` | `import '@bayinformatics/croppie/croppie.css'` |
@@ -228,9 +276,13 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 - cropper.result({ type: 'canvas' }).then(canvas => {})
 + const canvas = await cropper.result({ type: 'canvas' })
 
-// Points format changed
-- points: [x1, y1, x2, y2]
-+ points: { topLeftX, topLeftY, bottomRightX, bottomRightY }
+// Zoom limits moved into the zoom option
+- minZoom: 0.5, maxZoom: 3, enforceBoundary: true
++ zoom: { min: 0.5, max: 3, enforceMinimumCoverage: true }
+
+// Points: the array form still works; an object is also accepted
+points: [x1, y1, x2, y2]
+points: { topLeftX, topLeftY, bottomRightX, bottomRightY }
 ```
 
 ## Framework Examples
@@ -275,7 +327,7 @@ import Croppie from '@bayinformatics/croppie'
 
 function ImageCropper({ src, onCrop }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const croppieRef = useRef<Croppie>()
+  const croppieRef = useRef<Croppie | null>(null)
 
   useEffect(() => {
     if (containerRef.current) {
@@ -304,21 +356,30 @@ function ImageCropper({ src, onCrop }) {
 ## Development
 
 ```bash
-# Install dependencies
-bun install
+# Install dependencies (use the Bun version in .bun-version)
+bun install --frozen-lockfile
 
-# Run dev server with watch
-bun run dev
+# Run the tests
+bun run test
 
-# Run tests
-bun test
+# Lint (sources, tests, scripts and Playwright config) and type-check (the same, minus scripts)
+bun run lint
+bun run typecheck
 
-# Build for production
+# Build for production (cleans dist/ first)
 bun run build
 
-# Lint
-bun run lint
+# Watch build into dist/ (run `bun run build` before committing)
+bun run dev
+
+# Visual regression tests (Playwright, against the built bundle)
+bun run test:visual
+
+# Check the packed package with publint and Are the Types Wrong?
+bun run check:package
 ```
+
+`dist/` and the demo bundle in `docs/` are committed and CI checks that they match a fresh build under the pinned Bun version, so rebuild them (`bun run build && bun run build:docs`) in the last commit of a change that touches `src/`. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow.
 
 Visual regression runs in CI using Playwright against test fixtures in `tests/visual/`.
 

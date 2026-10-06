@@ -1,1 +1,1 @@
-export { canvasToBase64, canvasToBlob, drawCroppedImage } from "./draw.ts";
+export { canvasToBase64, canvasToBlob, drawCroppedImage } from "./draw.js";

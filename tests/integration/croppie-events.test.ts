@@ -1,11 +1,14 @@
-import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { TINY_PNG } from "../fixtures/test-image-data-url.ts";
 import {
 	createPointerEvent,
 	createWheelEvent,
 	installImageMock,
 } from "../fixtures/mock-helpers.ts";
+import {
+	fixtureDimensions,
+	TINY_PNG,
+} from "../fixtures/test-image-data-url.ts";
 
 describe("Croppie events", () => {
 	let container: HTMLDivElement;
@@ -13,7 +16,7 @@ describe("Croppie events", () => {
 	let cleanupImageMock: () => void;
 
 	beforeEach(() => {
-		cleanupImageMock = installImageMock();
+		cleanupImageMock = installImageMock(fixtureDimensions);
 		container = document.createElement("div");
 		document.body.appendChild(container);
 	});
@@ -270,5 +273,4 @@ describe("Croppie events", () => {
 			expect(handler).toHaveBeenCalled();
 		});
 	});
-
 });

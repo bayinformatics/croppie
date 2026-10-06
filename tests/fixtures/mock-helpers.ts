@@ -2,44 +2,55 @@
  * Mock helpers for Croppie tests
  */
 
+export interface Dimensions {
+	width: number;
+	height: number;
+}
+
+/** Fixed dimensions for every image, or a resolver that maps a src to its dimensions. */
+export type ImageDimensions =
+	| Dimensions
+	| ((src: string) => Dimensions | undefined);
+
 /**
  * Install a mock Image constructor that automatically fires onload when src is set.
  * This works around happy-dom's limitation where Image.onload doesn't fire for data URLs.
  *
  * @param dimensions - Optional natural image dimensions to expose once loaded
- *   (happy-dom reports naturalWidth/naturalHeight as 0 by default)
+ *   (happy-dom reports naturalWidth/naturalHeight as 0 by default). Pass a
+ *   function to resolve dimensions per src, e.g. `fixtureDimensions`; a src it
+ *   returns `undefined` for keeps the 0x0 default.
  * @returns A cleanup function that restores the original Image constructor
  */
-export function installImageMock(dimensions?: {
-	width: number;
-	height: number;
-}): () => void {
+export function installImageMock(dimensions?: ImageDimensions): () => void {
 	const OriginalImage = globalThis.Image;
 
 	class MockImage extends OriginalImage {
 		private _src = "";
 		private _onload: ((event: Event) => void) | null = null;
-		private _onerror: ((event: Event) => void) | null = null;
+		private _onerror: OnErrorEventHandler = null;
 
-		get src(): string {
+		override get src(): string {
 			return this._src;
 		}
 
-		set src(value: string) {
+		override set src(value: string) {
 			this._src = value;
 			// Schedule onload/onerror to fire asynchronously (like real browsers)
 			setTimeout(() => {
 				if (value.startsWith("data:") || value.startsWith("http")) {
 					// Simulate successful load for data URLs and http URLs
-					if (dimensions) {
+					const resolved =
+						typeof dimensions === "function" ? dimensions(value) : dimensions;
+					if (resolved) {
 						// happy-dom exposes naturalWidth/naturalHeight as readonly
 						// accessors; plain assignment throws, so define own properties
 						Object.defineProperty(this, "naturalWidth", {
-							value: dimensions.width,
+							value: resolved.width,
 							configurable: true,
 						});
 						Object.defineProperty(this, "naturalHeight", {
-							value: dimensions.height,
+							value: resolved.height,
 							configurable: true,
 						});
 					}
@@ -55,19 +66,19 @@ export function installImageMock(dimensions?: {
 			}, 0);
 		}
 
-		get onload(): ((event: Event) => void) | null {
+		override get onload(): ((event: Event) => void) | null {
 			return this._onload;
 		}
 
-		set onload(handler: ((event: Event) => void) | null) {
+		override set onload(handler: ((event: Event) => void) | null) {
 			this._onload = handler;
 		}
 
-		get onerror(): ((event: Event) => void) | null {
+		override get onerror(): OnErrorEventHandler {
 			return this._onerror;
 		}
 
-		set onerror(handler: ((event: Event) => void) | null) {
+		override set onerror(handler: OnErrorEventHandler) {
 			this._onerror = handler;
 		}
 	}
@@ -108,9 +119,13 @@ export function installGetComputedStyleMock(): () => void {
 					);
 					const scaleMatch = transform.match(/scale\(\s*(-?[\d.]+)\s*\)/);
 
-					const tx = translateMatch ? Number.parseFloat(translateMatch[1]) : 0;
-					const ty = translateMatch ? Number.parseFloat(translateMatch[2]) : 0;
-					const s = scaleMatch ? Number.parseFloat(scaleMatch[1]) : 1;
+					const tx = translateMatch
+						? Number.parseFloat(translateMatch[1] ?? "0")
+						: 0;
+					const ty = translateMatch
+						? Number.parseFloat(translateMatch[2] ?? "0")
+						: 0;
+					const s = scaleMatch ? Number.parseFloat(scaleMatch[1] ?? "1") : 1;
 
 					// Return as 2D matrix: matrix(a, b, c, d, tx, ty)
 					// For scale and translate: matrix(s, 0, 0, s, tx, ty)
@@ -231,7 +246,7 @@ export function createTouchEvent(
 	return new TouchEvent(type, {
 		bubbles: true,
 		cancelable: true,
-		touches: touchList as unknown as TouchList,
+		touches: touchList as unknown as Touch[],
 	});
 }
 

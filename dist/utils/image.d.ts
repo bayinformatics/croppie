@@ -40,4 +40,3 @@ export declare function aspectRatio(width: number, height: number): number;
  * @returns The scale factor to apply to the image so it fills the viewport; values > 1 enlarge the image, values < 1 shrink it
  */
 export declare function calculateInitialZoom(imageWidth: number, imageHeight: number, viewportWidth: number, viewportHeight: number): number;
-//# sourceMappingURL=image.d.ts.map

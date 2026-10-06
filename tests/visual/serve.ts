@@ -1,4 +1,4 @@
-import { resolve, normalize, join } from "node:path";
+import { join, normalize, resolve } from "node:path";
 
 const ROOT = resolve(".");
 

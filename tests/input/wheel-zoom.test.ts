@@ -1,7 +1,7 @@
-import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { createWheelZoomHandler } from "../../src/input/zoom.ts";
-import { createWheelEvent } from "../fixtures/mock-helpers.ts";
 import type { ZoomConfig } from "../../src/types.ts";
+import { createWheelEvent } from "../fixtures/mock-helpers.ts";
 
 describe("Wheel Zoom Handler", () => {
 	let element: HTMLDivElement;
@@ -29,12 +29,7 @@ describe("Wheel Zoom Handler", () => {
 
 	describe("initialization", () => {
 		it("returns a cleanup function", () => {
-			const cleanup = createWheelZoomHandler(
-				element,
-				getZoom,
-				setZoom,
-				config,
-			);
+			const cleanup = createWheelZoomHandler(element, getZoom, setZoom, config);
 			expect(typeof cleanup).toBe("function");
 		});
 	});
@@ -130,7 +125,14 @@ describe("Wheel Zoom Handler", () => {
 
 	describe("requireCtrl mode", () => {
 		it("ignores wheel events without ctrl when requireCtrl is true", () => {
-			createWheelZoomHandler(element, getZoom, setZoom, config, undefined, true);
+			createWheelZoomHandler(
+				element,
+				getZoom,
+				setZoom,
+				config,
+				undefined,
+				true,
+			);
 
 			element.dispatchEvent(createWheelEvent(-100)); // No ctrl
 
@@ -138,7 +140,14 @@ describe("Wheel Zoom Handler", () => {
 		});
 
 		it("responds to wheel events with ctrl when requireCtrl is true", () => {
-			createWheelZoomHandler(element, getZoom, setZoom, config, undefined, true);
+			createWheelZoomHandler(
+				element,
+				getZoom,
+				setZoom,
+				config,
+				undefined,
+				true,
+			);
 
 			element.dispatchEvent(createWheelEvent(-100, { ctrlKey: true }));
 
@@ -146,7 +155,14 @@ describe("Wheel Zoom Handler", () => {
 		});
 
 		it("responds to wheel events without ctrl when requireCtrl is false", () => {
-			createWheelZoomHandler(element, getZoom, setZoom, config, undefined, false);
+			createWheelZoomHandler(
+				element,
+				getZoom,
+				setZoom,
+				config,
+				undefined,
+				false,
+			);
 
 			element.dispatchEvent(createWheelEvent(-100));
 
@@ -208,9 +224,15 @@ describe("Wheel Zoom Handler", () => {
 	describe("cleanup", () => {
 		it("removes wheel event listener", () => {
 			const onChange = mock();
-			const cleanup = createWheelZoomHandler(element, getZoom, setZoom, config, {
-				onChange,
-			});
+			const cleanup = createWheelZoomHandler(
+				element,
+				getZoom,
+				setZoom,
+				config,
+				{
+					onChange,
+				},
+			);
 
 			cleanup();
 

@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { Croppie } from "../../src/Croppie.ts";
-import { SMALL_PNG } from "../fixtures/test-image-data-url.ts";
 import { installImageMock } from "../fixtures/mock-helpers.ts";
+import {
+	fixtureDimensions,
+	SMALL_PNG,
+} from "../fixtures/test-image-data-url.ts";
 
 describe("Croppie boundary constraints", () => {
 	let container: HTMLDivElement;
@@ -9,7 +12,7 @@ describe("Croppie boundary constraints", () => {
 	let cleanupImageMock: () => void;
 
 	beforeEach(() => {
-		cleanupImageMock = installImageMock();
+		cleanupImageMock = installImageMock(fixtureDimensions);
 		container = document.createElement("div");
 		document.body.appendChild(container);
 	});

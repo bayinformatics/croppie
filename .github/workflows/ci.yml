@@ -3,8 +3,15 @@ name: CI
 on:
   push:
     branches: [main]
+  # No base-branch filter: stacked PRs target other feature branches
   pull_request:
-    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint:
@@ -12,53 +19,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.2.15"
-
-      - name: Cache Bun dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - uses: ./.github/actions/setup
 
       - name: Run Biome
-        run: bunx biome check src
+        run: bun run lint
+
+      - name: Type-check
+        run: bun run typecheck
 
   test:
     name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.2.15"
-
-      - name: Cache Bun dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - uses: ./.github/actions/setup
 
       - name: Run tests with coverage
-        run: bun test tests/unit tests/integration tests/input tests/ui tests/utils --coverage --coverage-reporter=lcov
+        run: bun run test
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage/lcov.info
           fail_ci_if_error: false
@@ -69,25 +53,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Snapshot committed dist
         run: cp -r dist /tmp/dist-committed
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.2.15"
-
-      - name: Cache Bun dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - uses: ./.github/actions/setup
 
       - name: Build
         run: bun run build
@@ -117,8 +88,11 @@ jobs:
             }
           done
 
+      - name: Check package (publint, are-the-types-wrong)
+        run: bun run check:package
+
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/

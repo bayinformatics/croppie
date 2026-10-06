@@ -1,5 +1,5 @@
-import type { Boundary, Viewport } from "../types.ts";
-import { createElement } from "../utils/dom.ts";
+import type { Boundary, Viewport } from "../types.js";
+import { createElement } from "../utils/dom.js";
 
 /**
  * Create the croppie container element.

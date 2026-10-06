@@ -1,4 +1,4 @@
-import type { CropPoints, OutputFormat } from "../types.ts";
+import type { CropPoints, OutputFormat } from "../types.js";
 
 /**
  * Create a new canvas containing the specified rectangular region of an image, scaled to given dimensions and optionally masked or filled.

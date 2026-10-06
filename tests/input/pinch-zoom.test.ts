@@ -1,7 +1,7 @@
-import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { createPinchZoomHandler } from "../../src/input/zoom.ts";
-import { createTouchEvent } from "../fixtures/mock-helpers.ts";
 import type { ZoomConfig } from "../../src/types.ts";
+import { createTouchEvent } from "../fixtures/mock-helpers.ts";
 
 describe("Pinch Zoom Handler", () => {
 	let element: HTMLDivElement;
@@ -317,9 +317,15 @@ describe("Pinch Zoom Handler", () => {
 	describe("cleanup", () => {
 		it("removes all touch event listeners", () => {
 			const onChange = mock();
-			const cleanup = createPinchZoomHandler(element, getZoom, setZoom, config, {
-				onChange,
-			});
+			const cleanup = createPinchZoomHandler(
+				element,
+				getZoom,
+				setZoom,
+				config,
+				{
+					onChange,
+				},
+			);
 
 			cleanup();
 

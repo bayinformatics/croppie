@@ -1,12 +1,12 @@
 import { describe, expect, it } from "bun:test";
 import {
-	createContainer,
 	createBoundary,
-	createViewport,
+	createContainer,
 	createOverlay,
 	createPreview,
-	createZoomSlider,
 	createSliderContainer,
+	createViewport,
+	createZoomSlider,
 } from "../../src/ui/elements.ts";
 
 describe("UI Elements", () => {
@@ -230,7 +230,11 @@ describe("UI Elements", () => {
 		});
 
 		it("sets mask image for circle viewport", () => {
-			const circleViewport = { width: 200, height: 200, type: "circle" as const };
+			const circleViewport = {
+				width: 200,
+				height: 200,
+				type: "circle" as const,
+			};
 			const overlay = createOverlay(boundary, circleViewport);
 
 			expect(overlay.style.maskImage).toBeTruthy();
@@ -238,9 +242,37 @@ describe("UI Elements", () => {
 		});
 
 		it("sets webkit mask image for compatibility", () => {
-			const overlay = createOverlay(boundary, viewport);
+			// happy-dom >= 20.14 does not implement -webkit-mask-image and silently drops
+			// the assignment, so record it through a temporary accessor on the prototype.
+			const proto = Object.getPrototypeOf(
+				document.createElement("div").style,
+			) as object;
+			const original = Object.getOwnPropertyDescriptor(
+				proto,
+				"webkitMaskImage",
+			);
+			let assigned: unknown;
+			Object.defineProperty(proto, "webkitMaskImage", {
+				configurable: true,
+				get: () => assigned,
+				set: (value: unknown) => {
+					assigned = value;
+				},
+			});
 
-			expect(overlay.style.webkitMaskImage).toBeTruthy();
+			try {
+				const overlay = createOverlay(boundary, viewport);
+				expect(assigned).toBeTruthy();
+				// The same gradient as the standard property (which happy-dom trims), on the overlay itself
+				expect(String(assigned).trim()).toBe(overlay.style.maskImage);
+			} finally {
+				// Put back what was there (nothing in happy-dom 20.14) instead of deleting it
+				if (original) {
+					Object.defineProperty(proto, "webkitMaskImage", original);
+				} else {
+					Reflect.deleteProperty(proto, "webkitMaskImage");
+				}
+			}
 		});
 	});
 
