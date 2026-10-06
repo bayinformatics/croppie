@@ -4,7 +4,13 @@ node_modules
 # output
 out
 *.tgz
-# Note: dist is NOT ignored - we commit built files for git-based installs
+
+# build output (published to npm and GitHub Pages from CI, not committed)
+dist
+docs/croppie.js
+docs/croppie.js.map
+docs/croppie.css
+
 # bun build artifacts in src (bug workaround)
 src/*.js
 src/*.js.map

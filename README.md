@@ -35,6 +35,8 @@ pnpm add @bayinformatics/croppie
 bun add @bayinformatics/croppie
 ```
 
+Install from npm. The repository does not contain built files, so installing from a git URL does not work.
+
 ## Compatibility
 
 This is an **ESM-only** package for **Node 20 or newer**. It works with modern bundlers like Vite, Webpack, Rollup, Next.js, and Bun.
@@ -438,7 +440,7 @@ bun run typecheck
 # Build for production (cleans dist/ first)
 bun run build
 
-# Watch build into dist/ (run `bun run build` before committing)
+# Watch build into dist/
 bun run dev
 
 # Visual regression tests (Playwright, against the built bundle)
@@ -448,7 +450,7 @@ bun run test:visual
 bun run check:package
 ```
 
-`dist/` and the demo bundle in `docs/` are committed and CI checks that they match a fresh build under the pinned Bun version, so rebuild them (`bun run build && bun run build:docs`) in the last commit of a change that touches `src/`. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow.
+`dist/` and the demo bundle in `docs/` are build output: they are git-ignored and CI builds them for npm and GitHub Pages, so do not commit them. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow.
 
 Visual regression runs in CI using Playwright against test fixtures in `tests/visual/`.
 

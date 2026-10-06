@@ -26,8 +26,8 @@ Use `--frozen-lockfile` so you never change `bun.lock` by accident. Change depen
 | `bun run typecheck` | Type-checks `src`, `tests` and the Playwright config (`tsconfig.test.json`) |
 | `bun run build` | Cleans `dist/`, then builds the bundle, CSS and type declarations |
 | `bun run build:docs` | Builds the demo bundle in `docs/` |
-| `bun run check:package` | Checks that the type declarations in `dist/` import with `.js` specifiers, then `publint` + `attw` against the packed tarball |
-| `bun run dev` | Watch build into `dist/` (run `bun run build` before committing) |
+| `bun run check:package` | Checks that the type declarations in `dist/` import with `.js` specifiers, then `publint --strict` and `attw` against the packed tarball |
+| `bun run dev` | Watch build into `dist/` |
 
 Before you commit, run `bun run lint && bun run typecheck && bun run test`.
 
@@ -44,13 +44,11 @@ happy-dom does not load images or implement canvas, so the tests use mocks from 
 
 Write the failing test first and commit it, then commit the fix or feature (`test: failing tests for X`, then `fix: X`).
 
-## Committed build output
+## Build output
 
-`dist/` and `docs/croppie.js`, `docs/croppie.js.map` and `docs/croppie.css` are committed (so git-based installs and GitHub Pages work), and CI rebuilds them and fails on any difference. The rules:
+`dist/` and `docs/croppie.js`, `docs/croppie.js.map` and `docs/croppie.css` are build output and are git-ignored. Do not commit them. CI builds them: `publish.yml` builds the package that goes to npm, and `pages.yml` builds the demo for GitHub Pages. Because a clone has no `dist/`, the package cannot be installed from git; installs are from npm only.
 
-1. Rebuild them with `bun run build && bun run build:docs` under the pinned Bun version.
-2. Do it in the **last** commit of your PR (`chore: rebuild dist and docs artifacts`), not in intermediate commits.
-3. Never edit them by hand.
+Run `bun run build` for `dist/` (the visual tests do it for you) and `bun run build:docs` to preview `docs/index.html` with a fresh demo bundle. Every pull request also gets a bundle size report and a [pkg.pr.new](https://pkg.pr.new) preview comment with an installable build of your branch.
 
 ## Visual baselines
 
@@ -64,14 +62,18 @@ If Linux CI reports pixel differences that are not a regression (for example aft
 
 ## Commits and pull requests
 
-- Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `test:`, `docs:`, `chore:`, `ci:`, `build:`.
-- Keep commits to a single concern.
-- Add a line to `CHANGELOG.md` under the unreleased section for anything users can see.
+- Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `perf:`, `revert:`, `docs:`, `test:`, `chore:`, `ci:`, `build:`, `style:`, `refactor:`. Mark a breaking change with `!` (`feat!:`) or a `BREAKING CHANGE:` footer.
+- Keep commits to a single concern. Pull requests are merged with merge commits, so each commit message is what release-please reads.
+- Do not edit `CHANGELOG.md` or the `package.json` version: release-please writes both from the commit messages. `feat`, `fix`, `perf`, `revert` and `docs` commits appear in the changelog; `chore`, `ci`, `test`, `build`, `style` and `refactor` do not, so put the user-visible change in a `feat:` or `fix:` subject.
 - Fill in the pull request template.
 
 ## Releasing (maintainers)
 
-1. Merge the PR(s) to `main`; make sure `CHANGELOG.md` has the date and `package.json` the version.
-2. Create a GitHub release whose tag is `v<version>` targeting `main`.
-3. `publish.yml` first verifies that the tag matches `package.json`, then runs lint, typecheck, tests, build and `check:package`, then publishes to npm through trusted publishing (OIDC): there is no npm token, and the provenance statement is attached automatically. A manual run (`workflow_dispatch`) has to be started on the tag `v<version>`; on a branch it stops before building.
+Releases come from [release-please](https://github.com/googleapis/release-please) (`release-please.yml`):
+
+1. After commits land on `main`, release-please keeps one release pull request open (`chore(main): release X.Y.Z`) that bumps `package.json` and prepends the changelog entry. Review it like any other PR.
+2. Merge it. release-please creates the tag `vX.Y.Z` and the GitHub release on `main`.
+3. The release triggers `publish.yml`, which first verifies that the tag matches `package.json`, then runs lint, typecheck, tests, build and `check:package`, then publishes to npm through trusted publishing (OIDC): there is no npm token, and the provenance statement is attached automatically.
 4. Check `npm view @bayinformatics/croppie version`.
+
+If release-please is unavailable, a maintainer can create the GitHub release `vX.Y.Z` on `main` by hand once `package.json` has that version; `publish.yml` runs the same way. A manual run (`workflow_dispatch`) has to be started on the tag `vX.Y.Z`; on a branch it stops before building. Releases are created with a GitHub App token (`RELEASE_APP_ID`, `RELEASE_APP_PRIVATE_KEY`) because a release created with the default `GITHUB_TOKEN` does not trigger workflows.

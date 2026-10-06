@@ -55,9 +55,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Snapshot committed dist
-        run: cp -r dist /tmp/dist-committed
-
       - uses: ./.github/actions/setup
 
       - name: Build
@@ -69,27 +66,21 @@ jobs:
           test -f dist/croppie.css || exit 1
           echo "Build artifacts verified"
 
-      - name: Check dist build parity
-        run: |
-          diff -r /tmp/dist-committed dist || {
-            echo "::error::dist/ is stale - run 'bun run build' and commit the result"
-            exit 1
-          }
-
-      - name: Check docs build parity
-        run: |
-          mkdir -p /tmp/docs-parity
-          cp docs/croppie.js docs/croppie.js.map docs/croppie.css /tmp/docs-parity/
-          bun run build:docs
-          for artifact in croppie.js croppie.js.map croppie.css; do
-            cmp "/tmp/docs-parity/$artifact" "docs/$artifact" || {
-              echo "::error::docs/$artifact is stale - run 'bun run build:docs' and commit the result"
-              exit 1
-            }
-          done
+      # pages.yml builds the demo on main; building it here fails a PR before it breaks the deploy
+      - name: Build demo bundle
+        run: bun run build:docs
 
       - name: Check package (publint, are-the-types-wrong)
         run: bun run check:package
+
+      # The publish job runs npm 11 on Node 24; a dry run catches a bad manifest or file list
+      # before a release does. It needs no credentials.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Dry-run npm publish
+        run: npm publish --dry-run --ignore-scripts
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
@@ -97,3 +88,22 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
+
+  size:
+    name: Bundle size
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup
+
+      # Builds the base branch and the PR, then comments the gzip size difference. The action
+      # detects bun.lock and runs `bun install --frozen-lockfile` and `bun run build`.
+      - uses: preactjs/compressed-size-action@v2
+        with:
+          pattern: 'dist/croppie.{js,css}'

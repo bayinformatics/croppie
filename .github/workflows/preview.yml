@@ -1,0 +1,28 @@
+name: Preview
+
+# Publishes an installable build of every pull request with pkg.pr.new and links it in a PR
+# comment. Needs the pkg.pr.new GitHub App installed on the repository.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup
+
+      - name: Build
+        run: bun run build
+
+      - name: Publish preview
+        run: bun run pkg-pr-new publish --bun --comment=update
