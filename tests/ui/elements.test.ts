@@ -302,6 +302,17 @@ describe("UI Elements", () => {
 			expect(preview.tagName).toBe("IMG");
 		});
 
+		it("honors the EXIF orientation inline, next to its transform origin", () => {
+			// Not only in croppie.css: a host CSS reset or a missing stylesheet must not show
+			// the preview in another orientation than the one the geometry assumes
+			const preview = createPreview();
+
+			expect(preview.style.getPropertyValue("image-orientation")).toBe(
+				"from-image",
+			);
+			expect(preview.style.transformOrigin).toBe("0 0");
+		});
+
 		it("has cr-image class", () => {
 			const preview = createPreview();
 			expect(preview.classList.contains("cr-image")).toBe(true);

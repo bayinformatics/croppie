@@ -217,6 +217,39 @@ describe("DOM utilities", () => {
 			element.remove();
 		});
 
+		it("appends rotate() when a rotation is given", () => {
+			setTransform(element, 1, 2, 3, 90);
+
+			expect(element.style.transform).toBe(
+				"translate(1px, 2px) scale(3) rotate(90deg)",
+			);
+		});
+
+		it("supports every quarter turn", () => {
+			for (const rotation of [90, 180, 270] as const) {
+				setTransform(element, 0, 0, 1, rotation);
+
+				expect(element.style.transform).toBe(
+					`translate(0px, 0px) scale(1) rotate(${rotation}deg)`,
+				);
+			}
+		});
+
+		it("leaves the string unchanged for rotation 0", () => {
+			setTransform(element, 1, 2, 3, 0);
+
+			expect(element.style.transform).toBe("translate(1px, 2px) scale(3)");
+		});
+
+		it("leaves the string unchanged when the rotation is omitted", () => {
+			setTransform(element, 1, 2, 3);
+			const omitted = element.style.transform;
+			setTransform(element, 1, 2, 3, 0);
+
+			expect(omitted).toBe("translate(1px, 2px) scale(3)");
+			expect(element.style.transform).toBe(omitted);
+		});
+
 		it("sets transform with translation and scale", () => {
 			setTransform(element, 100, 200, 1.5);
 

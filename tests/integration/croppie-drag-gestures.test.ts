@@ -89,6 +89,20 @@ describe("Croppie drag gestures", () => {
 
 			expect(imageXUnder(150)).toBeCloseTo(center - 0.5, 6);
 		});
+
+		it("keeps a rotate(90) made during a drag", () => {
+			pointer("pointerdown", 100, 150);
+			pointer("pointermove", 120, 140);
+			croppie.rotate(90);
+			const before = croppie.get().points;
+
+			pointer("pointermove", 121, 140);
+
+			// Moving the quarter-turned image 1px right moves the natural crop 1px down
+			const after = croppie.get().points;
+			expect(after.topLeftX).toBeCloseTo(before.topLeftX, 6);
+			expect(after.topLeftY).toBeCloseTo(before.topLeftY + 1, 6);
+		});
 	});
 
 	describe("CSS-scaled boundary", () => {

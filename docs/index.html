@@ -446,7 +446,7 @@
           <div><dt>Maker</dt><dd>Bay Informatics</dd></div>
           <div><dt>After</dt><dd>Foliotek's Croppie</dd></div>
           <div><dt>Medium</dt><dd>TypeScript on canvas</dd></div>
-          <div><dt>Dimensions</dt><dd>~5 KB gzipped</dd></div>
+          <div><dt>Dimensions</dt><dd>~8 KB gzipped</dd></div>
           <div><dt>Requires</dt><dd>Nothing else</dd></div>
           <div><dt>Credit line</dt><dd>MIT License</dd></div>
         </dl>
@@ -506,7 +506,7 @@
             <h2>Make your own detail</h2>
             <ol class="steps">
               <li>Drag to move around the painting.</li>
-              <li>Scroll, pinch, or use the slider to zoom.</li>
+              <li>Scroll, pinch, or use the slider to zoom. Turn the image with ↺ and ↻.</li>
               <li>Crop to keep what's inside the circle.</li>
             </ol>
           </header>
@@ -518,6 +518,8 @@
             </div>
             <div class="buttons">
               <button class="btn solid" id="crop-btn">Crop the detail →</button>
+              <button class="btn" id="rotate-left-btn" title="Rotate left" aria-label="Rotate left">↺</button>
+              <button class="btn" id="rotate-right-btn" title="Rotate right" aria-label="Rotate right">↻</button>
               <input type="file" id="file-input" accept="image/*">
               <button class="btn" id="upload-btn">Use your own image</button>
             </div>
@@ -664,10 +666,10 @@ npm install github:bayinformatics/croppie</pre>
     new ResizeObserver(() => {
       clearTimeout(resizeTimer)
       resizeTimer = setTimeout(() => enqueue(async () => {
-        const { points } = croppie.get()
+        const { points, rotation } = croppie.get()
         if (!mount() || !source) return
-        if (source === IMAGE) await croppie.bind({ url: IMAGE, points })
-        else await croppie.bindFile(source)
+        if (source === IMAGE) await croppie.bind({ url: IMAGE, points, rotation })
+        else await croppie.bindFile(source, { rotation })
       }), 150)
     }).observe(stage.parentElement)
 
@@ -708,6 +710,10 @@ npm install github:bayinformatics/croppie</pre>
     markCurrent()
 
     document.getElementById('upload-btn').addEventListener('click', () => fileInput.click())
+
+    // rotate() does nothing until an image is bound
+    document.getElementById('rotate-left-btn').addEventListener('click', () => croppie.rotate(-90))
+    document.getElementById('rotate-right-btn').addEventListener('click', () => croppie.rotate(90))
 
     fileInput.addEventListener('change', async () => {
       const file = fileInput.files[0]

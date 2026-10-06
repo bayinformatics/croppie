@@ -379,6 +379,173 @@ describe("canvas draw", () => {
 		});
 	});
 
+	describe("drawCroppedImage with a rotation", () => {
+		// A 50x50 natural-frame rectangle inside the 400x300 image
+		const frame = {
+			topLeftX: 10,
+			topLeftY: 20,
+			bottomRightX: 60,
+			bottomRightY: 70,
+		};
+		// The natural-frame rectangles that fill a 100x50 output: 50x25 at 0 and 180, and
+		// 25x50 at 90 and 270 (the image is shown turned, so the box is the output turned back)
+		const wide = { ...frame, bottomRightY: 45 };
+		const tall = { ...frame, bottomRightX: 35 };
+
+		it("keeps the plain drawImage call for rotation 0", () => {
+			drawCroppedImage(image, wide, 100, 50, { rotation: 0 });
+
+			const ctx = lastContext();
+			expect(ctx.drawImage).toHaveBeenCalledWith(
+				image,
+				10,
+				20,
+				50,
+				25,
+				0,
+				0,
+				100,
+				50,
+			);
+			expect(ctx.save).not.toHaveBeenCalled();
+			expect(ctx.translate).not.toHaveBeenCalled();
+			expect(ctx.rotate).not.toHaveBeenCalled();
+			expect(ctx.restore).not.toHaveBeenCalled();
+		});
+
+		it("draws through a context rotated about the output center for 90", () => {
+			drawCroppedImage(image, tall, 100, 50, { rotation: 90 });
+
+			const ctx = lastContext();
+			expect(ctx.translate).toHaveBeenCalledWith(50, 25);
+			expect(ctx.rotate).toHaveBeenCalledWith(Math.PI / 2);
+			// The destination box is the output turned back: 50 wide and 100 tall
+			expect(ctx.drawImage).toHaveBeenCalledWith(
+				image,
+				10,
+				20,
+				25,
+				50,
+				-25,
+				-50,
+				50,
+				100,
+			);
+		});
+
+		it("draws a half turn into a box the size of the output for 180", () => {
+			drawCroppedImage(image, wide, 100, 50, { rotation: 180 });
+
+			const ctx = lastContext();
+			expect(ctx.translate).toHaveBeenCalledWith(50, 25);
+			expect(ctx.rotate).toHaveBeenCalledWith(Math.PI);
+			expect(ctx.drawImage).toHaveBeenCalledWith(
+				image,
+				10,
+				20,
+				50,
+				25,
+				-50,
+				-25,
+				100,
+				50,
+			);
+		});
+
+		it("rotates by 3 * PI / 2 for 270", () => {
+			drawCroppedImage(image, tall, 100, 50, { rotation: 270 });
+
+			const ctx = lastContext();
+			expect(ctx.rotate.mock.calls[0]?.[0]).toBeCloseTo((3 * Math.PI) / 2, 12);
+			expect(ctx.drawImage).toHaveBeenCalledWith(
+				image,
+				10,
+				20,
+				25,
+				50,
+				-25,
+				-50,
+				50,
+				100,
+			);
+		});
+
+		it("wraps the transformed draw in save and restore", () => {
+			drawCroppedImage(image, frame, 100, 100, { rotation: 90 });
+
+			const ctx = lastContext();
+			expect(ctx.save).toHaveBeenCalledTimes(1);
+			expect(ctx.restore).toHaveBeenCalledTimes(1);
+			expect(firstCall(ctx.save)).toBeLessThan(firstCall(ctx.translate));
+			expect(firstCall(ctx.translate)).toBeLessThan(firstCall(ctx.rotate));
+			expect(firstCall(ctx.rotate)).toBeLessThan(firstCall(ctx.drawImage));
+			expect(firstCall(ctx.drawImage)).toBeLessThan(firstCall(ctx.restore));
+		});
+
+		it("clips and fills in canvas coordinates, before the rotation", () => {
+			drawCroppedImage(image, tall, 100, 50, {
+				rotation: 90,
+				circle: true,
+				backgroundColor: "#fff",
+			});
+
+			const ctx = lastContext();
+			expect(ctx.ellipse).toHaveBeenCalledWith(
+				50,
+				25,
+				50,
+				25,
+				0,
+				0,
+				Math.PI * 2,
+			);
+			expect(firstCall(ctx.fillRect)).toBeLessThan(firstCall(ctx.translate));
+			expect(firstCall(ctx.clip)).toBeLessThan(firstCall(ctx.translate));
+		});
+
+		it("letterboxes a frame larger than the image inside the rotated box", () => {
+			// 100x100 output, frame of 1000x1000 natural px around the 400x300 image
+			drawCroppedImage(
+				image,
+				{
+					topLeftX: -300,
+					topLeftY: -350,
+					bottomRightX: 700,
+					bottomRightY: 650,
+				},
+				100,
+				100,
+				{ rotation: 90 },
+			);
+
+			// Scale 0.1: the image is 40x30 in a 100x100 box centered on the origin, offset
+			// by the 30x35 of empty space before it
+			expect(lastContext().drawImage).toHaveBeenCalledWith(
+				image,
+				0,
+				0,
+				400,
+				300,
+				-20,
+				-15,
+				40,
+				30,
+			);
+		});
+
+		it("skips drawImage for a frame that misses the image", () => {
+			drawCroppedImage(
+				image,
+				{ topLeftX: 500, topLeftY: 0, bottomRightX: 600, bottomRightY: 100 },
+				100,
+				100,
+				{ rotation: 180 },
+			);
+
+			expect(lastContext().drawImage).not.toHaveBeenCalled();
+		});
+	});
+
 	describe("drawCroppedImage into an output of another shape than the frame", () => {
 		// A 50x50 natural-frame rectangle inside the 400x300 image
 		const square = {
@@ -441,6 +608,31 @@ describe("canvas draw", () => {
 			const ctx = lastContext();
 			expect(ctx.fillRect).toHaveBeenCalledWith(0, 0, 100, 50);
 			expect(firstCall(ctx.fillRect)).toBeLessThan(firstCall(ctx.drawImage));
+		});
+
+		it("letterboxes in the box turned back by the rotation", () => {
+			// A 50x25 frame shown at 90 is 25 wide and 50 tall: centered in the 100x50 output
+			drawCroppedImage(image, { ...square, bottomRightY: 45 }, 100, 50, {
+				rotation: 90,
+				circle: true,
+			});
+
+			const ctx = lastContext();
+			// In the 50x100 box centered on the origin, the 50x25 frame is centered vertically,
+			// on whole pixels of the box: its top edge at 37.5 rounds to 38, i.e. -12
+			expect(ctx.drawImage.mock.calls[0]?.slice(1)).toEqual([
+				10, 20, 50, 25, -25, -12, 50, 25,
+			]);
+			// The mask is the turned frame, in canvas coordinates
+			expect(ctx.ellipse).toHaveBeenCalledWith(
+				50,
+				25,
+				12.5,
+				25,
+				0,
+				0,
+				Math.PI * 2,
+			);
 		});
 
 		it("centers a frame that extends past the image too", () => {

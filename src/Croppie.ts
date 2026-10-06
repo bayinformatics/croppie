@@ -9,6 +9,7 @@ import {
 	createWheelZoomHandler,
 } from "./input/zoom.js";
 import type {
+	BindFileOptions,
 	BindOptions,
 	Boundary,
 	CropPoints,
@@ -17,6 +18,7 @@ import type {
 	CroppieEvents,
 	CroppieOptions,
 	ResultOptions,
+	Rotation,
 	TransformState,
 } from "./types.js";
 import {
@@ -39,13 +41,20 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	describeUrl,
+	exifOrientationToRotation,
 	fileToDataUrl,
 	intersectFrame,
 	loadImage,
+	naturalRectToRotated,
 	normalizePoints,
+	normalizeRotation,
 	positiveFinite,
+	readDataUrlOrientation,
 	resolveMinZoom,
+	rotatedRectToNatural,
+	rotateOffset,
 	setTransform,
+	swapDims,
 	validateOptions,
 	type ZoomAnchor,
 	zoomAboutAnchor,
@@ -114,6 +123,10 @@ export class Croppie {
 	// State
 	private image: HTMLImageElement | null = null;
 	private transform: TransformState = Croppie.initialTransform();
+	/** The rotation `bind()` started with; `reset()` returns to it. */
+	private initialRotation: Rotation = 0;
+	/** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
+	private exifOrientation: number | undefined;
 	/**
 	 * `options.zoom` with its defaults applied: `min` as given (undefined when unset, then the
 	 * minimum is per image), `max` and `enforceMinimumCoverage` defaulted. An explicit
@@ -151,7 +164,7 @@ export class Croppie {
 
 	/** The transform before any image is bound, and again after `destroy()`. */
 	private static initialTransform(): TransformState {
-		return { x: 0, y: 0, scale: 1 };
+		return { x: 0, y: 0, scale: 1, rotation: 0 };
 	}
 
 	constructor(element: HTMLElement, givenOptions: CroppieOptions) {
@@ -194,13 +207,6 @@ export class Croppie {
 			this.effectiveMinZoom,
 			this.zoomConfig.max,
 		);
-
-		// Deprecation warning for v2.6 migration
-		if (options.enableOrientation !== undefined) {
-			console.warn(
-				"[@bayinformatics/croppie] enableOrientation is deprecated and has no effect. Rotation support is planned for a future release.",
-			);
-		}
 
 		this.createElements();
 		this.attachEventHandlers();
@@ -307,6 +313,8 @@ export class Croppie {
 	/**
 	 * Loads an image into the cropper.
 	 *
+	 * A `rotation` that is not a multiple of 90 rejects before anything changes, so it
+	 * neither half-applies the new image nor cancels a bind that is still loading.
 	 * Malformed `points` (an array without exactly 4 entries, a coordinate that is not a
 	 * number, a rect without width or height) are ignored with a console warning, and the
 	 * image gets its default framing.
@@ -323,24 +331,49 @@ export class Croppie {
 		const bindOptions: BindOptions =
 			typeof options === "string" ? { url: options } : options;
 
-		// Read the points before claiming a generation, so reading them can neither throw
-		// after the claim nor leave a half-applied image behind. An array without exactly 4
-		// entries is malformed like a NaN coordinate, and is ignored with the same warning
-		// in load(); the bind itself goes on, and like any bind it supersedes an older one
+		// Validate and read before claiming a generation. An invalid rotation rejects, so a bad
+		// call cannot supersede a good bind or leave a half-applied image behind. Reading the
+		// points cannot throw: an array without exactly 4 entries is malformed like a NaN
+		// coordinate, and is ignored with the same warning in load(); the bind itself goes on,
+		// and like any bind it supersedes an older one
+		const rotation = this.resolveBindRotation(bindOptions);
 		const points = readPoints(bindOptions.points);
 
 		await this.runBind(
 			++this.bindGeneration,
 			() => bindOptions.url,
-			(image) => this.load(image, bindOptions, points),
+			(image) => this.load(image, bindOptions, rotation, points),
 		);
+	}
+
+	/**
+	 * The rotation a bind starts with: the validated `rotation` option; else the rotation an
+	 * explicit `orientation` (EXIF 1-8) stands for; else 0. Mirrored or out-of-range
+	 * orientations cannot be expressed as a rotation, so they are ignored with a warning.
+	 *
+	 * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
+	 */
+	private resolveBindRotation(bindOptions: BindFileOptions): Rotation {
+		if (bindOptions.rotation !== undefined) {
+			return normalizeRotation(bindOptions.rotation);
+		}
+		if (bindOptions.orientation === undefined) return 0;
+
+		const rotation = exifOrientationToRotation(bindOptions.orientation);
+		if (rotation === undefined) {
+			console.warn(
+				`[@bayinformatics/croppie] Ignoring bind({ orientation: ${bindOptions.orientation} }): only the EXIF orientations 1, 3, 6 and 8 can be expressed as a rotation`,
+			);
+			return 0;
+		}
+		return rotation;
 	}
 
 	/**
 	 * The asynchronous part of every bind, for the bind that claimed `generation` (`bind()`
 	 * and `bindFile()` validate their arguments before claiming it, so a call they reject
 	 * supersedes nothing): produces the image URL (`bindFile()` reads it from the file), loads
-	 * the image, then hands it to `apply`.
+	 * the image, then hands it and its URL to `apply`.
 	 *
 	 * Only the newest bind applies anything. Once a later bind claimed a generation, or the
 	 * instance was destroyed, the next step rejects with an `AbortError` instead, whether it
@@ -354,11 +387,11 @@ export class Croppie {
 	private async runBind(
 		generation: number,
 		produceUrl: () => string | Promise<string>,
-		apply: (image: HTMLImageElement) => void,
+		apply: (image: HTMLImageElement, url: string) => void,
 	): Promise<void> {
 		const url = await this.whileNewest(generation, produceUrl());
 		const image = await this.whileNewest(generation, loadImage(url));
-		apply(image);
+		apply(image, url);
 	}
 
 	/**
@@ -397,14 +430,16 @@ export class Croppie {
 	}
 
 	/**
-	 * Applies a loaded image with the bind's `bindOptions` (zoom, points) and the `points`
-	 * resolved from them before the bind claimed its generation (`undefined` when malformed).
+	 * Applies a loaded image with the bind's `bindOptions` (its URL, zoom and points), and the
+	 * `rotation` and (natural-frame) `points` resolved from them before the bind claimed its
+	 * generation (`points` is `undefined` when malformed).
 	 *
 	 * @throws Error if the image has no intrinsic size
 	 */
 	private load(
 		image: HTMLImageElement,
-		bindOptions: Omit<BindOptions, "url">,
+		bindOptions: BindOptions,
+		rotation: Rotation,
 		points?: CropPoints,
 	): void {
 		// A 0x0 image (e.g. an SVG without a size) would make every zoom calculation Infinity
@@ -424,8 +459,27 @@ export class Croppie {
 			this.previewEl.src = this.image.src;
 		}
 
-		// Resolve the zoom limits for this image and sync the slider's min
-		const coverageZoom = this.updateZoomLimits(this.image);
+		// Read the tag from the data URL's prefix; the browser has already oriented the pixels,
+		// so it is only reported, never applied
+		this.exifOrientation = this.options.enableExif
+			? readDataUrlOrientation(bindOptions.url)
+			: undefined;
+		// Warn only when the turn came from `orientation`: an explicit `rotation` wins over it,
+		// and orientation 1 or an ignored value turns nothing
+		if (
+			bindOptions.rotation === undefined &&
+			rotation !== 0 &&
+			this.exifOrientation !== undefined &&
+			this.exifOrientation !== 1
+		) {
+			console.warn(
+				`[@bayinformatics/croppie] bind({ orientation: ${bindOptions.orientation} }) is applied on top of the file's own EXIF orientation (${this.exifOrientation}), which browsers already honor; the image may end up rotated twice. The explicit orientation wins.`,
+			);
+		}
+
+		// Resolve the zoom limits (from the displayed dimensions) and sync the slider's min
+		this.initialRotation = rotation;
+		const coverageZoom = this.updateZoomLimits(rotation);
 
 		// Calculate initial zoom. As in setZoom(), a numeric string is converted and a value
 		// that is then not finite (NaN, ±Infinity, a blank or non-numeric string) is ignored:
@@ -439,22 +493,30 @@ export class Croppie {
 			x: 0,
 			y: 0,
 			scale: clamp(initialZoom, this.effectiveMinZoom, this.zoomConfig.max),
+			rotation,
 		};
 
-		// Apply initial points if provided
+		// Apply initial points if provided. They are in the natural frame; the transform
+		// works in the displayed (rotated) frame, so map the rectangle across first.
 		if (bindOptions.points) {
+			const [displayedWidth, displayedHeight] = this.displayedSize(rotation);
 			const pointsTransform = points
 				? calculateTransformFromPoints(
-						points,
-						this.image.naturalWidth,
-						this.image.naturalHeight,
+						naturalRectToRotated(
+							points,
+							this.image.naturalWidth,
+							this.image.naturalHeight,
+							rotation,
+						),
+						displayedWidth,
+						displayedHeight,
 						this.options.viewport.width,
 						this.options.viewport.height,
 						{ min: this.effectiveMinZoom, max: this.zoomConfig.max },
 					)
 				: undefined;
 			if (pointsTransform) {
-				this.transform = pointsTransform;
+				this.transform = { ...pointsTransform, rotation };
 			} else {
 				console.warn(
 					"[@bayinformatics/croppie] Ignoring invalid initial points:",
@@ -470,12 +532,20 @@ export class Croppie {
 	}
 
 	/**
-	 * Binds a File or Blob to the cropper. Anything else (such as the `undefined` of an
-	 * empty file input) rejects with a `TypeError` before anything changes, so it does not
-	 * cancel a bind that is still loading. Like `bind()`, it rejects with an `AbortError`
-	 * when a later bind supersedes it or the instance is destroyed while the file loads.
+	 * Binds a File or Blob to the cropper, with the same `options` as `bind()` except `url`:
+	 * `rotation`, `orientation`, `points` and `zoom` apply exactly as there (an invalid
+	 * `rotation` rejects with a `RangeError` before anything changes; malformed `points` are
+	 * ignored with a warning), so a file can be bound back with the data `get()` returned.
+	 *
+	 * Anything else than a File or Blob (such as the `undefined` of an empty file input)
+	 * rejects with a `TypeError` before anything changes, so it does not cancel a bind that is
+	 * still loading. Like `bind()`, it rejects with an `AbortError` when a later bind
+	 * supersedes it or the instance is destroyed while the file loads.
 	 */
-	async bindFile(file: File | Blob): Promise<void> {
+	async bindFile(
+		file: File | Blob,
+		options: BindFileOptions = {},
+	): Promise<void> {
 		this.assertNotDestroyed("bindFile");
 
 		// Validate before claiming a generation, so a bad call cannot supersede a good bind.
@@ -492,12 +562,16 @@ export class Croppie {
 			);
 		}
 
+		// Validate and read the options like bind() does, before claiming a generation
+		const rotation = this.resolveBindRotation(options);
+		const points = readPoints(options.points);
+
 		// Claim the generation before reading, so a bind() started while the file is
 		// still being read supersedes this one
 		await this.runBind(
 			++this.bindGeneration,
 			() => fileToDataUrl(file),
-			(image) => this.load(image, {}),
+			(image, url) => this.load(image, { ...options, url }, rotation, points),
 		);
 	}
 
@@ -527,8 +601,11 @@ export class Croppie {
 			throw new Error("No image bound");
 		}
 
-		const frame = this.getViewportRect();
+		// The viewport rectangle in the displayed frame; the output canvas is in that
+		// orientation, so its size comes from here
+		const displayedFrame = this.getViewportRect();
 		const viewport = this.options.viewport;
+		const rotation = this.transform.rotation;
 
 		// Determine output size. 'original' (the frame at image resolution) and a custom size
 		// are capped to a canvas browsers can allocate, keeping their shape
@@ -537,8 +614,8 @@ export class Croppie {
 
 		if (options.size === "original") {
 			({ width: outputWidth, height: outputHeight } = capCanvasSize(
-				frame.bottomRightX - frame.topLeftX,
-				frame.bottomRightY - frame.topLeftY,
+				displayedFrame.bottomRightX - displayedFrame.topLeftX,
+				displayedFrame.bottomRightY - displayedFrame.topLeftY,
 			));
 		} else if (options.size && options.size !== "viewport") {
 			// A size that is not a positive finite number would give a 0-wide canvas and a
@@ -552,14 +629,21 @@ export class Croppie {
 			outputHeight = viewport.height;
 		}
 
+		// drawCroppedImage samples the natural image, so hand it the frame in natural coordinates
 		const canvas = drawCroppedImage(
 			this.image,
-			frame,
+			rotatedRectToNatural(
+				displayedFrame,
+				this.image.naturalWidth,
+				this.image.naturalHeight,
+				rotation,
+			),
 			outputWidth,
 			outputHeight,
 			{
 				circle: options.circle ?? viewport.type === "circle",
 				backgroundColor: options.backgroundColor,
+				rotation,
 			},
 		);
 
@@ -588,6 +672,10 @@ export class Croppie {
 		return {
 			points: this.getPoints(),
 			zoom: this.transform.scale,
+			rotation: this.transform.rotation,
+			...(this.exifOrientation !== undefined && {
+				orientation: this.exifOrientation,
+			}),
 		};
 	}
 
@@ -657,32 +745,99 @@ export class Croppie {
 	}
 
 	/**
-	 * Rotates the image by 90 degree increments
+	 * Rotates the image clockwise by `degrees`, any multiple of 90 (negative turns
+	 * counter-clockwise). The image pixel under the viewport center stays there, unless the
+	 * rotated image would then no longer cover the viewport; then the image moves the least
+	 * needed.
+	 *
+	 * Emits `rotate`, then `update`, then `zoom` if the zoom had to change: the zoom limits are
+	 * recomputed for the rotated image, so with a non-square viewport a quarter turn may raise
+	 * the zoom to the new minimum. As with `setZoom()`, when an `update` listener zooms again,
+	 * only its final zoom is reported. Rotating by a full turn or 0, before an image is bound or
+	 * after `destroy()` does nothing. `points` in `get()` stay in the natural frame.
+	 * Calling it while the user is dragging is not special-cased.
+	 *
+	 * @param degrees - Clockwise rotation in degrees
+	 * @throws RangeError if `degrees` is not a finite multiple of 90
 	 */
-	rotate(degrees: 90 | 180 | 270 | -90): void {
-		// TODO: Implement rotation
-		console.warn("Rotation not yet implemented:", degrees);
+	rotate(degrees: number): void {
+		const delta = normalizeRotation(degrees);
+		if (this.destroyed || !this.image || delta === 0) return;
+
+		const previousRotation = this.transform.rotation;
+		const previousZoom = this.transform.scale;
+		const rotation = ((previousRotation + delta) % 360) as Rotation;
+
+		// The offset of the image center from the viewport center turns with the image
+		const [x, y] = rotateOffset(this.transform.x, this.transform.y, delta);
+		this.transform = { x, y, scale: previousZoom, rotation };
+
+		// The displayed dimensions changed, so the zoom limits did too
+		this.updateZoomLimits(rotation);
+		if (this.transform.scale < this.effectiveMinZoom) {
+			this.transform = zoomAboutAnchor(
+				this.transform,
+				this.effectiveMinZoom,
+				CENTER_ANCHOR,
+			);
+		}
+
+		this.commitTurn(previousRotation, previousZoom);
 	}
 
 	/**
-	 * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+	 * Restores the rotation `bind()` started with, re-centers the image and returns to the
+	 * coverage zoom of that rotation (clamped to the zoom limits).
 	 *
-	 * The zoom goes through the same path as `setZoom()`, so the events follow the same
-	 * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
-	 * position did, and no stale `zoom` when an `update` listener zooms again.
+	 * Emits `rotate` when the rotation changed, then `update`, then `zoom` when the zoom
+	 * changed. As with `setZoom()`, when an `update` listener zooms again, only its final zoom
+	 * is reported.
 	 */
 	reset(): void {
 		if (this.destroyed || !this.image) return;
 
-		// Back to the coverage zoom stored with the zoom limits on bind
-		this.transform.x = 0;
-		this.transform.y = 0;
-		if (this.applyZoom(this.coverage)) return;
+		const previousZoom = this.transform.scale;
+		const previousRotation = this.transform.rotation;
+		const rotation = this.initialRotation;
 
-		// Same zoom: only the position changed, and applyZoom() emitted nothing
+		// Back to the bind-time rotation, centered, at its coverage zoom. A different rotation
+		// changes the displayed dimensions, so the zoom limits and the stored coverage zoom are
+		// refreshed for it first
+		if (rotation !== previousRotation) {
+			this.updateZoomLimits(rotation);
+		}
+		this.transform = {
+			x: 0,
+			y: 0,
+			scale: clamp(this.coverage, this.effectiveMinZoom, this.zoomConfig.max),
+			rotation,
+		};
+
+		this.commitTurn(previousRotation, previousZoom);
+	}
+
+	/**
+	 * Shows the rotation, position and zoom that `rotate()` or `reset()` settled, then emits
+	 * their events in the documented order: `rotate` when the rotation changed, `update`, and
+	 * `zoom` when the settled zoom differs from `previousZoom`.
+	 *
+	 * Like `applyZoom()`, the `zoom` event is decided from the zoom settled here, before any
+	 * listener runs: when a listener zooms again, its nested call already emitted the final
+	 * zoom and this one emits none, so `zoom` never reports a value that was already replaced.
+	 */
+	private commitTurn(previousRotation: Rotation, previousZoom: number): void {
 		this.constrainPosition();
 		this.updateTransform();
+		this.updateSlider();
+
+		const { rotation, scale: zoom } = this.transform;
+		if (rotation !== previousRotation) {
+			this.emitEvent("rotate", { rotation, previousRotation });
+		}
 		this.emitUpdate();
+		if (zoom !== previousZoom && this.transform.scale === zoom) {
+			this.emitEvent("zoom", { zoom, previousZoom });
+		}
 	}
 
 	/**
@@ -715,7 +870,10 @@ export class Croppie {
 		this.previewEl = null;
 		this.sliderEl = null;
 		this.image = null;
-		// get() and the zoom getter report the initial zoom next to the zeroed points
+		// get() and the zoom getter report the initial zoom next to the zeroed points, and no
+		// EXIF orientation: that tag belonged to the image that is gone
+		this.exifOrientation = undefined;
+		this.initialRotation = 0;
 		this.transform = Croppie.initialTransform();
 	}
 
@@ -758,23 +916,35 @@ export class Croppie {
 	}
 
 	/**
-	 * Resolves the effective minimum zoom for an image (see `resolveMinZoom`), stores it with
-	 * the image's coverage zoom (the one place both are computed), and syncs the slider's
-	 * `min`, so the slider range is never inverted.
+	 * Resolves the effective minimum zoom for the bound image shown at `rotation` (see
+	 * `resolveMinZoom`), stores it with the coverage zoom of the image as displayed (the one
+	 * place both are computed), and syncs the slider's `min`, so the slider range is never
+	 * inverted.
 	 *
-	 * @returns The zoom at which the image covers the viewport
+	 * @returns The zoom at which the displayed image covers the viewport
 	 */
-	private updateZoomLimits(image: HTMLImageElement): number {
-		const { naturalWidth, naturalHeight } = image;
+	private updateZoomLimits(rotation: Rotation): number {
+		// Coverage and fit depend on the image as displayed, i.e. after the rotation
+		const [displayedWidth, displayedHeight] = this.displayedSize(rotation);
 		const { width, height } = this.options.viewport;
-		const coverage = this.coverageZoom(image);
+		const coverage = calculateInitialZoom(
+			displayedWidth,
+			displayedHeight,
+			width,
+			height,
+		);
 		this.coverage = coverage;
 
 		this.effectiveMinZoom = resolveMinZoom({
 			configuredMin: this.zoomConfig.min,
 			max: this.zoomConfig.max,
 			coverage,
-			contain: calculateContainZoom(naturalWidth, naturalHeight, width, height),
+			contain: calculateContainZoom(
+				displayedWidth,
+				displayedHeight,
+				width,
+				height,
+			),
 			enforceMinimumCoverage: this.zoomConfig.enforceMinimumCoverage,
 		});
 
@@ -786,36 +956,49 @@ export class Croppie {
 	}
 
 	/**
-	 * The smallest zoom at which `image` covers the viewport (computed for
-	 * `updateZoomLimits()`, which stores it as `coverage`).
+	 * The dimensions of the image as displayed: the natural size, swapped for a quarter turn.
+	 *
+	 * @param rotation - Defaults to the current rotation
 	 */
-	private coverageZoom(image: HTMLImageElement): number {
-		return calculateInitialZoom(
-			image.naturalWidth,
-			image.naturalHeight,
-			this.options.viewport.width,
-			this.options.viewport.height,
+	private displayedSize(
+		rotation: Rotation = this.transform.rotation,
+	): [number, number] {
+		return swapDims(
+			this.image?.naturalWidth ?? 0,
+			this.image?.naturalHeight ?? 0,
+			rotation,
 		);
 	}
 
 	/**
-	 * Updates the CSS transform on the preview element
+	 * Updates the CSS transform on the preview element.
+	 *
+	 * The `<img>` keeps its natural size with transform-origin 0 0, so the transform is
+	 * `translate(tx, ty) scale(s) rotate(r)`. The rotation is about the displayed image's
+	 * center, which sits at `(x, y)` from the boundary center, so
+	 * `(tx, ty) = (B.w/2 + x, B.h/2 + y) - s * R(r)(W/2, H/2)`, with `R` from `rotateOffset()`.
 	 */
 	private updateTransform(): void {
 		if (this.previewEl) {
-			// Center the image in the boundary
 			const boundaryWidth = this.options.boundary.width;
 			const boundaryHeight = this.options.boundary.height;
-			const imageWidth = this.image?.naturalWidth ?? 0;
-			const imageHeight = this.image?.naturalHeight ?? 0;
+			const { x, y, scale, rotation } = this.transform;
 
-			const scaledWidth = imageWidth * this.transform.scale;
-			const scaledHeight = imageHeight * this.transform.scale;
+			// The natural image at the current scale
+			const scaledWidth = (this.image?.naturalWidth ?? 0) * scale;
+			const scaledHeight = (this.image?.naturalHeight ?? 0) * scale;
 
-			const centerX = (boundaryWidth - scaledWidth) / 2 + this.transform.x;
-			const centerY = (boundaryHeight - scaledHeight) / 2 + this.transform.y;
+			// s * R(r)(W/2, H/2): the image center's offset from the top-left corner the
+			// transform origin pins, turned with the image
+			const [centerX, centerY] = rotateOffset(
+				scaledWidth / 2,
+				scaledHeight / 2,
+				rotation,
+			);
+			const translateX = boundaryWidth / 2 - centerX + x;
+			const translateY = boundaryHeight / 2 - centerY + y;
 
-			setTransform(this.previewEl, centerX, centerY, this.transform.scale);
+			setTransform(this.previewEl, translateX, translateY, scale, rotation);
 		}
 	}
 
@@ -838,9 +1021,10 @@ export class Croppie {
 	private constrainPosition(): void {
 		if (!this.image) return;
 
+		const [displayedWidth, displayedHeight] = this.displayedSize();
 		const bounds = calculateBounds(
-			this.image.naturalWidth,
-			this.image.naturalHeight,
+			displayedWidth,
+			displayedHeight,
 			this.transform.scale,
 			this.options.viewport.width,
 			this.options.viewport.height,
@@ -851,20 +1035,31 @@ export class Croppie {
 	}
 
 	/**
-	 * Calculates the crop points based on current transform, clamped to the image
+	 * Calculates the crop points based on current transform, clamped to the image, in the
+	 * natural frame (the pixel space of the image as decoded): the displayed-frame rectangle
+	 * is clamped to the displayed image and then mapped back through the rotation.
 	 */
 	private getPoints(): CropPoints {
 		const frame = this.getViewportRect();
 		// Without an image the frame is already the empty rectangle
-		return this.image
-			? intersectFrame(frame, this.image.naturalWidth, this.image.naturalHeight)
-			: frame;
+		if (!this.image) return frame;
+
+		const [displayedWidth, displayedHeight] = this.displayedSize();
+
+		return rotatedRectToNatural(
+			intersectFrame(frame, displayedWidth, displayedHeight),
+			this.image.naturalWidth,
+			this.image.naturalHeight,
+			this.transform.rotation,
+		);
 	}
 
 	/**
-	 * The viewport rectangle in image pixels, NOT clamped to the image: it extends past the
-	 * image when the user zoomed out further than the image covers. `result()` renders this
-	 * frame so the output keeps the image's proportions.
+	 * The viewport rectangle in the DISPLAYED frame (the image after rotation), in image
+	 * pixels and NOT clamped to the image: it extends past the image when the user zoomed out
+	 * further than the image covers. With `(Dw, Dh)` the displayed dimensions:
+	 * `topLeft = (Dw/2 - (x + vw/2) / s, Dh/2 - (y + vh/2) / s)` and `bottomRight = topLeft +
+	 * (vw, vh) / s`.
 	 */
 	private getViewportRect(): CropPoints {
 		if (!this.image) {
@@ -872,27 +1067,18 @@ export class Croppie {
 		}
 
 		const viewport = this.options.viewport;
-		const boundary = this.options.boundary;
-		const imageWidth = this.image.naturalWidth;
-		const imageHeight = this.image.naturalHeight;
+		const { x, y, scale } = this.transform;
+		const [displayedWidth, displayedHeight] = this.displayedSize();
 
-		// Calculate the visible area in image coordinates
-		const scaledWidth = imageWidth * this.transform.scale;
-		const scaledHeight = imageHeight * this.transform.scale;
+		const topLeftX = displayedWidth / 2 - (x + viewport.width / 2) / scale;
+		const topLeftY = displayedHeight / 2 - (y + viewport.height / 2) / scale;
 
-		const imageLeft = (boundary.width - scaledWidth) / 2 + this.transform.x;
-		const imageTop = (boundary.height - scaledHeight) / 2 + this.transform.y;
-
-		const viewportLeft = (boundary.width - viewport.width) / 2;
-		const viewportTop = (boundary.height - viewport.height) / 2;
-
-		// Convert viewport coordinates to image coordinates
-		const topLeftX = (viewportLeft - imageLeft) / this.transform.scale;
-		const topLeftY = (viewportTop - imageTop) / this.transform.scale;
-		const bottomRightX = topLeftX + viewport.width / this.transform.scale;
-		const bottomRightY = topLeftY + viewport.height / this.transform.scale;
-
-		return { topLeftX, topLeftY, bottomRightX, bottomRightY };
+		return {
+			topLeftX,
+			topLeftY,
+			bottomRightX: topLeftX + viewport.width / scale,
+			bottomRightY: topLeftY + viewport.height / scale,
+		};
 	}
 
 	/**

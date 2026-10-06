@@ -1,5 +1,6 @@
-import type { CropPoints, OutputFormat } from "../types.js";
+import type { CropPoints, OutputFormat, Rotation } from "../types.js";
 import { intersectFrame } from "../utils/points.js";
+import { swapDims } from "../utils/rotation.js";
 
 /**
  * Create a new canvas showing the viewport `frame` of an image, scaled to given dimensions and optionally masked or filled.
@@ -23,13 +24,21 @@ import { intersectFrame } from "../utils/points.js";
  * dw = dx1 - dx0                                                                  (same for y)
  * ```
  *
+ * With a `rotation` the frame is still given in the NATURAL image frame, while the output
+ * canvas is in the displayed orientation: the image is drawn through a context rotated about
+ * the output center into the box `[bw, bh] = swapDims(outW, outH, rotation)` (the output
+ * turned back), which takes the place of `outW` and `outH` above, with the destination
+ * offsets measured from `(-bw/2, -bh/2)`. The background and the circle mask are applied in
+ * canvas coordinates, before the rotation, so they are not rotated.
+ *
  * @param image - Source HTMLImageElement to draw from.
- * @param frame - Viewport rectangle in source-image pixels; may extend past the image.
+ * @param frame - Viewport rectangle in source-image pixels (the natural frame); may extend past the image.
  * @param outputWidth - Width of the resulting canvas in pixels.
  * @param outputHeight - Height of the resulting canvas in pixels.
  * @param options - Optional rendering options.
  * @param options.circle - If true, clip to the ellipse inscribed in the drawn frame (a circle for a square viewport); that is the output's inscribed ellipse when the output has the frame's shape.
  * @param options.backgroundColor - If provided, fill the canvas background with this CSS color before drawing the image.
+ * @param options.rotation - Clockwise rotation the image is displayed with (default: 0).
  * @returns An HTMLCanvasElement containing the framed image scaled to `outputWidth` x `outputHeight`.
  * @throws If the 2D rendering context cannot be obtained from the created canvas.
  */
@@ -41,6 +50,7 @@ export function drawCroppedImage(
 	options?: {
 		circle?: boolean;
 		backgroundColor?: string;
+		rotation?: Rotation;
 	},
 ): HTMLCanvasElement {
 	const canvas = document.createElement("canvas");
@@ -68,25 +78,28 @@ export function drawCroppedImage(
 		return canvas;
 	}
 
-	// One scale keeps the image's proportions, with the frame centered in the output; an
-	// output that is the frame's shape rounded to whole pixels is filled exactly instead
-	const fill = isRoundedShape(
-		outputWidth,
-		outputHeight,
-		frameWidth,
-		frameHeight,
-	);
-	const scale = Math.min(outputWidth / frameWidth, outputHeight / frameHeight);
-	const scaleX = fill ? outputWidth / frameWidth : scale;
-	const scaleY = fill ? outputHeight / frameHeight : scale;
-	const offsetX = (outputWidth - frameWidth * scaleX) / 2;
-	const offsetY = (outputHeight - frameHeight * scaleY) / 2;
+	// The destination box in the image's own orientation: the output itself, or the output
+	// turned back by the rotation
+	const rotation = options?.rotation ?? 0;
+	const [boxWidth, boxHeight] = swapDims(outputWidth, outputHeight, rotation);
 
-	// Apply elliptical mask if needed: the ellipse inscribed in the scaled frame (a circle
-	// when the frame is square)
+	// One scale keeps the image's proportions, with the frame centered in the box; a box that
+	// is the frame's shape rounded to whole pixels is filled exactly instead
+	const fill = isRoundedShape(boxWidth, boxHeight, frameWidth, frameHeight);
+	const scale = Math.min(boxWidth / frameWidth, boxHeight / frameHeight);
+	const scaleX = fill ? boxWidth / frameWidth : scale;
+	const scaleY = fill ? boxHeight / frameHeight : scale;
+	const offsetX = (boxWidth - frameWidth * scaleX) / 2;
+	const offsetY = (boxHeight - frameHeight * scaleY) / 2;
+
+	// Apply elliptical mask if needed: the ellipse inscribed in the scaled frame, in canvas
+	// coordinates (a circle when the frame is square)
 	if (options?.circle) {
-		const maskWidth = frameWidth * scaleX;
-		const maskHeight = frameHeight * scaleY;
+		const [maskWidth, maskHeight] = swapDims(
+			frameWidth * scaleX,
+			frameHeight * scaleY,
+			rotation,
+		);
 		ctx.beginPath();
 		ctx.ellipse(
 			outputWidth / 2,
@@ -101,7 +114,7 @@ export function drawCroppedImage(
 		ctx.clip();
 	}
 
-	// Intersect the frame with the image and map the overlap into the output
+	// Intersect the frame with the image and map the overlap into the box
 	const {
 		topLeftX: sourceLeft,
 		topLeftY: sourceTop,
@@ -113,15 +126,20 @@ export function drawCroppedImage(
 	const sourceHeight = sourceBottom - sourceTop;
 
 	// A frame that misses the image entirely leaves only the background
-	if (sourceWidth > 0 && sourceHeight > 0) {
-		// Each edge on a whole pixel: a half-pixel edge blurs the seam between the image and
-		// a letterbox bar. An output the frame fills exactly is already 0..outW, 0..outH
-		const left = Math.round(offsetX + (sourceLeft - frame.topLeftX) * scaleX);
-		const right = Math.round(offsetX + (sourceRight - frame.topLeftX) * scaleX);
-		const top = Math.round(offsetY + (sourceTop - frame.topLeftY) * scaleY);
-		const bottom = Math.round(
-			offsetY + (sourceBottom - frame.topLeftY) * scaleY,
-		);
+	if (!(sourceWidth > 0 && sourceHeight > 0)) {
+		return canvas;
+	}
+
+	// Each edge on a whole pixel of the box: a half-pixel edge blurs the seam between the
+	// image and a letterbox bar. The box's corners are the output's corners whatever the
+	// rotation, so whole pixels of the box are whole pixels of the output. A box the frame
+	// fills exactly is already 0..boxWidth, 0..boxHeight
+	const left = Math.round(offsetX + (sourceLeft - frame.topLeftX) * scaleX);
+	const right = Math.round(offsetX + (sourceRight - frame.topLeftX) * scaleX);
+	const top = Math.round(offsetY + (sourceTop - frame.topLeftY) * scaleY);
+	const bottom = Math.round(offsetY + (sourceBottom - frame.topLeftY) * scaleY);
+
+	if (rotation === 0) {
 		ctx.drawImage(
 			image,
 			sourceLeft,
@@ -133,6 +151,22 @@ export function drawCroppedImage(
 			right - left,
 			bottom - top,
 		);
+	} else {
+		ctx.save();
+		ctx.translate(outputWidth / 2, outputHeight / 2);
+		ctx.rotate((rotation * Math.PI) / 180);
+		ctx.drawImage(
+			image,
+			sourceLeft,
+			sourceTop,
+			sourceWidth,
+			sourceHeight,
+			left - boxWidth / 2,
+			top - boxHeight / 2,
+			right - left,
+			bottom - top,
+		);
+		ctx.restore();
 	}
 
 	return canvas;

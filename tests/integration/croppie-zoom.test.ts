@@ -365,7 +365,7 @@ describe("Croppie zoom", () => {
 		});
 	});
 
-	describe("deprecation warnings", () => {
+	describe("enableOrientation", () => {
 		let originalWarn: typeof console.warn;
 
 		beforeEach(() => {
@@ -376,7 +376,7 @@ describe("Croppie zoom", () => {
 			console.warn = originalWarn;
 		});
 
-		it("warns about enableOrientation", () => {
+		it("no longer warns: rotation is always available", () => {
 			const warn = mock();
 			console.warn = warn;
 
@@ -385,38 +385,7 @@ describe("Croppie zoom", () => {
 				enableOrientation: true,
 			});
 
-			expect(warn).toHaveBeenCalledWith(
-				expect.stringContaining("enableOrientation is deprecated"),
-			);
-		});
-	});
-
-	describe("rotate", () => {
-		let originalWarn: typeof console.warn;
-
-		beforeEach(() => {
-			originalWarn = console.warn;
-		});
-
-		afterEach(() => {
-			console.warn = originalWarn;
-		});
-
-		it("logs warning for unimplemented rotation", async () => {
-			const warn = mock();
-			console.warn = warn;
-
-			croppie = new Croppie(container, {
-				viewport: { width: 100, height: 100, type: "square" },
-			});
-			await croppie.bind(TINY_PNG);
-
-			croppie.rotate(90);
-
-			expect(warn).toHaveBeenCalledWith(
-				expect.stringContaining("Rotation not yet implemented"),
-				90,
-			);
+			expect(warn).not.toHaveBeenCalled();
 		});
 	});
 

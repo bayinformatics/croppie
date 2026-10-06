@@ -10,6 +10,7 @@
 // Default export for convenience
 export { Croppie, Croppie as default } from "./Croppie.js";
 export type {
+	BindFileOptions,
 	BindOptions,
 	Boundary,
 	CropPoints,
@@ -20,7 +21,9 @@ export type {
 	OutputFormat,
 	OutputType,
 	ResultOptions,
+	Rotation,
 	Viewport,
 	ViewportType,
 	ZoomConfig,
 } from "./types.js";
+export { readJpegOrientation } from "./utils/exif.js";

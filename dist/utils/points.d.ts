@@ -40,7 +40,7 @@ export declare function intersectFrame(frame: CropPoints, imageWidth: number, im
 export declare function pointsToArray(points: CropPoints): PointsArray;
 /**
  * Derive the transform that makes the viewport show the region described by
- * `points` within an image of the given natural size.
+ * `points` within an image of the given size.
  *
  * The scale cover-fits the rect to the viewport (the larger of
  * `viewportWidth / rectWidth` and `viewportHeight / rectHeight`), so the
@@ -52,9 +52,10 @@ export declare function pointsToArray(points: CropPoints): PointsArray;
  * within the configured zoom and position bounds; otherwise `bind()` clamps
  * and `get()` cannot reproduce the original points.
  *
- * @param points - Crop region in natural image coordinates
- * @param imageWidth - Natural width of the image
- * @param imageHeight - Natural height of the image
+ * @param points - Crop region, in the same frame as `imageWidth` x `imageHeight`; Croppie
+ *   passes the displayed (rotated) frame, so a quarter turn swaps width and height
+ * @param imageWidth - Width of the image in that frame
+ * @param imageHeight - Height of the image in that frame
  * @param viewportWidth - Width of the crop viewport
  * @param viewportHeight - Height of the crop viewport
  * @param scaleBounds - Optional `[min, max]` the applied scale is clamped to
@@ -65,4 +66,4 @@ export declare function pointsToArray(points: CropPoints): PointsArray;
 export declare function calculateTransformFromPoints(points: CropPoints, imageWidth: number, imageHeight: number, viewportWidth: number, viewportHeight: number, scaleBounds?: {
     min: number;
     max: number;
-}): TransformState | undefined;
+}): Pick<TransformState, "x" | "y" | "scale"> | undefined;

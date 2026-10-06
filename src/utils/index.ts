@@ -8,6 +8,7 @@ export {
 	getTransformValues,
 	setTransform,
 } from "./dom.js";
+export { readDataUrlOrientation, readJpegOrientation } from "./exif.js";
 export {
 	aspectRatio,
 	calculateContainZoom,
@@ -34,6 +35,14 @@ export {
 	type PointsInput,
 	pointsToArray,
 } from "./points.js";
+export {
+	exifOrientationToRotation,
+	naturalRectToRotated,
+	normalizeRotation,
+	rotatedRectToNatural,
+	rotateOffset,
+	swapDims,
+} from "./rotation.js";
 export {
 	CENTER_ANCHOR,
 	type ZoomAnchor,

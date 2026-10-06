@@ -17,7 +17,7 @@ describe("Drag Handler", () => {
 		element.setPointerCapture = mock();
 		element.releasePointerCapture = mock();
 
-		transformState = { x: 0, y: 0, scale: 1 };
+		transformState = { x: 0, y: 0, scale: 1, rotation: 0 };
 		getTransform = () => transformState;
 		setTransform = mock((x: number, y: number) => {
 			transformState.x = x;
@@ -91,13 +91,18 @@ describe("Drag Handler", () => {
 		});
 
 		it("calls onStart callback with current transform", () => {
-			transformState = { x: 10, y: 20, scale: 1.5 };
+			transformState = { x: 10, y: 20, scale: 1.5, rotation: 0 };
 			const onStart = mock();
 			createDragHandler(element, getTransform, setTransform, { onStart });
 
 			element.dispatchEvent(createPointerEvent("pointerdown"));
 
-			expect(onStart).toHaveBeenCalledWith({ x: 10, y: 20, scale: 1.5 });
+			expect(onStart).toHaveBeenCalledWith({
+				x: 10,
+				y: 20,
+				scale: 1.5,
+				rotation: 0,
+			});
 		});
 
 		it("captures pointer", () => {
@@ -142,7 +147,7 @@ describe("Drag Handler", () => {
 		});
 
 		it("accumulates delta from start position", () => {
-			transformState = { x: 20, y: 30, scale: 1 };
+			transformState = { x: 20, y: 30, scale: 1, rotation: 0 };
 			createDragHandler(element, getTransform, setTransform);
 
 			element.dispatchEvent(
@@ -195,7 +200,12 @@ describe("Drag Handler", () => {
 			);
 
 			// After setTransform, transformState is now (50, 75)
-			expect(onMove).toHaveBeenCalledWith({ x: 50, y: 75, scale: 1 });
+			expect(onMove).toHaveBeenCalledWith({
+				x: 50,
+				y: 75,
+				scale: 1,
+				rotation: 0,
+			});
 		});
 	});
 
@@ -622,7 +632,7 @@ describe("Drag Handler", () => {
 			const onMove = mock();
 			const onEnd = mock();
 
-			transformState = { x: 100, y: 50, scale: 2 };
+			transformState = { x: 100, y: 50, scale: 2, rotation: 0 };
 
 			createDragHandler(element, getTransform, setTransform, {
 				onStart,
@@ -634,7 +644,12 @@ describe("Drag Handler", () => {
 			element.dispatchEvent(
 				createPointerEvent("pointerdown", { clientX: 200, clientY: 200 }),
 			);
-			expect(onStart).toHaveBeenCalledWith({ x: 100, y: 50, scale: 2 });
+			expect(onStart).toHaveBeenCalledWith({
+				x: 100,
+				y: 50,
+				scale: 2,
+				rotation: 0,
+			});
 
 			// Move to (250, 300)
 			element.dispatchEvent(

@@ -20,7 +20,7 @@ describe("Drag Handler gestures", () => {
 		element.setPointerCapture = mock();
 		element.releasePointerCapture = mock();
 
-		transformState = { x: 0, y: 0, scale: 1 };
+		transformState = { x: 0, y: 0, scale: 1, rotation: 0 };
 		getTransform = () => transformState;
 		setTransform = mock((x: number, y: number) => {
 			transformState.x = x;
@@ -59,7 +59,7 @@ describe("Drag Handler gestures", () => {
 			pointer("pointermove", { clientX: 110, clientY: 105 });
 
 			// A wheel zoom at the cursor moved the image while the button is held
-			transformState = { x: 40, y: -20, scale: 2 };
+			transformState = { x: 40, y: -20, scale: 2, rotation: 0 };
 			pointer("pointermove", { clientX: 113, clientY: 109 });
 
 			// Only the movement since the previous move is added

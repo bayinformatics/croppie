@@ -1,3 +1,4 @@
+import type { Rotation } from "../types.js";
 import { type ZoomAnchor } from "./transform.js";
 /**
  * Create an HTML element of the given tag and apply optional class, attributes, and styles.
@@ -26,14 +27,20 @@ export declare function getTransformValues(element: HTMLElement): {
     scale: number;
 };
 /**
- * Set an element's CSS transform to a translation (in pixels) and a uniform scale.
+ * Set an element's CSS transform to a translation (in pixels), a uniform scale and an optional
+ * clockwise quarter-turn rotation.
+ *
+ * With transform-origin `0 0` the rotation is applied first, then the scale, then the
+ * translation. The `rotate()` term is omitted for rotation 0, so the string is identical to
+ * the one produced before rotation existed.
  *
  * @param element - The target HTMLElement to transform
  * @param x - Horizontal translation in pixels
  * @param y - Vertical translation in pixels
  * @param scale - Uniform scale factor (1 = no scale)
+ * @param rotation - Clockwise rotation in degrees (default: 0)
  */
-export declare function setTransform(element: HTMLElement, x: number, y: number, scale: number): void;
+export declare function setTransform(element: HTMLElement, x: number, y: number, scale: number, rotation?: Rotation): void;
 /**
  * Convert a client (viewport) point to an offset from the center of an element, in the
  * element's own layout pixels: the anchor used to zoom about a cursor or finger position.

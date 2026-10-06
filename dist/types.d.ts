@@ -3,6 +3,10 @@
  */
 export type ViewportType = "circle" | "square";
 /**
+ * A quarter-turn rotation of the image, in degrees, clockwise.
+ */
+export type Rotation = 0 | 90 | 180 | 270;
+/**
  * Output format for the cropped image
  */
 export type OutputFormat = "png" | "jpeg" | "webp";
@@ -78,10 +82,15 @@ export interface CroppieOptions {
      * @default true
      */
     enableZoom?: boolean;
-    /** Enable EXIF orientation correction */
+    /**
+     * Read the EXIF Orientation tag of JPEGs bound as data URLs (which includes `bindFile()`)
+     * and report it as `get().orientation`. Browsers already display such images upright, so
+     * this never rotates anything. Remote URLs are not read; use the exported
+     * `readJpegOrientation()` on bytes you fetched yourself.
+     */
     enableExif?: boolean;
     /**
-     * @deprecated Use rotate() method instead. This option is a no-op for v2.6 migration compatibility.
+     * @deprecated No effect: `rotate()` is always available. Kept so v2 configuration still compiles.
      */
     enableOrientation?: boolean;
     /** Enable resize handles on viewport */
@@ -111,11 +120,20 @@ export type PointsArray = [number, number, number, number];
  * Current state of the cropper
  */
 export interface CroppieData {
-    /** Crop boundary points */
+    /**
+     * Crop boundary points, in the natural frame: the pixel space of the image as the browser
+     * decoded it (EXIF orientation already applied). They are not rotated; `rotation` says how
+     * `result()` turns the crop.
+     */
     points: CropPoints;
     /** Current zoom level */
     zoom: number;
-    /** Current rotation in degrees */
+    /** Current clockwise rotation */
+    rotation: Rotation;
+    /**
+     * The EXIF Orientation tag (1-8) of the bound image when read via `enableExif`.
+     * Informational: it is never derived from `rotation` and never changed by `rotate()`.
+     */
     orientation?: number;
 }
 /**
@@ -128,9 +146,23 @@ export interface BindOptions {
     points?: CropPoints | PointsArray;
     /** Initial zoom level */
     zoom?: number;
-    /** EXIF orientation (1-8) */
+    /**
+     * Initial clockwise rotation in degrees: any multiple of 90, positive or negative.
+     * `points` are given in the natural frame and are not affected by it.
+     */
+    rotation?: number;
+    /**
+     * EXIF orientation (1-8) override, mapped to a rotation (1 -> 0, 3 -> 180, 6 -> 90,
+     * 8 -> 270; mirrored values 2, 4, 5, 7 are ignored with a warning). For images whose
+     * tag was stripped; prefer `rotation`. An explicit `rotation` wins.
+     */
     orientation?: number;
 }
+/**
+ * Options for `bindFile(file, options)`: those of `bind()` without `url`, since the file is
+ * the image.
+ */
+export type BindFileOptions = Omit<BindOptions, "url">;
 /**
  * Result options - for exporting the cropped image
  */
@@ -161,12 +193,17 @@ export interface ResultOptions {
  * Event types emitted by Croppie
  */
 export interface CroppieEvents {
-    /** Fired when zoom/pan changes */
+    /** Fired when zoom/pan/rotation changes */
     update: CroppieData;
     /** Fired when zoom level changes */
     zoom: {
         zoom: number;
         previousZoom: number;
+    };
+    /** Fired when the rotation changes (`rotate()`, or `reset()` restoring the bind-time rotation) */
+    rotate: {
+        rotation: Rotation;
+        previousRotation: Rotation;
     };
 }
 /**
@@ -183,4 +220,6 @@ export interface TransformState {
     y: number;
     /** Current scale/zoom */
     scale: number;
+    /** Clockwise quarter-turn rotation of the image */
+    rotation: Rotation;
 }
