@@ -1,5 +1,5 @@
 import type { CropPoints, OutputFormat, Rotation } from "../types.js";
-import { MAX_CANVAS_AREA } from "../utils/limits.js";
+import { capCanvasSize } from "../utils/limits.js";
 import { intersectFrame } from "../utils/points.js";
 import { swapDims } from "../utils/rotation.js";
 
@@ -19,32 +19,34 @@ interface SourceRect {
  * A single drawImage that shrinks by much more than 2x samples too few source pixels in
  * WebKit (even at imageSmoothingQuality "high"), so a 48 MP photo cropped to an avatar came
  * out jagged and speckled. Each halving stays within the 2x that bilinear filtering handles
- * well. A step is never larger than MAX_CANVAS_AREA (the canvas size iOS Safari will still
- * draw into), so the first one may shrink by more.
+ * well. A step is never larger than the canvas `result()` renders (see `capCanvasSize`: the
+ * area iOS Safari will still draw into), so the first one may shrink by more.
  *
  * @param rect - The image and the rectangle of it to draw
  * @param targetWidth - The width the result will be drawn at
  * @param targetHeight - The height the result will be drawn at
- * @returns The rectangle to draw: `rect` itself when it shrinks by less than 2x, otherwise
- *   the whole of the last step canvas
+ * @returns The rectangle to draw: `rect` itself when it shrinks by less than 2x or the
+ *   target is empty, otherwise the whole of the last step canvas
  */
 function downsample(
 	rect: SourceRect,
 	targetWidth: number,
 	targetHeight: number,
 ): SourceRect {
+	// Nothing is drawn into an empty target (a sliver of image that rounds to no pixel), and
+	// halving toward it would never stop: a 1x1 step halves to 1x1 again
+	if (!(targetWidth > 0 && targetHeight > 0)) return rect;
+
 	let current = rect;
 	while (
 		current.width / 2 >= targetWidth &&
 		current.height / 2 >= targetHeight
 	) {
-		const scale = Math.min(
-			0.5,
-			Math.sqrt(MAX_CANVAS_AREA / (current.width * current.height)),
-		);
+		// Half the size, rounded so that the step never exceeds the canvas caps
+		const size = capCanvasSize(current.width / 2, current.height / 2);
 		const step = document.createElement("canvas");
-		step.width = Math.max(1, Math.round(current.width * scale));
-		step.height = Math.max(1, Math.round(current.height * scale));
+		step.width = size.width;
+		step.height = size.height;
 
 		const ctx = step.getContext("2d");
 		// Without a context, draw what we have in one go rather than fail the crop
