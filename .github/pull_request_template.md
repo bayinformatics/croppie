@@ -17,5 +17,4 @@
 ## Checklist
 
 - [ ] `bun run lint`, `bun run typecheck` and `bun run test` pass
-- [ ] `dist/` and `docs/` rebuilt (last commit) if anything in `src/` changed
-- [ ] `CHANGELOG.md` entry added for user-visible changes
+- [ ] Commits use Conventional Commits (`feat:`, `fix:`, ...): release-please writes the changelog from them
