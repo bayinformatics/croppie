@@ -73,5 +73,5 @@ If Linux CI reports pixel differences that are not a regression (for example aft
 
 1. Merge the PR(s) to `main`; make sure `CHANGELOG.md` has the date and `package.json` the version.
 2. Create a GitHub release whose tag is `v<version>` targeting `main`.
-3. `publish.yml` first verifies that the tag matches `package.json`, then runs lint, typecheck, tests, build and `check:package`, then publishes to npm and GitHub Packages. A manual run (`workflow_dispatch`) has to be started on the tag `v<version>`; on a branch it stops before building.
+3. `publish.yml` first verifies that the tag matches `package.json`, then runs lint, typecheck, tests, build and `check:package`, then publishes to npm through trusted publishing (OIDC): there is no npm token, and the provenance statement is attached automatically. A manual run (`workflow_dispatch`) has to be started on the tag `v<version>`; on a branch it stops before building.
 4. Check `npm view @bayinformatics/croppie version`.

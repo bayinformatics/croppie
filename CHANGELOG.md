@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.2.0] - Unreleased
+## [3.2.0] - 2026-10-06
 
 ### Added
 
@@ -80,6 +80,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Committed `dist/` and `docs/` bundles are checked for parity with a fresh build in CI, under the pinned Bun version.
 - Dependabot for the `bun` and `github-actions` ecosystems (#18, #22).
 - Added `CONTRIBUTING.md`, `SECURITY.md`, issue forms and a pull request template.
+- npm publishes via trusted publishing (OIDC) from `publish.yml`, so there is no long-lived npm token; GitHub Packages publishing is removed.
 
 ## [3.1.0] - 2026-01-05
 
@@ -112,7 +113,7 @@ Includes the untagged 3.0.1.
 
 First release of `@bayinformatics/croppie`, a TypeScript-first fork of [Foliotek/Croppie](https://github.com/Foliotek/Croppie), published to npm and with a demo page on GitHub Pages.
 
-[3.2.0]: https://github.com/bayinformatics/croppie/compare/v3.1.0...HEAD
+[3.2.0]: https://github.com/bayinformatics/croppie/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/bayinformatics/croppie/compare/v3.0.2...v3.1.0
 [3.0.2]: https://github.com/bayinformatics/croppie/compare/v3.0.0...v3.0.2
 [3.0.0]: https://github.com/bayinformatics/croppie/releases/tag/v3.0.0
