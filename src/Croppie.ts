@@ -870,7 +870,10 @@ export class Croppie {
 		this.previewEl = null;
 		this.sliderEl = null;
 		this.image = null;
-		// get() and the zoom getter report the initial zoom next to the zeroed points
+		// get() and the zoom getter report the initial zoom next to the zeroed points, and no
+		// EXIF orientation: that tag belonged to the image that is gone
+		this.exifOrientation = undefined;
+		this.initialRotation = 0;
 		this.transform = Croppie.initialTransform();
 	}
 
