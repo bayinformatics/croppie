@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `"sideEffects": ["./dist/croppie.css"]`, so bundlers keep the stylesheet import and can tree-shake everything else.
 - Type declarations for the `./croppie.css` and `./style.css` exports, so `import '@bayinformatics/croppie/croppie.css'` type-checks under TypeScript 7, whose default `noUncheckedSideEffectImports` rejected it (TS2882).
 - `typecheck` (type-checks sources and tests) and `check:package` (publint + Are the Types Wrong?, plus a check that every relative import in the type declarations has a `.js` extension) scripts.
+- `enableZoom` option (default `true`): `false` removes the slider, mouse wheel and pinch zoom; `setZoom()` and `zoom =` still work. With `enableZoom: false` a pinch over the cropper zooms the page instead of doing nothing.
 
 ### Changed
 
@@ -24,6 +25,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Declaration maps are no longer shipped; they pointed at sources that are not part of the package.
 - The package `homepage` is the live demo, and `CHANGELOG.md` is included in the published files.
 - Visual regression baselines are stored per platform (`chromium-linux`, `chromium-darwin`).
+- Zooming (slider, mouse wheel, pinch, `setZoom()`) keeps the point under the viewport center, the cursor or the finger midpoint fixed, instead of always zooming about the image center, so the image no longer drifts after a pan.
+- Mouse wheel zoom is multiplicative: ×1.1 per notch (100px, or 3 lines for a mouse that scrolls by lines), scaled by `deltaY` and `deltaMode` and capped at one notch per event (it was a fixed ±0.1 step).
+- Event contract: `bind()` now emits one `update`; `setZoom()` and `zoom =` emit `zoom`; `reset()` emits `zoom` when the zoom changed; `zoom` and `update` are emitted only when the clamped value actually changed; `update` fires before `zoom`. A drag that the bounds fully absorb no longer emits `update`. A `zoom` event is never emitted for a zoom that an `update` listener already replaced: only the final change is reported. See the Events table in the README.
+- A second touch ends an active drag, and a finger put down while another finger is down on the cropper never starts one (fingers resting elsewhere on the page do not count), so a pinch, also one resumed with a replacement finger, takes over instead of also panning. When the fingers of a pinch lift until one is left on the cropper, that finger pans again, from its next move and without a jump.
 
 ### Fixed
 
@@ -31,7 +36,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `bind({ points })` accepts v2's string coordinates (as v2's `get()` returned them) instead of ignoring them with a warning. Only plain decimal strings count (such as `"12.50"` or `"-3"`); a string such as `"50px"` or `"0x10"` is still ignored with a warning.
 - Stale `dist/*.js` files from v3.0.0 (about 28 unused tsc outputs) and declaration maps are no longer committed or shipped in the package.
 - `bun test` no longer tries to run the Playwright specs.
+- `setZoom(NaN)` (or any non-finite value, or a blank or non-numeric string; a numeric string, such as a range input's `value`, is still converted) is ignored instead of corrupting the transform, and every zoom input goes through one code path with one clamp.
+- `bind({ zoom })` with a non-finite zoom (`NaN`, `±Infinity`, a blank or non-numeric string) starts at the coverage zoom instead of leaving a `NaN` transform that no later zoom could repair.
 - The preview image is requested in the same CORS mode as the image `result()` crops, so the browser can reuse the image it already loaded when the response is cacheable, instead of requesting the URL again in another mode.
+- Dragging tracks the pointer that started it: moves from other pointers are ignored, `lostpointercapture` ends the drag, a new press of the same pointer after a lost `pointerup` starts a fresh drag (so does the first finger of a new touch, also after a mouse drag whose `pointerup` was lost), and pointer capture is guarded so dragging still works where it is missing or throws.
+- Dragging moves the image from where it currently is, so a zoom (wheel, pinch, slider, `setZoom()`) or `reset()` made while the button is held is no longer undone by the next pointer move, and moving back after dragging against an edge moves the image straight away.
+- Dragging inside a CSS-scaled ancestor (`transform: scale()`, `zoom`) keeps the image under the pointer instead of lagging behind or overshooting it, as wheel and pinch zoom already did.
+- Pinch zoom only counts fingers that went down on the cropper: a finger resting elsewhere on the page (a thumb, the zoom slider, another cropper) no longer turns a one-finger pan into pan plus zoom, and no longer blocks a two-finger pinch.
+- A `bind()`, `bindFile()`, `reset()` or `setZoom()` that lands during a pinch is no longer overwritten by the next finger move; the pinch carries on from the new zoom.
+- A third finger that lands and lifts during a pinch no longer stops the two fingers still down from zooming.
+- A mouse drag whose button was released where no `pointerup` reached the cropper (outside the window, where pointer capture is unavailable) ends at the next move without a button, instead of the image following the hovering cursor.
+- A wheel or pinch zoom whose pointer position is missing or not finite (an event built by hand without `clientX`/`clientY`) zooms about the viewport center instead of setting the image position to `NaN`.
 - The `LICENSE` file now has the standard MIT header, so GitHub detects the license.
 
 ### Internal

@@ -1,6 +1,10 @@
-export { createDragHandler, type DragCallbacks } from "./drag.js";
+export {
+	createDragHandler,
+	type DragCallbacks,
+	type DragOptions,
+} from "./drag.js";
 export {
 	createPinchZoomHandler,
 	createWheelZoomHandler,
-	type ZoomCallbacks,
+	type ZoomRequest,
 } from "./zoom.js";

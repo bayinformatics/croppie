@@ -1,3 +1,5 @@
+import { CENTER_ANCHOR, type ZoomAnchor } from "./transform.js";
+
 /**
  * Create an HTML element of the given tag and apply optional class, attributes, and styles.
  *
@@ -93,4 +95,63 @@ export function setTransform(
 	scale: number,
 ): void {
 	element.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+}
+
+/**
+ * Convert a client (viewport) point to an offset from the center of an element, in the
+ * element's own layout pixels: the anchor used to zoom about a cursor or finger position.
+ *
+ * Works for CSS-scaled elements: the displayed box (`getBoundingClientRect`) is mapped
+ * back to layout pixels through `offsetWidth`/`offsetHeight`. Without a layout box
+ * (detached or `display: none`), or with a coordinate that is not finite (an event built
+ * by hand without `clientX`/`clientY`), it falls back to the center: a NaN anchor would
+ * make the zoomed position NaN, which no later zoom could repair.
+ *
+ * @param element - The element the offset is relative to
+ * @param clientX - X in viewport coordinates (e.g. `event.clientX`)
+ * @param clientY - Y in viewport coordinates (e.g. `event.clientY`)
+ * @returns The offset from the element center; `{ x: 0, y: 0 }` when it has no layout box or
+ *   the point is not finite
+ */
+export function anchorFromClientPoint(
+	element: HTMLElement,
+	clientX: number,
+	clientY: number,
+): ZoomAnchor {
+	const rect = element.getBoundingClientRect();
+	if (!(rect.width > 0 && rect.height > 0)) {
+		return CENTER_ANCHOR;
+	}
+
+	const scale = clientToLayoutScale(element, rect);
+	const x = (clientX - rect.left - rect.width / 2) * scale.x;
+	const y = (clientY - rect.top - rect.height / 2) * scale.y;
+
+	return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : CENTER_ANCHOR;
+}
+
+/**
+ * The factors that turn a distance in client (viewport) pixels into the element's own
+ * layout pixels: 1 for an unscaled element, 2 inside a `transform: scale(0.5)` or
+ * `zoom: 0.5` ancestor. The displayed box (`getBoundingClientRect`) is compared with the
+ * layout size (`offsetWidth`/`offsetHeight`); an axis without a size counts as unscaled.
+ *
+ * @param element - The element whose layout pixels are wanted
+ * @param rect - The element's `getBoundingClientRect()`, when the caller already has it
+ * @returns Layout pixels per client pixel along each axis
+ */
+export function clientToLayoutScale(
+	element: HTMLElement,
+	rect: DOMRect = element.getBoundingClientRect(),
+): { x: number; y: number } {
+	return {
+		x:
+			rect.width > 0 && element.offsetWidth > 0
+				? element.offsetWidth / rect.width
+				: 1,
+		y:
+			rect.height > 0 && element.offsetHeight > 0
+				? element.offsetHeight / rect.height
+				: 1,
+	};
 }

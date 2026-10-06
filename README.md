@@ -99,6 +99,7 @@ new Croppie(element: HTMLElement, options: CroppieOptions)
 | `boundary` | `{ width, height }` | viewport + 100px | Container dimensions |
 | `showZoomer` | `boolean` | `true` | Show zoom slider |
 | `mouseWheelZoom` | `boolean \| 'ctrl'` | `true` | Enable scroll zoom (optionally require Ctrl key) |
+| `enableZoom` | `boolean` | `true` | Let the user zoom with the slider, wheel and pinch. `false` removes all three (the slider is not rendered even with `showZoomer`); `setZoom()` and `zoom =` still work |
 | `zoom` | `{ min, max, enforceMinimumCoverage? }` | `{ min: 0.1, max: 10 }` | Zoom limits and coverage enforcement |
 | `customClass` | `string` | — | Extra class for the container |
 | `enableExif` | `boolean` | `false` | Reserved for v2 compatibility (not implemented) |
@@ -172,7 +173,7 @@ Get current crop data (points and zoom).
 
 #### `setZoom(value: number): void`
 
-Set the zoom level programmatically.
+Set the zoom level programmatically. The value is clamped to the zoom limits and the image zooms about the viewport center; a numeric string is converted, and a non-finite value or a blank or non-numeric string is ignored. Emits `update` and `zoom` when the clamped zoom changed.
 
 #### `zoom: number`
 
@@ -180,7 +181,7 @@ Getter and setter for the current zoom level. Setting it clamps to the zoom limi
 
 #### `reset(): void`
 
-Re-centers the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Emits `update`. Does nothing before an image is bound.
+Re-centers the image and returns the zoom to the coverage zoom (the smallest zoom at which the image covers the viewport, clamped to the zoom limits). Always emits `update`, and then `zoom` when the zoom changed. Does nothing before an image is bound.
 
 #### `on(event, handler): void` / `off(event, handler): void`
 
@@ -217,8 +218,16 @@ cropper.on('zoom', ({ zoom, previousZoom }) => {
 })
 ```
 
-- `update` (payload: the same data as `get()`) fires while dragging, when the zoom actually changes (slider, wheel, pinch, `setZoom()` or `zoom =`), and on `reset()`. It does **not** fire when `bind()` completes.
-- `zoom` (payload: `{ zoom, previousZoom }`) fires for slider, mouse wheel and pinch interactions only, not for `setZoom()` or the `zoom` setter.
+`update` carries the same data as `get()`; `zoom` carries `{ zoom, previousZoom }`. Within one change `update` fires first, then `zoom`. Nothing is emitted when nothing changed (for example a zoom request that is clamped to the current zoom, or a drag the bounds absorb entirely).
+
+| Source | `update` | `zoom` |
+|--------|----------|--------|
+| `bind()` completes | once, with the initial data | no |
+| Dragging the image | only when the (clamped) position changed | no |
+| Slider, mouse wheel, pinch, `setZoom()`, `zoom =` | only when the clamped zoom changed | only when the clamped zoom changed |
+| `reset()` | always | only when the zoom changed |
+
+Zooming keeps the point under the cursor (mouse wheel), between the fingers (pinch) or at the viewport center (slider, `setZoom()`) fixed. One mouse-wheel notch (100px, or 3 lines for a mouse that scrolls by lines) zooms by ×1.1; trackpad scrolling zooms proportionally to the scroll distance. A second finger touching down ends a drag, so a pinch does not also pan; when the fingers of a pinch lift until one is left, that finger pans again.
 
 ## Theming
 

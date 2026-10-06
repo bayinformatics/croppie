@@ -61,19 +61,40 @@ export declare class Croppie {
      */
     get zoom(): number;
     /**
-     * Sets the zoom level
+     * Sets the zoom level, exactly like `setZoom()`
      */
     set zoom(value: number);
     /**
-     * Sets the zoom level with clamping
+     * Sets the zoom level, clamped to the effective zoom limits. Zooms about the
+     * viewport center. Emits `update` then `zoom` only when the clamped zoom changed.
+     * A numeric string (such as a range input's `value`) is converted to a number;
+     * a value that is then not finite, a blank string included, is ignored.
      */
     setZoom(value: number): void;
+    /**
+     * The single path for every zoom change (setZoom, slider, wheel, pinch).
+     *
+     * Clamps the request to the effective limits, zooms about `anchor` so the image point
+     * under it stays put, re-clamps the position, syncs the slider and emits `update`
+     * then `zoom`. Nothing is emitted when the clamped zoom did not change. When an `update`
+     * listener zooms again, that nested call emits the final `zoom` and this one emits none,
+     * so `zoom` never reports a value that has already been replaced.
+     *
+     * @param requested - Requested zoom level; not clamped by the caller
+     * @param anchor - Offset from the boundary center to keep fixed (default: the viewport center)
+     * @returns Whether the zoom changed, in which case `update` was emitted
+     */
+    private applyZoom;
     /**
      * Rotates the image by 90 degree increments
      */
     rotate(degrees: 90 | 180 | 270 | -90): void;
     /**
-     * Resets the cropper to initial state
+     * Re-centers the image and returns to the coverage zoom (clamped to the zoom limits).
+     *
+     * The zoom goes through the same path as `setZoom()`, so the events follow the same
+     * contract: `update` then `zoom` when the zoom changed, `update` alone when only the
+     * position did, and no stale `zoom` when an `update` listener zooms again.
      */
     reset(): void;
     /**
@@ -88,6 +109,11 @@ export declare class Croppie {
      * Removes an event handler
      */
     off<K extends keyof CroppieEvents>(event: K, handler: CroppieEventHandler<K>): void;
+    /**
+     * The smallest zoom at which `image` covers the viewport: where `bind()` starts by default
+     * and `reset()` returns to.
+     */
+    private coverageZoom;
     /**
      * Updates the CSS transform on the preview element
      */

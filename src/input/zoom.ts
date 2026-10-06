@@ -1,50 +1,91 @@
-import type { ZoomConfig } from "../types.js";
 import { clamp } from "../utils/clamp.js";
+import { anchorFromClientPoint } from "../utils/dom.js";
+import { CENTER_ANCHOR, type ZoomAnchor } from "../utils/transform.js";
 
-export interface ZoomCallbacks {
-	onChange?: (zoom: number, previousZoom: number) => void;
+/**
+ * Proposes a zoom level and the screen point to zoom about. The receiver (the Croppie
+ * instance) owns clamping, the position constraint and events, so handlers never clamp
+ * or emit.
+ */
+export type ZoomRequest = (zoom: number, anchor: ZoomAnchor) => void;
+
+/** Zoom factor of one wheel notch (a Chrome mouse notch is 100 CSS px). */
+export const WHEEL_FACTOR_PER_NOTCH = 1.1;
+/** Pixel delta that counts as one notch. */
+export const WHEEL_NOTCH_PX = 100;
+/**
+ * Pixels per line when `deltaMode` is `DOM_DELTA_LINE`. A line-mode mouse reports one notch
+ * as 3 lines, so 3 lines make one notch.
+ */
+export const WHEEL_LINE_PX = WHEEL_NOTCH_PX / 3;
+/** Pixels per page when `deltaMode` is `DOM_DELTA_PAGE`. */
+export const WHEEL_PAGE_PX = 800;
+/** Largest delta used from a single wheel event, so a fling cannot jump the zoom. */
+export const WHEEL_MAX_PX = 100;
+
+/**
+ * The vertical distance of one wheel event in pixels: `deltaY` converted from `deltaMode`
+ * (lines, pages) to pixels, then capped to one notch either way.
+ */
+export function wheelDeltaPx(
+	event: Pick<WheelEvent, "deltaY" | "deltaMode">,
+): number {
+	const unit =
+		event.deltaMode === 1
+			? WHEEL_LINE_PX
+			: event.deltaMode === 2
+				? WHEEL_PAGE_PX
+				: 1;
+	return clamp(event.deltaY * unit, -WHEEL_MAX_PX, WHEEL_MAX_PX);
+}
+
+/**
+ * The zoom factor for one wheel event: multiplicative, scaled by how far the wheel moved.
+ *
+ * The delta is normalized to pixels from `deltaMode`, capped to one notch, and then
+ * `1.1 ** (-px / 100)`: a mouse notch (100px, or 3 lines) zooms by 1.1 (up) or 1/1.1
+ * (down) and a trackpad's small deltas zoom smoothly. Scrolling up (negative `deltaY`)
+ * zooms in.
+ */
+export function wheelZoomFactor(
+	event: Pick<WheelEvent, "deltaY" | "deltaMode">,
+): number {
+	return WHEEL_FACTOR_PER_NOTCH ** (-wheelDeltaPx(event) / WHEEL_NOTCH_PX);
 }
 
 /**
  * Create and attach a wheel-based zoom handler to an element.
  *
- * When the user scrolls the wheel over the element this handler adjusts the zoom
- * by steps of 0.1, clamped to the supplied `config` bounds, and invokes the
- * optional `onChange` callback when the zoom changes.
+ * Each wheel event proposes `currentZoom * wheelZoomFactor(event)` anchored at the
+ * cursor. The handler does not clamp or emit anything: that is `requestZoom`'s job.
  *
  * @param element - The HTMLElement to attach the wheel listener to
  * @param getZoom - Function that returns the current zoom level
- * @param setZoom - Function that updates the zoom level
- * @param config - Zoom bounds; `min` and `max` define the allowed zoom range
- * @param callbacks - Optional callbacks; `onChange(newZoom, previousZoom)` is called when zoom changes
- * @param requireCtrl - If true, the handler only responds when the Ctrl key is pressed (default: `false`)
+ * @param requestZoom - Receives the proposed zoom and the cursor anchor
+ * @param options - `requireCtrl`: only respond while Ctrl is held (default: `false`)
  * @returns A cleanup function that removes the attached wheel listener
  */
 export function createWheelZoomHandler(
 	element: HTMLElement,
 	getZoom: () => number,
-	setZoom: (zoom: number) => void,
-	config: ZoomConfig,
-	callbacks?: ZoomCallbacks,
-	requireCtrl = false,
+	requestZoom: ZoomRequest,
+	options: { requireCtrl?: boolean } = {},
 ): () => void {
 	const handleWheel = (e: WheelEvent) => {
 		// Check for ctrl requirement
-		if (requireCtrl && !e.ctrlKey) return;
+		if (options.requireCtrl && !e.ctrlKey) return;
 
-		// Ignore zero deltaY (no scroll)
-		if (e.deltaY === 0) return;
+		// A factor of exactly 1 is an event that does not scroll vertically (a horizontal
+		// scroll, say): leave it to the page
+		const factor = wheelZoomFactor(e);
+		if (factor === 1) return;
 
 		e.preventDefault();
 
-		const previousZoom = getZoom();
-		const delta = e.deltaY > 0 ? -0.1 : 0.1;
-		const newZoom = clamp(previousZoom + delta, config.min, config.max);
-
-		if (newZoom !== previousZoom) {
-			setZoom(newZoom);
-			callbacks?.onChange?.(newZoom, previousZoom);
-		}
+		requestZoom(
+			getZoom() * factor,
+			anchorFromClientPoint(element, e.clientX, e.clientY),
+		);
 	};
 
 	element.addEventListener("wheel", handleWheel, { passive: false });
@@ -57,71 +98,112 @@ export function createWheelZoomHandler(
 /**
  * Attaches pinch-to-zoom touch handlers to an element and returns a cleanup function.
  *
- * Handles two-finger pinch gestures to update zoom between the bounds specified by `config`.
- * When the effective zoom changes, `setZoom` is called and `callbacks.onChange` is invoked with the new and previous zoom values.
+ * Only fingers that went down on the element count (a touch keeps the `target` it
+ * started on, even after sliding off): a finger resting elsewhere on the page neither
+ * turns a one-finger pan into a pinch nor blocks a pinch on the element.
+ *
+ * When exactly two such fingers are down, their distance and the current zoom are
+ * captured; every move then proposes `initialZoom * distance / initialDistance`, anchored
+ * at their midpoint. When a lift leaves exactly two fingers down (a third finger landed
+ * and lifted), they are measured again and the pinch carries on. A zoom changed by something else mid-pinch (`bind()`, `reset()`,
+ * `setZoom()`) becomes the new starting point instead of being overwritten by the next
+ * move. Like the wheel handler it neither clamps nor emits.
  *
  * @param element - The target HTMLElement to attach touch listeners to.
  * @param getZoom - Function that returns the current zoom level.
- * @param setZoom - Function called with the new zoom level when it changes.
- * @param config - Zoom bounds (`min` and `max`) used to clamp the computed zoom.
- * @param callbacks - Optional callbacks; `onChange(newZoom, previousZoom)` is called when zoom changes.
+ * @param requestZoom - Receives the proposed zoom and the finger-midpoint anchor.
  * @returns A function that removes the attached touch listeners from `element`.
  */
 export function createPinchZoomHandler(
 	element: HTMLElement,
 	getZoom: () => number,
-	setZoom: (zoom: number) => void,
-	config: ZoomConfig,
-	callbacks?: ZoomCallbacks,
+	requestZoom: ZoomRequest,
 ): () => void {
 	let initialDistance = 0;
 	let initialZoom = 1;
+	/** The zoom this pinch last left; any other zoom at the next move was set elsewhere. */
+	let lastZoom = 1;
 
-	const getDistance = (touches: TouchList): number => {
-		if (touches.length < 2) return 0;
-		const touch1 = touches.item(0);
-		const touch2 = touches.item(1);
+	/** The touches that went down on the element, wherever they are now. */
+	const ownTouches = (e: TouchEvent): Touch[] =>
+		Array.from(e.touches).filter((touch) =>
+			element.contains(touch.target as Node),
+		);
+
+	const getDistance = (touches: Touch[]): number => {
+		const [touch1, touch2] = touches;
 		if (!touch1 || !touch2) return 0;
 		const dx = touch1.clientX - touch2.clientX;
 		const dy = touch1.clientY - touch2.clientY;
 		return Math.sqrt(dx * dx + dy * dy);
 	};
 
+	const getMidpointAnchor = (touches: Touch[]): ZoomAnchor => {
+		const [touch1, touch2] = touches;
+		if (!touch1 || !touch2) return CENTER_ANCHOR;
+		return anchorFromClientPoint(
+			element,
+			(touch1.clientX + touch2.clientX) / 2,
+			(touch1.clientY + touch2.clientY) / 2,
+		);
+	};
+
+	/** Starts measuring a pinch from the two fingers' current distance and the current zoom. */
+	const startPinch = (touches: Touch[]) => {
+		initialDistance = getDistance(touches);
+		initialZoom = getZoom();
+		lastZoom = initialZoom;
+	};
+
 	const handleTouchStart = (e: TouchEvent) => {
-		if (e.touches.length === 2) {
+		const touches = ownTouches(e);
+		if (touches.length === 2) {
 			e.preventDefault();
-			initialDistance = getDistance(e.touches);
-			initialZoom = getZoom();
+			startPinch(touches);
 		}
 	};
 
 	const handleTouchMove = (e: TouchEvent) => {
-		if (e.touches.length === 2 && initialDistance > 0) {
+		const touches = ownTouches(e);
+		if (touches.length === 2 && initialDistance > 0) {
 			e.preventDefault();
 
-			const currentDistance = getDistance(e.touches);
-			const scale = currentDistance / initialDistance;
-			const previousZoom = getZoom();
-			const newZoom = clamp(initialZoom * scale, config.min, config.max);
-
-			if (newZoom !== previousZoom) {
-				setZoom(newZoom);
-				callbacks?.onChange?.(newZoom, previousZoom);
+			const distance = getDistance(touches);
+			// Zoomed from elsewhere since the last move: carry on from that zoom
+			if (getZoom() !== lastZoom && distance > 0) {
+				initialZoom = getZoom();
+				initialDistance = distance;
 			}
+
+			requestZoom(
+				initialZoom * (distance / initialDistance),
+				getMidpointAnchor(touches),
+			);
+			lastZoom = getZoom();
 		}
 	};
 
-	const handleTouchEnd = () => {
-		initialDistance = 0;
+	const handleTouchEnd = (e: TouchEvent) => {
+		// Two fingers still down (a third one lifted, say) carry on pinching from where they
+		// are now; with fewer there is no pinch. With more, the moves are ignored until a
+		// lift leaves two
+		const touches = ownTouches(e);
+		if (touches.length === 2) {
+			startPinch(touches);
+		} else if (touches.length < 2) {
+			initialDistance = 0;
+		}
 	};
 
 	element.addEventListener("touchstart", handleTouchStart, { passive: false });
 	element.addEventListener("touchmove", handleTouchMove, { passive: false });
 	element.addEventListener("touchend", handleTouchEnd);
+	element.addEventListener("touchcancel", handleTouchEnd);
 
 	return () => {
 		element.removeEventListener("touchstart", handleTouchStart);
 		element.removeEventListener("touchmove", handleTouchMove);
 		element.removeEventListener("touchend", handleTouchEnd);
+		element.removeEventListener("touchcancel", handleTouchEnd);
 	};
 }
