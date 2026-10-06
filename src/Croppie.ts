@@ -187,6 +187,13 @@ export class Croppie {
 			this.zoomConfig.min ?? DEFAULT_MIN_ZOOM,
 			this.zoomConfig.max,
 		);
+		// The zoom before any bind (what the slider starts at and zoom reports) stays within
+		// those limits too: a zoom.max of 0.05 must not leave it at 1
+		this.transform.scale = clamp(
+			this.transform.scale,
+			this.effectiveMinZoom,
+			this.zoomConfig.max,
+		);
 
 		// Deprecation warning for v2.6 migration
 		if (options.enableOrientation !== undefined) {
