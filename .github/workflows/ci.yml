@@ -74,13 +74,22 @@ jobs:
         run: bun run check:package
 
       # The publish job runs npm 11 on Node 24; a dry run catches a bad manifest or file list
-      # before a release does. It needs no credentials.
+      # before a release does. It needs no credentials. A publish dry run asks the registry,
+      # which rejects a version that is already published, so it only fits an unpublished
+      # version (such as a release PR); otherwise `npm pack --dry-run` lists the same tarball.
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
 
       - name: Dry-run npm publish
-        run: npm publish --dry-run --ignore-scripts
+        run: |
+          SPEC="$(node -p "require('./package.json').name + '@' + require('./package.json').version")"
+          if [ -n "$(npm view "$SPEC" version 2>/dev/null)" ]; then
+            echo "$SPEC is already on npm: checking the tarball with npm pack"
+            npm pack --dry-run --ignore-scripts
+          else
+            npm publish --dry-run --ignore-scripts
+          fi
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
