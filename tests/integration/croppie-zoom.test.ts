@@ -518,6 +518,23 @@ describe("Croppie zoom", () => {
 				expect(croppie.get().points.bottomRightX).toBeCloseTo(250, 6);
 			});
 
+			it("a wheel event without a finite cursor position zooms about the center", async () => {
+				const boundary = await bindWide(1);
+				boxBoundary(boundary);
+				simulateDrag(boundary, 100, 100, 150, 100); // pan x to 50
+
+				// Hand-built events often lack clientX/clientY
+				boundary.dispatchEvent(
+					createWheelEvent(-100, { clientX: Number.NaN, clientY: Number.NaN }),
+				);
+
+				expect(croppie.zoom).toBeCloseTo(1.1, 9);
+				for (const value of Object.values(croppie.get().points)) {
+					expect(Number.isFinite(value)).toBe(true);
+				}
+				expect(cropCenterX()).toBeCloseTo(150, 6);
+			});
+
 			it("pinch zoom keeps the point under the finger midpoint fixed", async () => {
 				const boundary = await bindWide(1);
 				boxBoundary(boundary);
