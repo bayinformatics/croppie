@@ -154,6 +154,17 @@ try {
     await page.evaluate(async()=>{window.restoreEncoder();await window.finishPendingExport();});
     assert.equal(await page.locator('#result img').count(),0,'Old export reappeared after changing the source');
     assert.ok((await page.locator('#status').textContent()).startsWith('640 × 480 image ready'));
+    await page.evaluate(()=>{
+      const native=HTMLCanvasElement.prototype.toBlob;
+      window.restoreEncoder=()=>{HTMLCanvasElement.prototype.toBlob=native;};
+      HTMLCanvasElement.prototype.toBlob=function(callback){window.failPendingExport=()=>callback(null);};
+    });
+    await page.getByRole('button',{name:'Export PNG',exact:true}).click();
+    await page.waitForFunction(()=>typeof window.failPendingExport==='function');
+    await page.locator('#file').setInputFiles(resolve(repo,'experiments/lean-cropper/checks/fixtures/orientation-6.jpg'));
+    await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('160 × 240 image ready'));
+    await page.evaluate(async()=>{window.restoreEncoder();window.failPendingExport();await Promise.resolve();await Promise.resolve();});
+    assert.ok((await page.locator('#status').textContent()).startsWith('160 × 240 image ready'),'Stale encoding error replaced current status');
     assert.deepEqual(pageErrors,[]);
     results.push({browser:name,version:browser.version(),...model,maskPixels:{rectPixel,circlePixel},demoExport:rendered,staleExportSuppressed:true,passed:true});
     await browser.close();browser=undefined;

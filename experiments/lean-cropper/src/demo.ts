@@ -76,6 +76,8 @@ $('export').onclick = () => void run(async () => {
     text.textContent = `${image.naturalWidth} × ${image.naturalHeight} PNG, ${(blob.size / 1024).toFixed(1)} KB`;
     link.href = resultURL; link.download = 'crop.png'; link.className = 'download'; link.textContent = 'Download PNG';
     content.append(text, link); result.replaceChildren(image, content); status.textContent = 'Crop exported. Download it below the preview.';
+  } catch (error) {
+    if (generation === exportGeneration) throw error;
   } finally {
     if (url) URL.revokeObjectURL(url);
     if (generation === exportGeneration) $<HTMLButtonElement>('export').disabled = !hasImage;
