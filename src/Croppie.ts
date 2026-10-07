@@ -1042,11 +1042,14 @@ export class Croppie {
 	 */
 	private updateSlider(): void {
 		if (this.sliderEl) {
-			this.sliderEl.value = String(this.transform.scale);
-			this.sliderEl.setAttribute(
-				"aria-valuetext",
-				`${Math.round(this.transform.scale * 100)}%`,
-			);
+			const value = String(this.transform.scale);
+			if (this.sliderEl.value !== value) this.sliderEl.value = value;
+			const spokenValue = `${Math.round(this.transform.scale * 100)}%`;
+			// Small wheel/pinch changes often leave the spoken percentage unchanged. Read the
+			// DOM rather than caching it so a clamped input still repairs an altered slider.
+			if (this.sliderEl.getAttribute("aria-valuetext") !== spokenValue) {
+				this.sliderEl.setAttribute("aria-valuetext", spokenValue);
+			}
 		}
 	}
 

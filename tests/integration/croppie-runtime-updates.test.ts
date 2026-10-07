@@ -117,4 +117,41 @@ describe("Croppie update work", () => {
 		cropper.rotate(90);
 		expect(get).toHaveBeenCalledTimes(1);
 	});
+
+	it("updates the spoken percentage synchronously only when its text changes", async () => {
+		await cropper.bind({ url: TINY_PNG, zoom: 1 });
+		const slider = host.querySelector<HTMLInputElement>(".cr-slider");
+		if (!slider) throw new Error("Missing slider");
+		const setAttribute = spyOn(slider, "setAttribute");
+		try {
+			cropper.on("update", () => {
+				expect(slider.getAttribute("aria-valuetext")).toBe(
+					`${Math.round(cropper.zoom * 100)}%`,
+				);
+			});
+			cropper.setZoom(1.001);
+			cropper.setZoom(1.002);
+			cropper.setZoom(1.002);
+			expect(setAttribute).not.toHaveBeenCalled();
+			cropper.setZoom(1.01);
+			expect(setAttribute).toHaveBeenCalledTimes(1);
+			expect(slider.getAttribute("aria-valuetext")).toBe("101%");
+		} finally {
+			setAttribute.mockRestore();
+		}
+	});
+
+	it("repairs an altered slider even when zoom does not change", async () => {
+		await cropper.bind({ url: TINY_PNG, zoom: 1 });
+		const slider = host.querySelector<HTMLInputElement>(".cr-slider");
+		if (!slider) throw new Error("Missing slider");
+		const listener = mock();
+		cropper.on("update", listener);
+		slider.value = "4";
+		slider.setAttribute("aria-valuetext", "400%");
+		cropper.setZoom(1);
+		expect(slider.value).toBe("1");
+		expect(slider.getAttribute("aria-valuetext")).toBe("100%");
+		expect(listener).not.toHaveBeenCalled();
+	});
 });
