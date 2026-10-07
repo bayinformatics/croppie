@@ -30,6 +30,7 @@ const settings = {
 	runs: Number(process.env.RUNS || 20),
 	warmups: Number(process.env.WARMUPS || 5),
 	verifyOnly: process.env.VERIFY_ONLY === "1",
+	capture: process.env.CAPTURE === "1",
 };
 for (const key of ["batches", "runs", "warmups"]) {
 	assert(
@@ -122,6 +123,7 @@ const summarize = (samples) =>
 		}),
 	);
 const report = {
+	outcome: "running",
 	at: new Date().toISOString(),
 	node: process.version,
 	settings,
@@ -149,7 +151,17 @@ try {
 					viewport: { width: 800, height: 600 },
 				});
 				await page.goto(`${origin}/?variant=${variant}`);
-				const verified = await page.evaluate(verify, { variant });
+				const { pngs, ...verified } = await page.evaluate(verify, {
+					variant,
+					capture: settings.capture,
+				});
+				for (const [image, data] of Object.entries(pngs)) {
+					await writeFile(
+						resolve(dirname(output), `${name}-${variant}-${image}.png`),
+						Buffer.from(data.split(",")[1], "base64"),
+					);
+				}
+				result.correctness[variant] = verified;
 				assert.equal(verified.remainingCroppers, 0);
 				if (reference)
 					assert.deepEqual(
@@ -158,7 +170,6 @@ try {
 						`${name}/${variant}: output pixels differ`,
 					);
 				reference = verified.outputHashes;
-				result.correctness[variant] = verified;
 				await page.close();
 				console.log(
 					`${name}/${variant}: EXIF, lifecycle, round-trip and output checks passed`,
@@ -204,6 +215,11 @@ try {
 			await browser.close();
 		}
 	}
+	report.outcome = "passed";
+} catch (error) {
+	report.outcome = "failed";
+	report.error = { name: error.name, message: error.message };
+	throw error;
 } finally {
 	await writeFile(output, JSON.stringify(report, null, 2));
 	await new Promise((done) => server.close(done));

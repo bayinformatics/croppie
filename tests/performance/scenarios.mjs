@@ -75,7 +75,7 @@ export async function measure({ variant, image, warmups, runs }) {
 	return { moduleLoadMs, firstRun, samples };
 }
 
-export async function verify({ variant }) {
+export async function verify({ variant, capture = false }) {
 	const { default: Croppie } = await import(`/build/${variant}/croppie.js`);
 	const { injectExifOrientation } = await import("/exif-jpeg.js");
 	const assert = (condition, message) => {
@@ -141,6 +141,7 @@ export async function verify({ variant }) {
 		}
 	};
 	const outputHashes = {};
+	const pngs = {};
 	for (let orientation = 1; orientation <= 8; orientation++) {
 		const blob = new Blob([injectExifOrientation(bytes, orientation)], {
 			type: "image/jpeg",
@@ -220,6 +221,7 @@ export async function verify({ variant }) {
 				size: { width: size, height: size },
 			});
 			outputHashes[`${image}/${size}`] = await hash(canvas);
+			if (capture && size === 256) pngs[image] = canvas.toDataURL("image/png");
 			canvas.width = canvas.height = 0;
 		}
 		cropper.destroy();
@@ -261,6 +263,7 @@ export async function verify({ variant }) {
 		orientations: 8,
 		replacements: 20,
 		outputHashes,
+		pngs,
 		remainingCroppers: document.querySelectorAll(".croppie-container").length,
 	};
 }
