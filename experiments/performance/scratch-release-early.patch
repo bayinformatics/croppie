@@ -1,0 +1,146 @@
+diff --git a/src/canvas/draw.ts b/src/canvas/draw.ts
+index b074b60..6b6b983 100644
+--- a/src/canvas/draw.ts
++++ b/src/canvas/draw.ts
+@@ -12,6 +12,12 @@ interface SourceRect {
+ 	height: number;
+ }
+ 
++/** Release owned scratch pixels without waiting for canvas garbage collection. */
++function releaseCanvas(canvas: HTMLCanvasElement): void {
++	canvas.width = 0;
++	canvas.height = 0;
++}
++
+ /**
+  * Shrink a source rectangle by repeated halving until one more halving would undershoot the
+  * size it will finally be drawn at.
+@@ -38,6 +44,7 @@ function downsample(
+ 	if (!(targetWidth > 0 && targetHeight > 0)) return rect;
+ 
+ 	let current = rect;
++	let previous: HTMLCanvasElement | undefined;
+ 	while (
+ 		current.width / 2 >= targetWidth &&
+ 		current.height / 2 >= targetHeight
+@@ -48,22 +55,35 @@ function downsample(
+ 		step.width = size.width;
+ 		step.height = size.height;
+ 
+-		const ctx = step.getContext("2d");
+-		// Without a context, draw what we have in one go rather than fail the crop
+-		if (!ctx) break;
+-		ctx.imageSmoothingEnabled = true;
+-		ctx.imageSmoothingQuality = "high";
+-		ctx.drawImage(
+-			current.source,
+-			current.x,
+-			current.y,
+-			current.width,
+-			current.height,
+-			0,
+-			0,
+-			step.width,
+-			step.height,
+-		);
++		try {
++			const ctx = step.getContext("2d");
++			// Without a context, keep the previous step alive for the final draw.
++			if (!ctx) {
++				releaseCanvas(step);
++				break;
++			}
++			ctx.imageSmoothingEnabled = true;
++			ctx.imageSmoothingQuality = "high";
++			ctx.drawImage(
++				current.source,
++				current.x,
++				current.y,
++				current.width,
++				current.height,
++				0,
++				0,
++				step.width,
++				step.height,
++			);
++		} catch (error) {
++			releaseCanvas(step);
++			if (previous) releaseCanvas(previous);
++			throw error;
++		}
++
++		// drawImage has consumed the source; only the new step is needed from here on.
++		if (previous) releaseCanvas(previous);
++		previous = step;
+ 
+ 		current = {
+ 			source: step,
+@@ -228,34 +248,40 @@ export function drawCroppedImage(
+ 		destinationHeight,
+ 	);
+ 
+-	if (rotation === 0) {
+-		ctx.drawImage(
+-			source,
+-			x,
+-			y,
+-			width,
+-			height,
+-			left,
+-			top,
+-			destinationWidth,
+-			destinationHeight,
+-		);
+-	} else {
+-		ctx.save();
+-		ctx.translate(outputWidth / 2, outputHeight / 2);
+-		ctx.rotate((rotation * Math.PI) / 180);
+-		ctx.drawImage(
+-			source,
+-			x,
+-			y,
+-			width,
+-			height,
+-			left - boxWidth / 2,
+-			top - boxHeight / 2,
+-			destinationWidth,
+-			destinationHeight,
+-		);
+-		ctx.restore();
++	try {
++		if (rotation === 0) {
++			ctx.drawImage(
++				source,
++				x,
++				y,
++				width,
++				height,
++				left,
++				top,
++				destinationWidth,
++				destinationHeight,
++			);
++		} else {
++			ctx.save();
++			ctx.translate(outputWidth / 2, outputHeight / 2);
++			ctx.rotate((rotation * Math.PI) / 180);
++			ctx.drawImage(
++				source,
++				x,
++				y,
++				width,
++				height,
++				left - boxWidth / 2,
++				top - boxHeight / 2,
++				destinationWidth,
++				destinationHeight,
++			);
++			ctx.restore();
++		}
++	} finally {
++		// downsample returns either the original image or an owned scratch canvas. The
++		// returned output belongs to the caller and must keep its pixels.
++		if (source !== image) releaseCanvas(source as HTMLCanvasElement);
+ 	}
+ 
+ 	return canvas;

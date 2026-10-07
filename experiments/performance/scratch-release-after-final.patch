@@ -1,0 +1,132 @@
+diff --git c/src/canvas/draw.ts w/src/canvas/draw.ts
+index b074b60..7fc2a85 100644
+--- c/src/canvas/draw.ts
++++ w/src/canvas/draw.ts
+@@ -25,6 +25,7 @@ interface SourceRect {
+  * @param rect - The image and the rectangle of it to draw
+  * @param targetWidth - The width the result will be drawn at
+  * @param targetHeight - The height the result will be drawn at
++ * @param scratch - Collects owned canvases for release after the final output draw
+  * @returns The rectangle to draw: `rect` itself when it shrinks by less than 2x or the
+  *   target is empty, otherwise the whole of the last step canvas
+  */
+@@ -32,6 +33,7 @@ function downsample(
+ 	rect: SourceRect,
+ 	targetWidth: number,
+ 	targetHeight: number,
++	scratch: HTMLCanvasElement[],
+ ): SourceRect {
+ 	// Nothing is drawn into an empty target (a sliver of image that rounds to no pixel), and
+ 	// halving toward it would never stop: a 1x1 step halves to 1x1 again
+@@ -45,11 +47,12 @@ function downsample(
+ 		// Half the size, rounded so that the step never exceeds the canvas caps
+ 		const size = capCanvasSize(current.width / 2, current.height / 2);
+ 		const step = document.createElement("canvas");
++		scratch.push(step);
+ 		step.width = size.width;
+ 		step.height = size.height;
+ 
+ 		const ctx = step.getContext("2d");
+-		// Without a context, draw what we have in one go rather than fail the crop
++		// Without a context, draw what we have in one go rather than fail the crop.
+ 		if (!ctx) break;
+ 		ctx.imageSmoothingEnabled = true;
+ 		ctx.imageSmoothingQuality = "high";
+@@ -216,46 +219,58 @@ export function drawCroppedImage(
+ 	const destinationHeight = bottom - top;
+ 
+ 	// The box is in the image's own orientation, so the steps are the same for any rotation
+-	const { source, x, y, width, height } = downsample(
+-		{
+-			source: image,
+-			x: sourceLeft,
+-			y: sourceTop,
+-			width: sourceWidth,
+-			height: sourceHeight,
+-		},
+-		destinationWidth,
+-		destinationHeight,
+-	);
++	const scratch: HTMLCanvasElement[] = [];
++	try {
++		const { source, x, y, width, height } = downsample(
++			{
++				source: image,
++				x: sourceLeft,
++				y: sourceTop,
++				width: sourceWidth,
++				height: sourceHeight,
++			},
++			destinationWidth,
++			destinationHeight,
++			scratch,
++		);
+ 
+-	if (rotation === 0) {
+-		ctx.drawImage(
+-			source,
+-			x,
+-			y,
+-			width,
+-			height,
+-			left,
+-			top,
+-			destinationWidth,
+-			destinationHeight,
+-		);
+-	} else {
+-		ctx.save();
+-		ctx.translate(outputWidth / 2, outputHeight / 2);
+-		ctx.rotate((rotation * Math.PI) / 180);
+-		ctx.drawImage(
+-			source,
+-			x,
+-			y,
+-			width,
+-			height,
+-			left - boxWidth / 2,
+-			top - boxHeight / 2,
+-			destinationWidth,
+-			destinationHeight,
+-		);
+-		ctx.restore();
++		if (rotation === 0) {
++			ctx.drawImage(
++				source,
++				x,
++				y,
++				width,
++				height,
++				left,
++				top,
++				destinationWidth,
++				destinationHeight,
++			);
++		} else {
++			ctx.save();
++			ctx.translate(outputWidth / 2, outputHeight / 2);
++			ctx.rotate((rotation * Math.PI) / 180);
++			ctx.drawImage(
++				source,
++				x,
++				y,
++				width,
++				height,
++				left - boxWidth / 2,
++				top - boxHeight / 2,
++				destinationWidth,
++				destinationHeight,
++			);
++			ctx.restore();
++		}
++	} finally {
++		// Keep every intermediate until the final draw: clearing one between downsample
++		// steps changes WebKit's pixels. Release them together, including on failure;
++		// only the output canvas belongs to the caller.
++		for (const step of scratch) {
++			step.width = 0;
++			step.height = 0;
++		}
+ 	}
+ 
+ 	return canvas;

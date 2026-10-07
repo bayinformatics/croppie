@@ -1,0 +1,166 @@
+{
+  "browser": "webkit",
+  "version": "26.6",
+  "rows": [
+    {
+      "size": 8,
+      "target": 1,
+      "mode": "retain",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 8,
+      "target": 1,
+      "mode": "early",
+      "differentChannels": 2,
+      "maxDifference": 8,
+      "meanAbsoluteDifference": 3.25
+    },
+    {
+      "size": 8,
+      "target": 1,
+      "mode": "last-only",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 8,
+      "target": 1,
+      "mode": "after-final",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 16,
+      "target": 2,
+      "mode": "retain",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 16,
+      "target": 2,
+      "mode": "early",
+      "differentChannels": 12,
+      "maxDifference": 30,
+      "meanAbsoluteDifference": 6.25
+    },
+    {
+      "size": 16,
+      "target": 2,
+      "mode": "last-only",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 16,
+      "target": 2,
+      "mode": "after-final",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 64,
+      "target": 8,
+      "mode": "retain",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 64,
+      "target": 8,
+      "mode": "early",
+      "differentChannels": 212,
+      "maxDifference": 47,
+      "meanAbsoluteDifference": 5.2265625
+    },
+    {
+      "size": 64,
+      "target": 8,
+      "mode": "last-only",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 64,
+      "target": 8,
+      "mode": "after-final",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 256,
+      "target": 32,
+      "mode": "retain",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 256,
+      "target": 32,
+      "mode": "early",
+      "differentChannels": 3320,
+      "maxDifference": 53,
+      "meanAbsoluteDifference": 5.88720703125
+    },
+    {
+      "size": 256,
+      "target": 32,
+      "mode": "last-only",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 256,
+      "target": 32,
+      "mode": "after-final",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 2048,
+      "target": 256,
+      "mode": "retain",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 2048,
+      "target": 256,
+      "mode": "early",
+      "differentChannels": 201449,
+      "maxDifference": 33,
+      "meanAbsoluteDifference": 3.7327346801757812
+    },
+    {
+      "size": 2048,
+      "target": 256,
+      "mode": "last-only",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    },
+    {
+      "size": 2048,
+      "target": 256,
+      "mode": "after-final",
+      "differentChannels": 0,
+      "maxDifference": 0,
+      "meanAbsoluteDifference": 0
+    }
+  ]
+}

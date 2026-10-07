@@ -1,0 +1,1991 @@
+{
+  "baseline": "76540ff3ec7f95b6adae2615f630e80cbc33c523",
+  "experimentPatch": "experiments/performance/scratch-release-early.patch",
+  "candidate": "b66023768efda6c8ae79630f913a6378cd8f1263",
+  "dirty": "?? experiments/",
+  "bun": "1.4.2",
+  "node": "v24.16.0",
+  "playwright": "1.63.0",
+  "browser": "webkit",
+  "browserVersion": "26.6",
+  "platform": "darwin",
+  "arch": "arm64",
+  "sizes": {
+    "baseline": {
+      "raw": 24127,
+      "gzip9": 8205,
+      "brotli11": 7330
+    },
+    "candidate": {
+      "raw": 24386,
+      "gzip9": 8315,
+      "brotli11": 7445
+    }
+  },
+  "note": "Exploratory, potentially competing CPU load. Canvas pixels are explicit live dimensions, not measured RSS or GPU memory. Timing excludes instrumentation.",
+  "runs": [
+    {
+      "label": "baseline",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 999,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            6,
+            6,
+            6,
+            5,
+            6,
+            5,
+            6
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            50,
+            50,
+            51,
+            51,
+            50,
+            52,
+            51
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            6,
+            5,
+            6,
+            5,
+            5,
+            6,
+            5
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            52,
+            51,
+            51,
+            53,
+            51,
+            51,
+            49
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            2,
+            2,
+            3,
+            2,
+            2,
+            2,
+            2
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 1056768,
+        "retainedScratchPixels": 1044480,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "a6a92c078e5f288cdb79f362cdebf5ab54cd635a0d00d1d8c1b869c10d09e863"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "9300300c3499c04b4592ed9436eaf50915ca6619cf71e1d378b6aa7733e87baf"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "1c91766cc05c12fdba89f781660060c5b6a2e17ccc8fc626d655a700b580ec40"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "385fd45c2a4ad33213a3104a83cc811f2acb3a1195ec7b52f81b60e429f48f67"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e19ec6b131a1c404b4f19d9af3ee359367bea28b19871afde607ad30c422cb11"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "4e5500bdd853ce8d567ab6e666e324f4c4c0e504e59a1abb8b021bd3070b132a"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "de161f81881c070022857bdbaaaba2ff31c5a98d2aa8ba1a394d5f979bd63d03"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "bede554e1fa205a0109eff76394affc3a311e2a8e66475f08faf8de1e18d6b3b"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "c217d87962e8781d1f4840ab768559e94ecc4f64aad365fb354bbc4a01eb36e7"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "5c3235ec93bcfabb6b4eeda7d69362dccc837b61f541858f19771d00c945b625"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "8f25958eb2f9dfceb95c97a66f46e1b8b9f72903e61cf55d804a96bb1fdc4ddc"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "efbb2606733a1ef73702fd211cb82bc8403a783e241cf0640b770e1dfa34d736"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "da0599dacd5218bf82a4b2fba81146dca5acfc18aff4b91775c545253b008e56"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "a944e9575d5c74be47ebd85d871d3f320ff182c038f7a9eb7562b82834c25a44"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "4745a14b62d62fc176471710c28b6db8be4855512a9d943f9f14938c51604dc6"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "a4c7f6cf8ae6faa18c0987d973172760c2de6cc84792dd983331fb2536d947ae"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            1,
+            2
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            1,
+            1,
+            2,
+            1,
+            1,
+            1,
+            1
+          ],
+          "hash": "ccbc351f35a55195882c8d33541cd20a2187d4511b805e797c85040027c6ee64",
+          "bytes": 8822,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            2,
+            2,
+            2,
+            2,
+            1,
+            1,
+            1
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            1,
+            1,
+            1,
+            1,
+            2,
+            1,
+            2
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            1
+          ],
+          "hash": "ccbc351f35a55195882c8d33541cd20a2187d4511b805e797c85040027c6ee64",
+          "bytes": 8822,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            1,
+            2,
+            1,
+            2,
+            2,
+            2,
+            1
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "label": "candidate",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            5,
+            6,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            50,
+            50,
+            51,
+            48,
+            49,
+            47,
+            48
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            3,
+            4,
+            3,
+            3,
+            4,
+            3,
+            3
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            5,
+            6,
+            6,
+            6,
+            5,
+            6,
+            5
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            49,
+            48,
+            49,
+            49,
+            49,
+            48,
+            50
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            4,
+            3,
+            4,
+            4,
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 995328,
+        "retainedScratchPixels": 0,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "12d03148f78bf365fc1c68e3412a5b994fd1c24fcd418be52521e71d26667f52"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "575cb3bdf27638a54746c197e782a26aff54982fff51979f7db7e1bff725aef6"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "8f0ab2da06e64aff128f973c7fd6170c42e52bbb8007693d712ea0e78269c3d5"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "61c49f193f6be2a99d8680dded3b26a76027a2a6d38d174d8b86de80ca2f8242"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "25baf55fe1d5acbd8f7bd1aa2a99fc0bf7c082cb0bffd362f28a3cfb66c12393"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "0be1ac44eabf2bae285794ba1684de9d870f106b833c4547a7a53e36d232ec42"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "cb8cb95a87c05e2ed85e809cd6439dc34c99febf61a5e927b0cf1c5bde24ec11"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "e26209e0910cc256620c33049edf66ac0df9e26af8fd4573a4f695a404fc4ecc"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "262b5dd1125dc4b76ee99a92b820e6b03c40a94144dfadb597c82bd82c34fd4e"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "0acec4706899ce7ce704e43b1e1730c69bef1ea15be6ff9219bd993d095d0d27"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "36bbad8d35d3b151bb6a0b0652c522178735021e49ea5fb1389b083c7533b9c6"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "6a181cfffc310f79f78c480df7ba4581bf812430546972577c3294d41b632bbf"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e2f4f1a2732a5b223a47d258e88740e91c9c8dfe211433ac3d1f86db405c6fa0"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "ec82c69b2e223e8b33a36afcd97dc15650c8c857ef225c1a57564d8a7c80c50d"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "81514e38d2cd795b54dee94c44913cfdb0f528709be2f019ed3a44d50cd4d369"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "57ee984ae771ef6a1c53ee6054c39a6d13034404412bdc281df2dfb14b053b82"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            3,
+            4,
+            3,
+            3,
+            3,
+            4,
+            3
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            6,
+            5,
+            5,
+            7,
+            6,
+            6,
+            6
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            5,
+            6,
+            5,
+            5,
+            5,
+            6,
+            5
+          ],
+          "hash": "fffc4d8ab89afd0c2401672645ed07d376812ca88ac367570543db8fdfb9dd03",
+          "bytes": 9704,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            5,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            6,
+            7,
+            7,
+            6,
+            5,
+            6,
+            6
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            5,
+            6,
+            5,
+            6,
+            5,
+            5,
+            5
+          ],
+          "hash": "fffc4d8ab89afd0c2401672645ed07d376812ca88ac367570543db8fdfb9dd03",
+          "bytes": 9704,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            6,
+            6,
+            6,
+            5,
+            6,
+            6,
+            6
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "label": "candidate",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            48,
+            48,
+            48,
+            50,
+            52,
+            52,
+            54
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            4,
+            3,
+            4,
+            4,
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            56,
+            54,
+            54,
+            55,
+            54,
+            54,
+            54
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            4,
+            4,
+            4,
+            5,
+            4,
+            4,
+            5
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 995328,
+        "retainedScratchPixels": 0,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "12d03148f78bf365fc1c68e3412a5b994fd1c24fcd418be52521e71d26667f52"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "575cb3bdf27638a54746c197e782a26aff54982fff51979f7db7e1bff725aef6"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "8f0ab2da06e64aff128f973c7fd6170c42e52bbb8007693d712ea0e78269c3d5"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "61c49f193f6be2a99d8680dded3b26a76027a2a6d38d174d8b86de80ca2f8242"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "25baf55fe1d5acbd8f7bd1aa2a99fc0bf7c082cb0bffd362f28a3cfb66c12393"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "0be1ac44eabf2bae285794ba1684de9d870f106b833c4547a7a53e36d232ec42"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "cb8cb95a87c05e2ed85e809cd6439dc34c99febf61a5e927b0cf1c5bde24ec11"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "e26209e0910cc256620c33049edf66ac0df9e26af8fd4573a4f695a404fc4ecc"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "262b5dd1125dc4b76ee99a92b820e6b03c40a94144dfadb597c82bd82c34fd4e"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "0acec4706899ce7ce704e43b1e1730c69bef1ea15be6ff9219bd993d095d0d27"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "36bbad8d35d3b151bb6a0b0652c522178735021e49ea5fb1389b083c7533b9c6"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "6a181cfffc310f79f78c480df7ba4581bf812430546972577c3294d41b632bbf"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e2f4f1a2732a5b223a47d258e88740e91c9c8dfe211433ac3d1f86db405c6fa0"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "ec82c69b2e223e8b33a36afcd97dc15650c8c857ef225c1a57564d8a7c80c50d"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "81514e38d2cd795b54dee94c44913cfdb0f528709be2f019ed3a44d50cd4d369"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "57ee984ae771ef6a1c53ee6054c39a6d13034404412bdc281df2dfb14b053b82"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            3,
+            4,
+            4,
+            3,
+            4,
+            3,
+            4
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            7,
+            6,
+            5,
+            6,
+            6,
+            6,
+            6
+          ],
+          "hash": "fffc4d8ab89afd0c2401672645ed07d376812ca88ac367570543db8fdfb9dd03",
+          "bytes": 9704,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            6,
+            7,
+            7,
+            6,
+            7,
+            7,
+            6
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            9,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            6,
+            6,
+            6,
+            5,
+            6,
+            6,
+            7
+          ],
+          "hash": "fffc4d8ab89afd0c2401672645ed07d376812ca88ac367570543db8fdfb9dd03",
+          "bytes": 9704,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            7,
+            6,
+            7,
+            7,
+            6,
+            7,
+            7
+          ],
+          "hash": "3d756e9c8a1eb6c85fb24b2080ebfd53271b8c4c2ba15d489bb0252046b7b12f",
+          "bytes": 27626,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "label": "baseline",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 999,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            7,
+            7,
+            7,
+            6,
+            6,
+            7,
+            6
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            62,
+            64,
+            62,
+            67,
+            69,
+            69,
+            71
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            8,
+            7,
+            7,
+            6,
+            7,
+            7,
+            6
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            3,
+            3,
+            3,
+            3,
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            7,
+            7,
+            8,
+            7,
+            8,
+            7,
+            7
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            70,
+            69,
+            68,
+            72,
+            73,
+            75,
+            75
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            7,
+            7,
+            7,
+            7,
+            8,
+            7,
+            7
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            3,
+            3,
+            3,
+            3,
+            4,
+            3,
+            3
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 1056768,
+        "retainedScratchPixels": 1044480,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "a6a92c078e5f288cdb79f362cdebf5ab54cd635a0d00d1d8c1b869c10d09e863"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "9300300c3499c04b4592ed9436eaf50915ca6619cf71e1d378b6aa7733e87baf"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "1c91766cc05c12fdba89f781660060c5b6a2e17ccc8fc626d655a700b580ec40"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "385fd45c2a4ad33213a3104a83cc811f2acb3a1195ec7b52f81b60e429f48f67"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e19ec6b131a1c404b4f19d9af3ee359367bea28b19871afde607ad30c422cb11"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "4e5500bdd853ce8d567ab6e666e324f4c4c0e504e59a1abb8b021bd3070b132a"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "de161f81881c070022857bdbaaaba2ff31c5a98d2aa8ba1a394d5f979bd63d03"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "bede554e1fa205a0109eff76394affc3a311e2a8e66475f08faf8de1e18d6b3b"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "c217d87962e8781d1f4840ab768559e94ecc4f64aad365fb354bbc4a01eb36e7"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "5c3235ec93bcfabb6b4eeda7d69362dccc837b61f541858f19771d00c945b625"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "8f25958eb2f9dfceb95c97a66f46e1b8b9f72903e61cf55d804a96bb1fdc4ddc"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "efbb2606733a1ef73702fd211cb82bc8403a783e241cf0640b770e1dfa34d736"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "da0599dacd5218bf82a4b2fba81146dca5acfc18aff4b91775c545253b008e56"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "a944e9575d5c74be47ebd85d871d3f320ff182c038f7a9eb7562b82834c25a44"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "4745a14b62d62fc176471710c28b6db8be4855512a9d943f9f14938c51604dc6"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "a4c7f6cf8ae6faa18c0987d973172760c2de6cc84792dd983331fb2536d947ae"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            2,
+            2,
+            1,
+            3,
+            1,
+            2,
+            1
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            1,
+            1
+          ],
+          "hash": "ccbc351f35a55195882c8d33541cd20a2187d4511b805e797c85040027c6ee64",
+          "bytes": 8822,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            2,
+            2,
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            2,
+            1,
+            1,
+            2,
+            1,
+            2,
+            2
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            1,
+            1,
+            2,
+            1,
+            2,
+            2,
+            1
+          ],
+          "hash": "ccbc351f35a55195882c8d33541cd20a2187d4511b805e797c85040027c6ee64",
+          "bytes": 8822,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            2,
+            2,
+            2,
+            1,
+            2,
+            2,
+            2
+          ],
+          "hash": "f89a89cd340d192dfac709a8c5f9ec8b0c5b69050898eb2dccc48d7b1e001442",
+          "bytes": 18478,
+          "mime": "image/png"
+        }
+      ]
+    }
+  ],
+  "pixelsIdentical": false,
+  "encodedPixelsIdentical": false,
+  "drawStepsIdentical": true
+}

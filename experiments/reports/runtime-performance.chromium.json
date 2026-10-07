@@ -1,0 +1,1990 @@
+{
+  "baseline": "76540ff3ec7f95b6adae2615f630e80cbc33c523",
+  "candidate": "b66023768efda6c8ae79630f913a6378cd8f1263",
+  "dirty": "?? experiments/",
+  "bun": "1.4.2",
+  "node": "v24.16.0",
+  "playwright": "1.63.0",
+  "browser": "chromium",
+  "browserVersion": "153.0.8010.12",
+  "platform": "darwin",
+  "arch": "arm64",
+  "sizes": {
+    "baseline": {
+      "raw": 24127,
+      "gzip9": 8205,
+      "brotli11": 7330
+    },
+    "candidate": {
+      "raw": 24266,
+      "gzip9": 8238,
+      "brotli11": 7366
+    }
+  },
+  "note": "Exploratory, potentially competing CPU load. Canvas pixels are explicit live dimensions, not measured RSS or GPU memory. Timing excludes instrumentation.",
+  "runs": [
+    {
+      "label": "baseline",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 999,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            5.200000047683716,
+            5.100000023841858,
+            5.299999952316284,
+            5.100000023841858,
+            4.799999952316284,
+            4.600000023841858,
+            4.799999952316284
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            17.40000009536743,
+            17.699999928474426,
+            17.5,
+            18.300000071525574,
+            21.799999952316284,
+            16.399999976158142,
+            16.700000047683716
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            5.099999904632568,
+            5,
+            4.800000071525574,
+            5,
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            3.600000023841858,
+            3.600000023841858,
+            3.600000023841858,
+            3.399999976158142,
+            3.600000023841858,
+            3.5,
+            3.5999999046325684
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            4.399999976158142,
+            4.5,
+            4.600000023841858,
+            4.700000047683716,
+            4.199999928474426,
+            6.900000095367432,
+            4.399999976158142
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            16.200000047683716,
+            15.799999952316284,
+            16.100000023841858,
+            16,
+            16.700000047683716,
+            16.399999976158142,
+            15.899999976158142
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            5.099999904632568,
+            4.900000095367432,
+            4.899999976158142,
+            4.799999952316284,
+            5,
+            5,
+            4.899999976158142
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            3.5,
+            3.5,
+            3.5,
+            3.5,
+            3.600000023841858,
+            3.399999976158142,
+            3.399999976158142
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 1056768,
+        "retainedScratchPixels": 1044480,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e60d575c99489f0233de939fa1017bc439816185bd9350c1d3f9d09f96a62a84"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "c794b40062cd880dd697e6d78b207d1c9f3da63c1a3468c22dc035518bf04af3"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "e97ea6f1fc6d9ada9f4467c21af93b61f69dcd1e2b6488351b4a1f2d901d6551"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "607b3c9af846b876deb62b3ae8aa7408f0571546e7447c330058d4df5da1d07d"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "fdbccab8ab2617e39397b804645dd51a7a6f07230c8d1013fd0f274ae00018f7"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "ac10b930b2be5aceecc03b96793eb7849a833871c98edb1351110d3102598292"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "859ce86372db20fab1dcb60786bfe1fc8b5ee35196042daa5459afdabb6ae4cb"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "2ecd566120896ae8bf2a3e734da4a3bd462713f201c3973367144cd036e5f533"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "0232259e31d035b799f19f1164e041038acf646015f303420ca48d966e1863d4"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "a4ca518b4f16ce8851bda8486348051f0caf1799c41aae6b254662d57b972f08"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "eb60446a5f4eba78c2617fb7b19cd8865d40dcb93f8545cd9e6ee40dbc5c3fbf"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "310a15ba571f0fa580da52e7b1d3232aa9bb18fcc4136e9f147a45e8fc18fd09"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "25039fce3a4f58cbf825978ab01653eafe91f029bf76e64422673a92835cb6c8"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "22f752f8fe589244e83682b3ab644403cacfaaa3fd497041ed4c86ec7e7c3103"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "b7bca70881a56311558478a5223413b8e50535e32089d41dfe5c81495565240f"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "0cf3b85111c5b9a27f8b8eb7f1f01a9f5766a8ea79fa15a77e490560d1c805e9"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            2.899999976158142,
+            3.1999999284744263,
+            2.899999976158142,
+            2.8000000715255737,
+            2.9000000953674316,
+            2.899999976158142,
+            3.0999999046325684
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            9.599999904632568,
+            3.200000047683716,
+            3.200000047683716,
+            3.200000047683716,
+            3.3000000715255737,
+            3.3000000715255737,
+            3.3000000715255737
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            3.0999999046325684,
+            3.100000023841858,
+            5.300000071525574,
+            2.899999976158142,
+            2.899999976158142,
+            2.899999976158142,
+            2.899999976158142
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            3.899999976158142,
+            3.899999976158142,
+            4.200000047683716,
+            3.799999952316284,
+            4.800000071525574,
+            3.799999952316284,
+            3.799999952316284
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            3.200000047683716,
+            3.100000023841858,
+            3.100000023841858,
+            3.100000023841858,
+            3,
+            3,
+            3.5
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            2.899999976158142,
+            2.899999976158142,
+            2.9000000953674316,
+            2.799999952316284,
+            2.799999952316284,
+            2.8000000715255737,
+            2.899999976158142
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            3.9000000953674316,
+            3.899999976158142,
+            3.899999976158142,
+            3.899999976158142,
+            3.899999976158142,
+            3.799999952316284,
+            3.799999952316284
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        }
+      ]
+    },
+    {
+      "label": "candidate",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            4.399999976158142,
+            4.700000047683716,
+            4.5,
+            4.599999904632568,
+            4.400000095367432,
+            4.399999976158142,
+            4.299999952316284
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            16.399999976158142,
+            16.700000047683716,
+            16.5,
+            16.799999952316284,
+            18.100000023841858,
+            15.799999952316284,
+            16.5
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            2.899999976158142,
+            3.100000023841858,
+            2.8000000715255737,
+            2.899999976158142,
+            2.899999976158142,
+            2.899999976158142,
+            2.899999976158142
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            0.10000002384185791,
+            0.10000002384185791,
+            0.10000002384185791,
+            0.19999992847442627,
+            0,
+            0.20000004768371582,
+            0.10000002384185791
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            4.600000023841858,
+            4.700000047683716,
+            4.699999928474426,
+            4.600000023841858,
+            4.800000071525574,
+            4.699999928474426,
+            6.700000047683716
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            16.199999928474426,
+            15.700000047683716,
+            15.699999928474426,
+            16,
+            17.100000023841858,
+            16.300000071525574,
+            15.899999976158142
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            3.5,
+            3.1999999284744263,
+            3.100000023841858,
+            3.3000000715255737,
+            3.1999999284744263,
+            3.100000023841858,
+            3.100000023841858
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            0.19999992847442627,
+            0,
+            0.20000004768371582,
+            0.10000002384185791,
+            0.10000002384185791,
+            0.09999990463256836,
+            0.10000002384185791
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 1056768,
+        "retainedScratchPixels": 1044480,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e60d575c99489f0233de939fa1017bc439816185bd9350c1d3f9d09f96a62a84"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "c794b40062cd880dd697e6d78b207d1c9f3da63c1a3468c22dc035518bf04af3"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "e97ea6f1fc6d9ada9f4467c21af93b61f69dcd1e2b6488351b4a1f2d901d6551"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "607b3c9af846b876deb62b3ae8aa7408f0571546e7447c330058d4df5da1d07d"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "fdbccab8ab2617e39397b804645dd51a7a6f07230c8d1013fd0f274ae00018f7"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "ac10b930b2be5aceecc03b96793eb7849a833871c98edb1351110d3102598292"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "859ce86372db20fab1dcb60786bfe1fc8b5ee35196042daa5459afdabb6ae4cb"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "2ecd566120896ae8bf2a3e734da4a3bd462713f201c3973367144cd036e5f533"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "0232259e31d035b799f19f1164e041038acf646015f303420ca48d966e1863d4"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "a4ca518b4f16ce8851bda8486348051f0caf1799c41aae6b254662d57b972f08"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "eb60446a5f4eba78c2617fb7b19cd8865d40dcb93f8545cd9e6ee40dbc5c3fbf"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "310a15ba571f0fa580da52e7b1d3232aa9bb18fcc4136e9f147a45e8fc18fd09"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "25039fce3a4f58cbf825978ab01653eafe91f029bf76e64422673a92835cb6c8"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "22f752f8fe589244e83682b3ab644403cacfaaa3fd497041ed4c86ec7e7c3103"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "b7bca70881a56311558478a5223413b8e50535e32089d41dfe5c81495565240f"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "0cf3b85111c5b9a27f8b8eb7f1f01a9f5766a8ea79fa15a77e490560d1c805e9"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            2.899999976158142,
+            2.899999976158142,
+            2.799999952316284,
+            2.899999976158142,
+            3,
+            2.899999976158142,
+            3.100000023841858
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            3.399999976158142,
+            3.200000047683716,
+            3.200000047683716,
+            7.399999976158142,
+            3.299999952316284,
+            3.1999999284744263,
+            3.1999999284744263
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            3,
+            3.100000023841858,
+            2.9000000953674316,
+            3.100000023841858,
+            2.899999976158142,
+            4.800000071525574,
+            3
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            3.8000000715255737,
+            4,
+            3.8000000715255737,
+            3.899999976158142,
+            3.9000000953674316,
+            4,
+            4
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            3,
+            3.100000023841858,
+            3.1999999284744263,
+            3,
+            3.100000023841858,
+            3.0999999046325684,
+            3.100000023841858
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            3.1999999284744263,
+            3,
+            2.700000047683716,
+            2.799999952316284,
+            2.9000000953674316,
+            2.799999952316284,
+            2.899999976158142
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            3.799999952316284,
+            3.799999952316284,
+            4.100000023841858,
+            3.6999999284744263,
+            3.799999952316284,
+            3.799999952316284,
+            3.799999952316284
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        }
+      ]
+    },
+    {
+      "label": "candidate",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 0
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            4.399999976158142,
+            4.699999928474426,
+            4.400000095367432,
+            4.5,
+            4.299999952316284,
+            4.299999952316284,
+            4.300000071525574
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            16.5,
+            16.600000023841858,
+            16.799999952316284,
+            17,
+            18.200000047683716,
+            15.699999928474426,
+            16.90000009536743
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            2.899999976158142,
+            3.100000023841858,
+            2.799999952316284,
+            2.899999976158142,
+            3.100000023841858,
+            2.899999976158142,
+            2.8000000715255737
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            0.09999990463256836,
+            0.20000004768371582,
+            0.10000002384185791,
+            0.19999992847442627,
+            0,
+            0.10000002384185791,
+            0.10000002384185791
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            4.600000023841858,
+            4.600000023841858,
+            4.600000023841858,
+            4.799999952316284,
+            4.600000023841858,
+            4.600000023841858,
+            7.199999928474426
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            16.200000047683716,
+            15.600000023841858,
+            15.799999952316284,
+            16,
+            17.100000023841858,
+            17.100000023841858,
+            16.100000023841858
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            3.1999999284744263,
+            3.4000000953674316,
+            3.1999999284744263,
+            3.100000023841858,
+            3.200000047683716,
+            3.0999999046325684,
+            3.100000023841858
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            0.10000002384185791,
+            0.10000002384185791,
+            0.19999992847442627,
+            0.10000002384185791,
+            0.10000002384185791,
+            0.10000002384185791,
+            0.10000002384185791
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 1056768,
+        "retainedScratchPixels": 1044480,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e60d575c99489f0233de939fa1017bc439816185bd9350c1d3f9d09f96a62a84"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "c794b40062cd880dd697e6d78b207d1c9f3da63c1a3468c22dc035518bf04af3"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "e97ea6f1fc6d9ada9f4467c21af93b61f69dcd1e2b6488351b4a1f2d901d6551"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "607b3c9af846b876deb62b3ae8aa7408f0571546e7447c330058d4df5da1d07d"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "fdbccab8ab2617e39397b804645dd51a7a6f07230c8d1013fd0f274ae00018f7"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "ac10b930b2be5aceecc03b96793eb7849a833871c98edb1351110d3102598292"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "859ce86372db20fab1dcb60786bfe1fc8b5ee35196042daa5459afdabb6ae4cb"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "2ecd566120896ae8bf2a3e734da4a3bd462713f201c3973367144cd036e5f533"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "0232259e31d035b799f19f1164e041038acf646015f303420ca48d966e1863d4"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "a4ca518b4f16ce8851bda8486348051f0caf1799c41aae6b254662d57b972f08"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "eb60446a5f4eba78c2617fb7b19cd8865d40dcb93f8545cd9e6ee40dbc5c3fbf"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "310a15ba571f0fa580da52e7b1d3232aa9bb18fcc4136e9f147a45e8fc18fd09"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "25039fce3a4f58cbf825978ab01653eafe91f029bf76e64422673a92835cb6c8"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "22f752f8fe589244e83682b3ab644403cacfaaa3fd497041ed4c86ec7e7c3103"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "b7bca70881a56311558478a5223413b8e50535e32089d41dfe5c81495565240f"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "0cf3b85111c5b9a27f8b8eb7f1f01a9f5766a8ea79fa15a77e490560d1c805e9"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            2.8000000715255737,
+            3,
+            3,
+            2.899999976158142,
+            3,
+            2.799999952316284,
+            2.799999952316284
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            3.5,
+            3.5,
+            3.399999976158142,
+            7.799999952316284,
+            3.299999952316284,
+            3.100000023841858,
+            3.1999999284744263
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            3,
+            3.0999999046325684,
+            3.100000023841858,
+            3,
+            3,
+            5,
+            2.899999976158142
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            4,
+            3.899999976158142,
+            3.9000000953674316,
+            4.100000023841858,
+            3.899999976158142,
+            4,
+            4.100000023841858
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            3.100000023841858,
+            3,
+            3.100000023841858,
+            3.100000023841858,
+            3.100000023841858,
+            3,
+            3.100000023841858
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            3.100000023841858,
+            2.8000000715255737,
+            2.799999952316284,
+            3,
+            2.9000000953674316,
+            2.799999952316284,
+            2.799999952316284
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            3.799999952316284,
+            3.899999976158142,
+            4.100000023841858,
+            3.899999976158142,
+            3.799999952316284,
+            3.899999976158142,
+            3.799999952316284
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        }
+      ]
+    },
+    {
+      "label": "baseline",
+      "audit": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "getCalls": 999,
+          "updates": 0,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "getCalls": 1000,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "getCalls": 999,
+          "updates": 999,
+          "ariaWrites": 0
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "getCalls": 1000,
+          "updates": 1000,
+          "ariaWrites": 1000
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "getCalls": 0,
+          "updates": 0,
+          "ariaWrites": 1000
+        }
+      ],
+      "timings": [
+        {
+          "kind": "drag",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            4.800000071525574,
+            4.899999976158142,
+            5,
+            4.899999976158142,
+            4.799999952316284,
+            4.5,
+            4.900000095367432
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            17.199999928474426,
+            17.200000047683716,
+            16.899999976158142,
+            17.300000071525574,
+            18.699999928474426,
+            16.600000023841858,
+            17.299999952316284
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            5.5,
+            5.200000047683716,
+            5.099999904632568,
+            5,
+            4.900000095367432,
+            5,
+            5
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": false,
+          "eventsPerSample": 3000,
+          "samples": [
+            3.5,
+            3.600000023841858,
+            3.600000023841858,
+            3.5,
+            3.5,
+            3.600000023841858,
+            3.5
+          ]
+        },
+        {
+          "kind": "drag",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            4.400000095367432,
+            4.5,
+            4.799999952316284,
+            4.600000023841858,
+            4.5,
+            7,
+            4.5
+          ]
+        },
+        {
+          "kind": "wheel",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            16.699999928474426,
+            16.200000047683716,
+            16.199999928474426,
+            16.300000071525574,
+            17.299999952316284,
+            16.600000023841858,
+            16.100000023841858
+          ]
+        },
+        {
+          "kind": "setZoom",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            5.199999928474426,
+            4.900000095367432,
+            5,
+            4.899999976158142,
+            4.799999952316284,
+            4.899999976158142,
+            4.900000095367432
+          ]
+        },
+        {
+          "kind": "no-op",
+          "subscribed": true,
+          "eventsPerSample": 3000,
+          "samples": [
+            3.600000023841858,
+            3.399999976158142,
+            3.600000023841858,
+            3.600000023841858,
+            3.600000023841858,
+            3.5,
+            3.600000023841858
+          ]
+        }
+      ],
+      "allocation": {
+        "canvases": 5,
+        "peakPixels": 1056768,
+        "retainedScratchPixels": 1044480,
+        "outputPixels": 12288,
+        "drawCalls": [
+          {
+            "source": "image",
+            "destination": [
+              1024,
+              768
+            ],
+            "args": [
+              0,
+              0,
+              2048,
+              1536,
+              0,
+              0,
+              1024,
+              768
+            ]
+          },
+          {
+            "source": [
+              1024,
+              768
+            ],
+            "destination": [
+              512,
+              384
+            ],
+            "args": [
+              0,
+              0,
+              1024,
+              768,
+              0,
+              0,
+              512,
+              384
+            ]
+          },
+          {
+            "source": [
+              512,
+              384
+            ],
+            "destination": [
+              256,
+              192
+            ],
+            "args": [
+              0,
+              0,
+              512,
+              384,
+              0,
+              0,
+              256,
+              192
+            ]
+          },
+          {
+            "source": [
+              256,
+              192
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              256,
+              192,
+              0,
+              0,
+              128,
+              96
+            ]
+          },
+          {
+            "source": [
+              128,
+              96
+            ],
+            "destination": [
+              128,
+              96
+            ],
+            "args": [
+              0,
+              0,
+              128,
+              96,
+              0,
+              0,
+              128,
+              96
+            ]
+          }
+        ]
+      },
+      "pixels": [
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": false,
+          "hash": "e60d575c99489f0233de939fa1017bc439816185bd9350c1d3f9d09f96a62a84"
+        },
+        {
+          "rotation": 0,
+          "circle": false,
+          "letterbox": true,
+          "hash": "c794b40062cd880dd697e6d78b207d1c9f3da63c1a3468c22dc035518bf04af3"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": false,
+          "hash": "e97ea6f1fc6d9ada9f4467c21af93b61f69dcd1e2b6488351b4a1f2d901d6551"
+        },
+        {
+          "rotation": 0,
+          "circle": true,
+          "letterbox": true,
+          "hash": "607b3c9af846b876deb62b3ae8aa7408f0571546e7447c330058d4df5da1d07d"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": false,
+          "hash": "fdbccab8ab2617e39397b804645dd51a7a6f07230c8d1013fd0f274ae00018f7"
+        },
+        {
+          "rotation": 90,
+          "circle": false,
+          "letterbox": true,
+          "hash": "ac10b930b2be5aceecc03b96793eb7849a833871c98edb1351110d3102598292"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": false,
+          "hash": "859ce86372db20fab1dcb60786bfe1fc8b5ee35196042daa5459afdabb6ae4cb"
+        },
+        {
+          "rotation": 90,
+          "circle": true,
+          "letterbox": true,
+          "hash": "2ecd566120896ae8bf2a3e734da4a3bd462713f201c3973367144cd036e5f533"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": false,
+          "hash": "0232259e31d035b799f19f1164e041038acf646015f303420ca48d966e1863d4"
+        },
+        {
+          "rotation": 180,
+          "circle": false,
+          "letterbox": true,
+          "hash": "a4ca518b4f16ce8851bda8486348051f0caf1799c41aae6b254662d57b972f08"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": false,
+          "hash": "eb60446a5f4eba78c2617fb7b19cd8865d40dcb93f8545cd9e6ee40dbc5c3fbf"
+        },
+        {
+          "rotation": 180,
+          "circle": true,
+          "letterbox": true,
+          "hash": "310a15ba571f0fa580da52e7b1d3232aa9bb18fcc4136e9f147a45e8fc18fd09"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": false,
+          "hash": "25039fce3a4f58cbf825978ab01653eafe91f029bf76e64422673a92835cb6c8"
+        },
+        {
+          "rotation": 270,
+          "circle": false,
+          "letterbox": true,
+          "hash": "22f752f8fe589244e83682b3ab644403cacfaaa3fd497041ed4c86ec7e7c3103"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": false,
+          "hash": "b7bca70881a56311558478a5223413b8e50535e32089d41dfe5c81495565240f"
+        },
+        {
+          "rotation": 270,
+          "circle": true,
+          "letterbox": true,
+          "hash": "0cf3b85111c5b9a27f8b8eb7f1f01a9f5766a8ea79fa15a77e490560d1c805e9"
+        }
+      ],
+      "exports": [
+        {
+          "type": "canvas",
+          "format": "png",
+          "samples": [
+            2.9000000953674316,
+            3.0999999046325684,
+            3,
+            2.899999976158142,
+            3,
+            3,
+            2.899999976158142
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0"
+        },
+        {
+          "type": "blob",
+          "format": "png",
+          "samples": [
+            8.600000023841858,
+            4.600000023841858,
+            3.399999976158142,
+            3.299999952316284,
+            3.5,
+            3.5,
+            3.399999976158142
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "blob",
+          "format": "jpeg",
+          "samples": [
+            3,
+            3.100000023841858,
+            5,
+            2.899999976158142,
+            3,
+            3,
+            3
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "blob",
+          "format": "webp",
+          "samples": [
+            4.199999928474426,
+            4.099999904632568,
+            3.899999976158142,
+            3.799999952316284,
+            5,
+            3.799999952316284,
+            4
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        },
+        {
+          "type": "base64",
+          "format": "png",
+          "samples": [
+            3.100000023841858,
+            3.200000047683716,
+            3.100000023841858,
+            3.100000023841858,
+            3,
+            3,
+            3.399999976158142
+          ],
+          "hash": "9f2564d4ba6c976345767bd5e1fa13da2e52132b4ef1c5764221049fcb2f4ee0",
+          "bytes": 28972,
+          "mime": "image/png"
+        },
+        {
+          "type": "base64",
+          "format": "jpeg",
+          "samples": [
+            2.799999952316284,
+            2.8000000715255737,
+            2.799999952316284,
+            2.700000047683716,
+            2.799999952316284,
+            2.899999976158142,
+            2.799999952316284
+          ],
+          "hash": "0f3fcb6965fbe423b8ddddb82d1922649fbf7eee6e7202fb6658388ed181bf37",
+          "bytes": 4760,
+          "mime": "image/jpeg"
+        },
+        {
+          "type": "base64",
+          "format": "webp",
+          "samples": [
+            3.899999976158142,
+            3.899999976158142,
+            3.6999999284744263,
+            3.799999952316284,
+            3.799999952316284,
+            3.899999976158142,
+            3.9000000953674316
+          ],
+          "hash": "f159282102f3688e91a765fae4d71c31cc6b46f95ab25b0c3096f37765170aac",
+          "bytes": 4292,
+          "mime": "image/webp"
+        }
+      ]
+    }
+  ],
+  "pixelsIdentical": true,
+  "encodedPixelsIdentical": true,
+  "drawStepsIdentical": true
+}
