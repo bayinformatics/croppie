@@ -27,9 +27,12 @@ Use `--frozen-lockfile` so you never change `bun.lock` by accident. Change depen
 | `bun run build` | Cleans `dist/`, then builds the bundle, CSS and type declarations |
 | `bun run build:docs` | Builds the demo bundle in `docs/` |
 | `bun run check:package` | Checks that the type declarations in `dist/` import with `.js` specifiers, then `publint --strict` and `attw` against the packed tarball |
+| `bun run size` | Checks the gzip size of `dist/croppie.js` and `dist/croppie.css` against the budget in `.size-limit.json` (run `bun run build` first) |
 | `bun run dev` | Watch build into `dist/` |
 
 Before you commit, run `bun run lint && bun run typecheck && bun run test`.
+
+The bundle has a hard gzip size budget, enforced in CI (`dist/croppie.js` 8.5 kB, `dist/croppie.css` 1.5 kB; 1 kB is 1000 bytes). To raise it on purpose, change the `limit` in `.size-limit.json` in the same PR that adds the feature and give the reason in the PR description; do not raise it just to make a failing check pass.
 
 ## Tests
 

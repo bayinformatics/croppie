@@ -98,6 +98,11 @@ jobs:
           path: dist/
           retention-days: 7
 
+      # Hard gzip budget for dist/croppie.js and dist/croppie.css (limits in .size-limit.json).
+      # Runs under the Node 24 set up above: size-limit 14 needs Node 22.19 or newer.
+      - name: Check bundle size budget
+        run: bun run size
+
   size:
     name: Bundle size
     if: github.event_name == 'pull_request'
