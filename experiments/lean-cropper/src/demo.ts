@@ -9,6 +9,7 @@ const angle = (s: CropState) => Math.atan2(s.transform[1], s.transform[0]) * 180
 const status = $('status'), result = $('result');
 let resultURL: string | undefined;
 let loadGeneration = 0, exportGeneration = 0, hasImage = false;
+let shape: 'rect' | 'circle' | 'ellipse' = 'rect';
 
 function showState(s: CropState) {
   input('angle').value = String(angle(s));
@@ -17,7 +18,12 @@ function showState(s: CropState) {
   input('width').value = s.viewport.width.toFixed(1); input('height').value = s.viewport.height.toFixed(1);
   input('width').max = String(s.stage.width); input('height').max = String(s.stage.height);
   select('aspect').value = s.aspect === null ? '' : String(s.aspect);
-  select('mask').value = s.mask ?? 'rect';
+  select('aspect').disabled = shape === 'circle';
+  select('mask').value = shape;
+  const hint = shape === 'circle' ? 'Circle uses a square crop. The aspect ratio is locked to Square.'
+    : shape === 'ellipse' ? 'Resize the crop or choose an aspect ratio to change the ellipse.'
+    : 'Choose Circle for a round image. Its square aspect ratio is set automatically.';
+  if ($('shape-hint').textContent !== hint) $('shape-hint').textContent = hint;
 }
 const cropper = new LeanCropper($('editor'), { coverage: 'fill', onChange: showState });
 function controls(disabled: boolean) {
@@ -38,6 +44,7 @@ async function load(source: Blob | string) {
   try {
     const s = await cropper.load(source);
     if (generation !== loadGeneration) return;
+    if (shape === 'circle') cropper.setAspect(1);
     hasImage = true; controls(false); clearResult();
     status.textContent = `${s.image.width} × ${s.image.height} image ready. Choose coverage and crop shape, then export.`;
   } catch (error) {
@@ -53,7 +60,13 @@ $('flip-x').onclick = () => void run(() => cropper.flip('horizontal'));
 $('flip-y').onclick = () => void run(() => cropper.flip('vertical'));
 $('aspect').onchange = () => void run(() => cropper.setAspect(Number(select('aspect').value) || null));
 $('coverage').onchange = () => void run(() => cropper.setCoverage(select('coverage').value as 'fill' | 'free'));
-$('mask').onchange = () => void run(() => cropper.setMask(select('mask').value as 'rect' | 'circle'));
+$('mask').onchange = () => void run(() => {
+  shape = select('mask').value as typeof shape;
+  if (shape === 'circle') cropper.setAspect(1);
+  else if (shape === 'ellipse') cropper.setAspect(null);
+  cropper.setMask(shape === 'rect' ? 'rect' : 'circle');
+  showState(cropper.getState());
+});
 for (const key of ['width', 'height'] as const) input(key).onchange = () => void run(() => {
   const s = cropper.getState(), v = { ...s.viewport, [key]: input(key).valueAsNumber };
   if (key === 'height' && s.aspect) v.width = v.height * s.aspect;

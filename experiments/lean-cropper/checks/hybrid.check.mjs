@@ -132,13 +132,28 @@ try {
     await page.evaluate(()=>{hybrid.destroy();hybridHost.remove();});
     await page.goto(`${origin}/dist/`); await page.waitForFunction(()=>!document.querySelector('#export').disabled);
     assert.equal(await page.getByLabel('Image coverage').inputValue(),'fill');
+    await page.getByLabel('Aspect ratio').selectOption('1.3333333333333333');
     await page.getByLabel('Crop shape').selectOption('circle');
-    await page.getByLabel('Aspect ratio').selectOption('1');
+    assert.equal(await page.getByLabel('Aspect ratio').inputValue(),'1');
+    assert.equal(await page.getByLabel('Aspect ratio').isDisabled(),true);
+    assert.match(await page.locator('#shape-hint').textContent(),/locked to Square/);
+    await page.getByLabel('Crop shape').selectOption('ellipse');
+    assert.equal(await page.getByLabel('Aspect ratio').isDisabled(),false);
+    assert.equal(await page.getByLabel('Aspect ratio').inputValue(),'');
+    await page.getByLabel('Aspect ratio').selectOption('1.3333333333333333');
+    await page.getByLabel('Crop shape').selectOption('circle');
+    assert.equal(await page.getByLabel('Aspect ratio').inputValue(),'1');
     await page.getByLabel('Export width (px)').fill('320');
     await page.getByRole('button',{name:'Export PNG',exact:true}).click();
     await page.getByRole('link',{name:'Download PNG'}).waitFor();
     const rendered=await page.locator('#result img').evaluate(img=>[img.naturalWidth,img.naturalHeight]);assert.deepEqual(rendered,[320,320]);
     await page.screenshot({path:resolve(output,`${name}-hybrid-demo.png`),fullPage:true});
+    await page.setViewportSize({width:390,height:844});
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    assert.equal(await page.getByLabel('Aspect ratio').inputValue(),'1');
+    assert.equal(await page.getByLabel('Aspect ratio').isDisabled(),true);
+    await page.screenshot({path:resolve(output,`${name}-hybrid-mobile.png`),fullPage:true});
     // A file replacement invalidates a pending export instead of displaying stale pixels.
     await page.evaluate(()=>{
       const native=HTMLCanvasElement.prototype.toBlob;
@@ -151,6 +166,8 @@ try {
     await page.waitForFunction(()=>typeof window.finishPendingExport==='function');
     await page.locator('#file').setInputFiles(resolve(repo,'experiments/lean-cropper/checks/fixtures/landmarks.png'));
     await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('640 × 480 image ready'));
+    assert.equal(await page.getByLabel('Aspect ratio').inputValue(),'1');
+    assert.equal(await page.getByLabel('Aspect ratio').isDisabled(),true);
     await page.evaluate(async()=>{window.restoreEncoder();await window.finishPendingExport();});
     assert.equal(await page.locator('#result img').count(),0,'Old export reappeared after changing the source');
     assert.ok((await page.locator('#status').textContent()).startsWith('640 × 480 image ready'));
@@ -163,6 +180,7 @@ try {
     await page.waitForFunction(()=>typeof window.failPendingExport==='function');
     await page.locator('#file').setInputFiles(resolve(repo,'experiments/lean-cropper/checks/fixtures/orientation-6.jpg'));
     await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('160 × 240 image ready'));
+    assert.equal(await page.getByLabel('Aspect ratio').inputValue(),'1');
     await page.evaluate(async()=>{window.restoreEncoder();window.failPendingExport();await Promise.resolve();await Promise.resolve();});
     assert.ok((await page.locator('#status').textContent()).startsWith('160 × 240 image ready'),'Stale encoding error replaced current status');
     assert.deepEqual(pageErrors,[]);

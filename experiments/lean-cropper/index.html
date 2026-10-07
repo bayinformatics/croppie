@@ -25,9 +25,10 @@
       </fieldset>
       <fieldset id="crop-controls" disabled>
         <legend>Crop</legend>
-        <label>Aspect ratio<select id="aspect"><option value="">Free</option><option value="1">Square</option><option value="1.3333333333333333">4:3</option><option value="1.7777777777777777">16:9</option></select></label>
+        <label>Crop shape<select id="mask" aria-describedby="shape-hint"><option value="rect">Rectangle</option><option value="circle">Circle</option><option value="ellipse">Ellipse</option></select></label>
+        <p class="hint" id="shape-hint" aria-live="polite">Choose Circle for a round image. Its square aspect ratio is set automatically.</p>
+        <label>Aspect ratio<select id="aspect" aria-describedby="shape-hint"><option value="">Free</option><option value="1">Square</option><option value="1.3333333333333333">4:3</option><option value="1.7777777777777777">16:9</option></select></label>
         <label>Image coverage<select id="coverage"><option value="fill">Keep crop filled</option><option value="free">Allow transparent edges</option></select></label>
-        <label>Crop shape<select id="mask"><option value="rect">Rectangle</option><option value="circle">Ellipse / circle</option></select></label>
         <div class="pair"><label>Width (px)<input id="width" type="number" min="24" step="1"></label><label>Height (px)<input id="height" type="number" min="24" step="1"></label></div>
         <button id="reset" type="button">Reset crop and image</button>
       </fieldset>
