@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.1](https://github.com/bayinformatics/croppie/compare/v3.2.0...v3.2.1) (2026-10-07)
+
+
+### Performance
+
+* reduce shipped size and redundant cropper updates ([c1a18c5](https://github.com/bayinformatics/croppie/commit/c1a18c51bb28625bf292971a522b45630221e4e4))
+* reduce shipped size and redundant cropper updates ([ef7fa67](https://github.com/bayinformatics/croppie/commit/ef7fa674724bbd5960ff559f9ee5fc7006e541fc))
+
 ## [3.2.0] - 2026-10-06
 
 ### Added
