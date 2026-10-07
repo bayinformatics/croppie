@@ -7,7 +7,7 @@ import { join, resolve } from 'node:path';
 import { once } from 'node:events';
 
 const root = fileURLToPath(new URL('../', import.meta.url)), repo = resolve(root, '../..');
-const evidence = join(root, 'evidence'); await mkdir(evidence, { recursive: true });
+const evidence = process.env.LEAN_EVIDENCE ? resolve(process.env.LEAN_EVIDENCE) : join(root, 'evidence'); await mkdir(evidence, { recursive: true });
 const port = process.env.LEAN_PORT || '4197', base = `http://127.0.0.1:${port}/experiments/lean-cropper`;
 const server = spawn('bun', [join(root, 'serve.ts')], { cwd: repo, env: { ...process.env, LEAN_PORT: port }, stdio: ['ignore', 'pipe', 'pipe'] });
 let serverLog = ''; server.stderr.on('data', data => { serverLog += data; });
@@ -124,9 +124,13 @@ try {
         const details = await page.evaluate(async orientation => {
           const response = await fetch(`./fixtures/orientation-${orientation}.jpg`), blob = await response.blob();
           const s = await lc.load(blob); lc.setState({ ...s, transform: [1, 0, 0, 1, 0, 0], viewport: { x: 0, y: 0, ...s.image } });
-          return { sameBlob: lc.getSource().blob === blob, image: s.image, png: api.toCanvas(lc).toDataURL() };
+          return { sameBlob: lc.getSource().blob === blob, image: s.image,
+            tag: await api.readBlobOrientation(blob),
+            byteTag: api.readJpegOrientation(new Uint8Array(await blob.arrayBuffer())),
+            png: api.toCanvas(lc).toDataURL() };
         }, orientation);
-        assert.ok(details.sameBlob); assert.deepEqual(details.image, orientation >= 5 ? { width: 160, height: 240 } : { width: 240, height: 160 });
+        assert.ok(details.sameBlob); assert.equal(details.tag, orientation); assert.equal(details.byteTag, orientation);
+        assert.deepEqual(details.image, orientation >= 5 ? { width: 160, height: 240 } : { width: 240, height: 160 });
         const actual = join(evidence, `${name}-orientation-${orientation}.png`), expected = join(root, `checks/fixtures/orientation-${orientation}-expected.png`);
         await png(actual, details.png); comparisons.push({ name: `${name}/EXIF-${orientation}/Pillow`, actual, expected, maxMean: 1.5, maxLarge: .001 });
         await saveComparison(`orientation-${orientation}`);
@@ -158,21 +162,17 @@ try {
       const quality = await page.evaluate(() => {
         const s = lc.getState();
         lc.setState({ ...s, transform: [.1, 0, 0, .1, 0, 0], viewport: { x: 0, y: 0, width: s.image.width / 10, height: s.image.height / 10 } });
-        const direct = api.toCanvas(lc, { width: 320 });
-        let scratch = document.createElement('canvas'); scratch.width = s.image.width; scratch.height = s.image.height;
-        scratch.getContext('2d').drawImage(lc.getSource().image, 0, 0);
-        while (scratch.width > direct.width * 2) {
-          const next = document.createElement('canvas'); next.width = Math.floor(scratch.width / 2); next.height = Math.floor(scratch.height / 2);
-          const ctx = next.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(scratch, 0, 0, next.width, next.height);
-          scratch.width = scratch.height = 0; scratch = next;
-        }
-        const final = document.createElement('canvas'); final.width = direct.width; final.height = direct.height;
-        const ctx = final.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(scratch, 0, 0, final.width, final.height);
-        scratch.width = scratch.height = 0;
-        return { direct: direct.toDataURL(), progressive: final.toDataURL(), width: direct.width, height: direct.height };
+        const hybrid = api.toCanvas(lc, { width: 320 });
+        const direct = document.createElement('canvas'); direct.width = hybrid.width; direct.height = hybrid.height;
+        const ctx = direct.getContext('2d'); ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(lc.getSource().image, 0, 0, direct.width, direct.height);
+        const production = api.drawCroppedImage(lc.getSource().image,
+          {topLeftX:0,topLeftY:0,bottomRightX:s.image.width,bottomRightY:s.image.height}, hybrid.width, hybrid.height);
+        return { direct: direct.toDataURL(), hybrid: hybrid.toDataURL(), production: production.toDataURL(), width: hybrid.width, height: hybrid.height };
       });
       await png(join(evidence, `${name}-downsample-direct.png`), quality.direct);
-      await png(join(evidence, `${name}-downsample-progressive.png`), quality.progressive);
+      await png(join(evidence, `${name}-downsample-hybrid.png`), quality.hybrid);
+      await png(join(evidence, `${name}-downsample-production.png`), quality.production);
       stats.downsampleDimensions = [quality.width, quality.height];
     });
     await check('failed/racing loads, reset, canvas lifetime, destroy', async () => {
@@ -193,7 +193,9 @@ try {
         const transparent = api.toCanvas(lc, { width: 10 }).getContext('2d').getImageData(0, 0, 1, 1).data[3] === 0;
         const filled = api.toCanvas(lc, { width: 10, background: '#fff' }).getContext('2d').getImageData(0, 0, 1, 1).data;
         const whiteBackground = [...filled].every(v => v === 255); lc.reset();
-        let oversized = false; try { api.toCanvas(lc, { width: 6000, height: 6000 }); } catch { oversized = true; }
+        const capped = api.toCanvas(lc, { width: 6000, height: 6000 });
+        const oversized = capped.width === 4096 && capped.height === 4096;
+        capped.width = capped.height = 0;
         const host = document.createElement('div'); host.style.cssText = 'width:300px;height:200px'; document.body.append(host);
         const other = new api.LeanCropper(host), loading = other.load('./fixtures/landmarks.png').then(() => 'loaded', e => e.name);
         other.destroy(); other.destroy(); const aborted = await loading;
@@ -207,7 +209,7 @@ try {
       const delta = await page.evaluate(async () => {
         const { LeanCropper: Native } = await import('../dist/core-dommatrix.js');
         const host = document.createElement('div'); host.style.cssText = 'width:640px;height:480px'; document.body.append(host);
-        const other = new Native(host); await other.load('./fixtures/orientation-6.jpg');
+        const other = new Native(host, {coverage:'free'}); await other.load('./fixtures/orientation-6.jpg');
         lc.reset(); other.setState(lc.getState());
         for (const cropper of [lc, other]) { cropper.rotate(43.29); cropper.flip('vertical'); cropper.zoom(1.3, { x: 155, y: 224 }); cropper.pan(-12, 33); }
         const error = Math.max(...lc.getState().transform.map((v, i) => Math.abs(v - other.getState().transform[i])));

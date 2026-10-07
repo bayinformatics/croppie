@@ -5,7 +5,10 @@
 <script type="module">
 import {LeanCropper} from '../dist/core.js';
 import {toCanvas,toBlob} from '../dist/export.js';
-window.api={LeanCropper,toCanvas,toBlob};
-window.lc=new LeanCropper(document.querySelector('#host'));
+import {drawCroppedImage} from '../dist/production-export.js';
+import {readJpegOrientation,readBlobOrientation} from '../dist/exif.js';
+window.api={LeanCropper,toCanvas,toBlob,drawCroppedImage,readJpegOrientation,readBlobOrientation};
+// This suite preserves the original free-mode geometry checks. Fill has a separate suite.
+window.lc=new LeanCropper(document.querySelector('#host'),{coverage:'free'});
 window.ready=lc.load('./fixtures/landmarks.png');
 </script>

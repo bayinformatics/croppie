@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Lean cropper experiment</title>
+  <title>Hybrid cropper experiment</title>
   <link rel="stylesheet" href="./core.css"><link rel="stylesheet" href="./demo.css">
 </head>
 <body>
 <main>
-  <header><h1>Make the cut.</h1><p>Lean cropper experiment</p></header>
+  <header><h1>Make the cut.</h1><p>Hybrid cropper experiment</p></header>
   <div class="workspace">
     <section aria-label="Image workspace">
       <div id="editor" aria-describedby="hint"></div>
@@ -20,19 +20,22 @@
       <fieldset id="image-controls" disabled>
         <legend>Image</legend>
         <label for="angle">Rotation angle <output id="degrees" for="angle">0°</output><input id="angle" type="range" min="-180" max="180" step="0.1" value="0"></label>
-        <label>Scale (%)<input id="zoom" type="number" min="0.1" max="6400" step="0.1" value="100"></label>
+        <label>Scale (%)<input id="zoom" type="number" min="0.1" step="0.1" value="100"></label>
         <div class="pair"><button id="flip-x" type="button">Flip horizontal</button><button id="flip-y" type="button">Flip vertical</button></div>
       </fieldset>
       <fieldset id="crop-controls" disabled>
         <legend>Crop</legend>
         <label>Aspect ratio<select id="aspect"><option value="">Free</option><option value="1">Square</option><option value="1.3333333333333333">4:3</option><option value="1.7777777777777777">16:9</option></select></label>
+        <label>Image coverage<select id="coverage"><option value="fill">Keep crop filled</option><option value="free">Allow transparent edges</option></select></label>
+        <label>Crop shape<select id="mask"><option value="rect">Rectangle</option><option value="circle">Ellipse / circle</option></select></label>
         <div class="pair"><label>Width (px)<input id="width" type="number" min="24" step="1"></label><label>Height (px)<input id="height" type="number" min="24" step="1"></label></div>
         <button id="reset" type="button">Reset crop and image</button>
       </fieldset>
+      <label>Export width (px)<input id="export-width" type="number" min="1" step="1" value="512"></label>
       <button class="primary" id="export" type="button" disabled>Export PNG</button>
     </form>
   </div>
-  <details><summary>Keyboard controls and prototype limits</summary><p>Focus the image and use arrow keys to pan, or + / − to zoom. Focus a crop handle and use arrow keys to resize or move it. Hold Shift for 10-pixel steps. Every control works with a keyboard.</p><p>Empty areas export as transparency. Export preserves the original image as its source, but uses one Canvas resampling pass. Large reductions can show aliasing in Firefox and Safari. This prototype has no undo history, metadata preservation, or guarantee that the image fills the crop.</p></details>
+  <details><summary>Keyboard controls and experiment limits</summary><p>Focus the image and use arrow keys to pan, or + / − to zoom. Focus a crop handle and use arrow keys to resize or move it. Hold Shift for 10-pixel steps.</p><p>The image stays inside the crop's coverage limits by default. Free mode allows transparent edges. Export uses the original image and progressive downsampling; requested sizes preserve proportions and are bounded. This experiment has no undo history or source-metadata preservation. Physical phone and assistive-technology testing remain outstanding.</p></details>
   <footer>Native image preview · Canvas export · No runtime dependencies</footer>
 </main>
 <script type="module" src="./demo.js"></script>

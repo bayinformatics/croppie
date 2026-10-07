@@ -83,9 +83,12 @@ export class LeanCropper {
 
   /** Retains the original encoded Blob; stale/failed loads never replace a good image. */
   async load(input: Blob | string): Promise<CropState> {
-    this.alive(); this.loading?.abort();
+    this.alive();
+    // Let the browser validate Blob branding (including other realms) before canceling a
+    // valid in-flight load. Invalid non-URL input must not supersede it.
+    let url = typeof input === 'string' ? undefined : URL.createObjectURL(input);
+    this.loading?.abort();
     const request = this.loading = new AbortController();
-    let url: string | undefined;
     try {
       let blob: Blob;
       if (typeof input === 'string') {
@@ -94,7 +97,7 @@ export class LeanCropper {
         blob = await response.blob();
       } else blob = input;
       request.signal.throwIfAborted();
-      url = URL.createObjectURL(blob);
+      url ??= URL.createObjectURL(blob);
       const image = new Image();
       image.className = 'lc-image'; image.alt = ''; image.draggable = false;
       image.src = url; await image.decode(); request.signal.throwIfAborted();
