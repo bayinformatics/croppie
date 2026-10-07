@@ -1,0 +1,6265 @@
+{
+  "startedAt": "2026-10-07T03:03:50.130Z",
+  "browser": "webkit",
+  "browserVersion": "26.6",
+  "browserExecutable": "/Users/matthewstingel/Library/Caches/ms-playwright/webkit-2359/pw_run.sh",
+  "playwright": "1.63.0",
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.6.0",
+    "cpu": "Apple M5 Max",
+    "logicalCpus": 18,
+    "totalMemory": 137438953472
+  },
+  "command": {
+    "argv": [
+      "/private/tmp/croppie-performance-2026-10-06/tools/bun",
+      "/Users/matthewstingel/orca/workspaces/croppie/croppie-runtime-experiment/experiments/offscreen-export/run.mjs"
+    ],
+    "phase": "correctness",
+    "browsers": [
+      "chromium",
+      "firefox",
+      "webkit"
+    ],
+    "warmups": 4,
+    "repeats": 10,
+    "fixtures": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/performance/images",
+    "output": "/Users/matthewstingel/orca/workspaces/croppie/croppie-runtime-experiment/experiments/offscreen-export/results"
+  },
+  "manifest": {
+    "head": "1708e6f854ccdd8b038754292d4e7cb151fb0a7f",
+    "bun": "1.4.2",
+    "substitutions": [
+      [
+        "document.createElement(\"canvas\")",
+        "new OffscreenCanvas(1, 1)",
+        2
+      ],
+      [
+        "image: HTMLImageElement,",
+        "image: ImageBitmap,",
+        1
+      ],
+      [
+        "): HTMLCanvasElement {",
+        "): OffscreenCanvas {",
+        1
+      ],
+      [
+        "image.naturalWidth",
+        "image.width",
+        1
+      ],
+      [
+        "image.naturalHeight",
+        "image.height",
+        1
+      ]
+    ],
+    "drawSourceSha256": "f7e4c1a5623175d7174c0d05545876d2817d598f44178dbb2990e6ac53e93a85",
+    "adaptedDrawSha256": "e8c5b46289f6b8baafdf9ee1d2fd8bdf1dcb4afe38de916a21d5b263d7b6aac9",
+    "sources": {
+      "src/canvas/draw.ts": "f7e4c1a5623175d7174c0d05545876d2817d598f44178dbb2990e6ac53e93a85",
+      "src/utils/limits.ts": "c5a3c7919c086e11995a1204b5407cf30b74684ef9ee36ad79f11ada9dd73898",
+      "src/utils/points.ts": "e6d739eb029d72ff1164fc1eed92d2d8fbf3b571b583846ae93aaffa6c75e844",
+      "src/utils/rotation.ts": "b3c8aba02c94e51ebc170f8a7aeebd56c1dad5cd2a1a07641dc0e0452fe4c5cb",
+      "experiments/offscreen-export/build.mjs": "dd96ee0650229936400e6c76bbf9b7e09fbf51ca0e19711d5934ca0b61d2246c",
+      "experiments/offscreen-export/loader.mjs": "28c9088e97ec82899b55d4971b194239e0a1d82b3b04764d3495f19c7cb29e4e",
+      "experiments/offscreen-export/worker.ts": "bf0507c8623c9d4dee7089669ba73e1aedc45ac28b9ce97fb4556b51e5ec7f93",
+      "experiments/offscreen-export/harness.mjs": "5f8f46e11e8e260575a1d91f29f22258dd97ddfed71f5c20fd3a24db4d661321",
+      "experiments/offscreen-export/run.mjs": "0301f61e9fdf45bd20f44f15e1aa87d75b8089dd142cc7dbeb0f471748d8391c"
+    },
+    "sizes": {
+      "node": "v24.16.0",
+      "files": [
+        {
+          "name": "native.js",
+          "raw": 2455,
+          "gzip9": 1131,
+          "sha256": "4471be3b31cbc11eb74b2cfd5905f0b6b6cd8aa691466ed5ca9bc88673d1f084"
+        },
+        {
+          "name": "loader.js",
+          "raw": 1096,
+          "gzip9": 608,
+          "sha256": "9d27d61862e7ff045400c55e17d920ea6bcdd4c8651f0b116a14f1354bfdb713"
+        },
+        {
+          "name": "worker.js",
+          "raw": 2924,
+          "gzip9": 1328,
+          "sha256": "0dbbb9c47a347a72a35d6d99f1b0104ff48574fbe8d2b24efa293bdb52390e2b"
+        },
+        {
+          "name": "harness.js",
+          "raw": 6394,
+          "gzip9": 2864,
+          "sha256": "baead960988e9f91ea03dcf7210eef0fba9d4efa0b1dee3213bd67ed3b051752"
+        },
+        {
+          "name": "croppie.js",
+          "raw": 24266,
+          "gzip9": 8238,
+          "sha256": "011e37d903481586556c98348351cc689ca6ff6df2b71846cd1485b633d640fc"
+        },
+        {
+          "name": "croppie.css",
+          "raw": 4257,
+          "gzip9": 1354,
+          "sha256": "6652d810fc6622db70adb139b3a159f37e3c4978b36f302708fa2c378319aae0"
+        }
+      ],
+      "isolatedNative": {
+        "raw": 2455,
+        "gzip9": 1131
+      },
+      "isolatedWorkerIncludingLoader": {
+        "raw": 4020,
+        "gzip9": 1936
+      },
+      "fullNative": {
+        "raw": 28523,
+        "gzip9": 9592
+      },
+      "fullNativePlusWorker": {
+        "raw": 32543,
+        "gzip9": 11528
+      },
+      "wholeBenchmarkRuntime": {
+        "raw": 12869,
+        "gzip9": 5931
+      }
+    }
+  },
+  "fixtureMetadata": [
+    {
+      "name": "photo-12mp.jpg",
+      "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/performance/images/photo-12mp.jpg",
+      "bytes": 4244657,
+      "sha256": "138044d384489e2d8a11cd4eb125ea20ac3de1c1465cbb14c1fb41f64735eb18"
+    },
+    {
+      "name": "photo-48mp.jpg",
+      "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/performance/images/photo-48mp.jpg",
+      "bytes": 11006443,
+      "sha256": "694d490c6411aced1d979e340a82ad53f075c125a1b392ee6c192342512fc7dc"
+    },
+    {
+      "name": "transparent.png",
+      "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/performance/images/transparent.png",
+      "bytes": 9875,
+      "sha256": "174c216d215a724c4a2d208d0f0dc793c26fffff45be0599f6b0ccdf338df16d"
+    }
+  ],
+  "blockedRequests": [],
+  "fixtures": [
+    {
+      "name": "photo-12mp.jpg",
+      "bytes": 4244657,
+      "mime": "image/jpeg",
+      "sha256": "138044d384489e2d8a11cd4eb125ea20ac3de1c1465cbb14c1fb41f64735eb18",
+      "dimensions": [
+        4000,
+        3000
+      ],
+      "nativeDecodeMs": 66,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 6
+      }
+    },
+    {
+      "name": "photo-48mp.jpg",
+      "bytes": 11006443,
+      "mime": "image/jpeg",
+      "sha256": "694d490c6411aced1d979e340a82ad53f075c125a1b392ee6c192342512fc7dc",
+      "dimensions": [
+        8000,
+        6000
+      ],
+      "nativeDecodeMs": 177,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "transparent.png",
+      "bytes": 9875,
+      "mime": "image/png",
+      "sha256": "174c216d215a724c4a2d208d0f0dc793c26fffff45be0599f6b0ccdf338df16d",
+      "dimensions": [
+        1600,
+        1200
+      ],
+      "nativeDecodeMs": 6,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "exif-1",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "8f65b3cfb5c16f84ac3806f9bc82d674c153170735ab7356eba09f02c765c49c",
+      "dimensions": [
+        400,
+        240
+      ],
+      "nativeDecodeMs": 2,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "exif-2",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "31aa8d90e34a11fcfae07964c6bac0cca9e858c59a78e4b9d89cf535ccfd11ae",
+      "dimensions": [
+        400,
+        240
+      ],
+      "nativeDecodeMs": 2,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "exif-3",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "4a1bc0f127fd02eecbb82dea482ac1c8998da07eda10713958f38a88f1b6f4a8",
+      "dimensions": [
+        400,
+        240
+      ],
+      "nativeDecodeMs": 2,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "exif-4",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "04462c786b0e5a5f081e37068af5911e723c5528452d13996133332edb34d63d",
+      "dimensions": [
+        400,
+        240
+      ],
+      "nativeDecodeMs": 1,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "exif-5",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "468740ac7b7f503a8dbc0eaf94930130b15fdad62a4ed42312b217bd6890805e",
+      "dimensions": [
+        240,
+        400
+      ],
+      "nativeDecodeMs": 1,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "exif-6",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "90c67b444bf4122f958a6fb3592e5eca270849cbfcd8ee3dd5d27e0866a375ed",
+      "dimensions": [
+        240,
+        400
+      ],
+      "nativeDecodeMs": 2,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 2
+      }
+    },
+    {
+      "name": "exif-7",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "8d691179f7896e54e32bef983ac95e1a7132f20231000d0ee944193eb056df1d",
+      "dimensions": [
+        240,
+        400
+      ],
+      "nativeDecodeMs": 2,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    },
+    {
+      "name": "exif-8",
+      "bytes": 3921,
+      "mime": "image/jpeg",
+      "sha256": "77ecac07f727bc79564f9167fad72f9bf119cfe2d279157a3930ffb173a08a9c",
+      "dimensions": [
+        240,
+        400
+      ],
+      "nativeDecodeMs": 2,
+      "support": {
+        "ready": true,
+        "supported": true,
+        "reason": "",
+        "startupMs": 3
+      }
+    }
+  ],
+  "correctness": [
+    {
+      "name": "photo-12mp.jpg/full-letterbox-256",
+      "spec": {
+        "name": "full-letterbox-256",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 4000,
+          "bottomRightY": 3000
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "0db1746b79eb211099e1b19f18375d44fb7557b8a63ece25d91bfd679fd3ef4a",
+      "nativeBlobBytes": 136653,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 22207,
+          "differentChannels": 27417,
+          "maxChannelDelta": 4,
+          "first": {
+            "x": 0,
+            "y": 34,
+            "channel": 1,
+            "native": 28,
+            "worker": 29
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "db33db7546fd8625bfe7e2c2e9842461b7688acba5c49782437a464f9c354871",
+          "blobBytes": 136542,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 22207,
+          "differentChannels": 27417,
+          "maxChannelDelta": 4,
+          "first": {
+            "x": 0,
+            "y": 34,
+            "channel": 1,
+            "native": 28,
+            "worker": 29
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "db33db7546fd8625bfe7e2c2e9842461b7688acba5c49782437a464f9c354871",
+          "blobBytes": 136542,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/square-256",
+      "spec": {
+        "name": "square-256",
+        "frame": {
+          "topLeftX": 500,
+          "topLeftY": 0,
+          "bottomRightX": 3500,
+          "bottomRightY": 3000
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "f4ee344f11792125872bf7a74c636021c611938f9d60eeaf478bc14baf5d0d78",
+      "nativeBlobBytes": 174310,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "f4ee344f11792125872bf7a74c636021c611938f9d60eeaf478bc14baf5d0d78",
+          "blobBytes": 174310,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "f4ee344f11792125872bf7a74c636021c611938f9d60eeaf478bc14baf5d0d78",
+          "blobBytes": 174310,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/fractional-bars-256",
+      "spec": {
+        "name": "fractional-bars-256",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "c4560beff55a8697dfecdaf44ec5b74f57f42c7e4e020ff2590592f60bb7a8eb",
+      "nativeBlobBytes": 147077,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 17,
+            "y": 12,
+            "channel": 0,
+            "native": 199,
+            "worker": 198
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e924b2876159d9ead4cc3dbe693bdd4ba8bbe286da412ec52d8158770fdeb5e0",
+          "blobBytes": 147061,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 17,
+            "y": 12,
+            "channel": 0,
+            "native": 199,
+            "worker": 198
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e924b2876159d9ead4cc3dbe693bdd4ba8bbe286da412ec52d8158770fdeb5e0",
+          "blobBytes": 147061,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/circle-alpha-256",
+      "spec": {
+        "name": "circle-alpha-256",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "circle": true
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "741ef8b058b0fe3cd31369feb9724b4f0bfca1b3210ae4f5034070934fdde580",
+      "nativeBlobBytes": 130512,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1958,
+          "differentChannels": 2063,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 137,
+            "y": 12,
+            "channel": 1,
+            "native": 172,
+            "worker": 170
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ace40178101aa3a9377f2e97fad8198c1992ff06dabd02bd9ba048830a6fbc0d",
+          "blobBytes": 130573,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1958,
+          "differentChannels": 2063,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 137,
+            "y": 12,
+            "channel": 1,
+            "native": 172,
+            "worker": 170
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ace40178101aa3a9377f2e97fad8198c1992ff06dabd02bd9ba048830a6fbc0d",
+          "blobBytes": 130573,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/circle-background-256",
+      "spec": {
+        "name": "circle-background-256",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "circle": true,
+          "backgroundColor": "#173655"
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "92e12cadd9905fbcb4bff67b2c90b60632b457045e6a421bee134347bf1065b6",
+      "nativeBlobBytes": 129341,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1958,
+          "differentChannels": 2063,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 137,
+            "y": 12,
+            "channel": 1,
+            "native": 151,
+            "worker": 150
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a609e53847ad274c0eb5d9614f2091b2b54bd073f44fd372aa037b33dccc426a",
+          "blobBytes": 129370,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1958,
+          "differentChannels": 2063,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 137,
+            "y": 12,
+            "channel": 1,
+            "native": 151,
+            "worker": 150
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a609e53847ad274c0eb5d9614f2091b2b54bd073f44fd372aa037b33dccc426a",
+          "blobBytes": 129370,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/rotated90-256",
+      "spec": {
+        "name": "rotated90-256",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "rotation": 90
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "715b6887564b686c321733863238f3f5f49925b1e08d46780404ca94ff0230e4",
+      "nativeBlobBytes": 149018,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 75,
+            "y": 9,
+            "channel": 2,
+            "native": 113,
+            "worker": 112
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a54784865a59886cc422acbfaa9c63250deeae3955364b71074c782ae97e8f2c",
+          "blobBytes": 149030,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 75,
+            "y": 9,
+            "channel": 2,
+            "native": 113,
+            "worker": 112
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a54784865a59886cc422acbfaa9c63250deeae3955364b71074c782ae97e8f2c",
+          "blobBytes": 149030,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/rotated180-256",
+      "spec": {
+        "name": "rotated180-256",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "rotation": 180
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "9bb18effabcb086d0fb595a623580b7d8b7037cd9b808eb7ab7be19f82c81083",
+      "nativeBlobBytes": 147522,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 114,
+            "y": 35,
+            "channel": 2,
+            "native": 41,
+            "worker": 42
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e887e6ec7f877a39a143305fc22d2864396a44a7c18876e56b41948fa7bb527b",
+          "blobBytes": 147465,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 114,
+            "y": 35,
+            "channel": 2,
+            "native": 41,
+            "worker": 42
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e887e6ec7f877a39a143305fc22d2864396a44a7c18876e56b41948fa7bb527b",
+          "blobBytes": 147465,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/rotated270-256",
+      "spec": {
+        "name": "rotated270-256",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "rotation": 270
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "4976a308d8d26226e73784e96df30fd7d8a17770b2a4b4647ebf5c88abba25f6",
+      "nativeBlobBytes": 148817,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 22,
+            "y": 0,
+            "channel": 0,
+            "native": 157,
+            "worker": 158
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "1ab46f8f4d17830e12ee7b5b2687cc9849bff19a47403ca85e947fa8a83f4e3f",
+          "blobBytes": 148872,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 2304,
+          "differentChannels": 2422,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 22,
+            "y": 0,
+            "channel": 0,
+            "native": 157,
+            "worker": 158
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "1ab46f8f4d17830e12ee7b5b2687cc9849bff19a47403ca85e947fa8a83f4e3f",
+          "blobBytes": 148872,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/full-letterbox-2048",
+      "spec": {
+        "name": "full-letterbox-2048",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 4000,
+          "bottomRightY": 3000
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "8e481074c62ada57f8bd9ef7e62b5aeb45bbe3a9eb95c94f8eeb32efd46f7a45",
+      "nativeBlobBytes": 7118062,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 125344,
+          "differentChannels": 175943,
+          "maxChannelDelta": 67,
+          "first": {
+            "x": 917,
+            "y": 272,
+            "channel": 0,
+            "native": 4,
+            "worker": 3
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "7791973b4011dd2d82e539d1a8fa323ce8b819635cee5c83b83ba07abdc39193",
+          "blobBytes": 7117009,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 125344,
+          "differentChannels": 175943,
+          "maxChannelDelta": 67,
+          "first": {
+            "x": 917,
+            "y": 272,
+            "channel": 0,
+            "native": 4,
+            "worker": 3
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "7791973b4011dd2d82e539d1a8fa323ce8b819635cee5c83b83ba07abdc39193",
+          "blobBytes": 7117009,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/square-2048",
+      "spec": {
+        "name": "square-2048",
+        "frame": {
+          "topLeftX": 500,
+          "topLeftY": 0,
+          "bottomRightX": 3500,
+          "bottomRightY": 3000
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "baec17a6b4223116172fa25cef7ab5fbb34cffee7c1d2472d2fbbfb9679091d0",
+      "nativeBlobBytes": 9010628,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 358307,
+          "differentChannels": 463868,
+          "maxChannelDelta": 43,
+          "first": {
+            "x": 532,
+            "y": 22,
+            "channel": 0,
+            "native": 21,
+            "worker": 22
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "60ff9230b9b6d33ebfecae9d562482c752008149403689ca3645deb81dbb9be7",
+          "blobBytes": 9009902,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 358307,
+          "differentChannels": 463868,
+          "maxChannelDelta": 43,
+          "first": {
+            "x": 532,
+            "y": 22,
+            "channel": 0,
+            "native": 21,
+            "worker": 22
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "60ff9230b9b6d33ebfecae9d562482c752008149403689ca3645deb81dbb9be7",
+          "blobBytes": 9009902,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/fractional-bars-2048",
+      "spec": {
+        "name": "fractional-bars-2048",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "2d2b5fd1ee47c790319ef63afa06c7a25d9ddabdc11114c62d5e241cd710be4e",
+      "nativeBlobBytes": 7542574,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 260580,
+          "differentChannels": 342799,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 231,
+            "y": 95,
+            "channel": 0,
+            "native": 192,
+            "worker": 187
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ce1a5fd03aa2744375c2c407d285c17b321d4b31de28920e548d9bf2f0616574",
+          "blobBytes": 7541031,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 260580,
+          "differentChannels": 342799,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 231,
+            "y": 95,
+            "channel": 0,
+            "native": 192,
+            "worker": 187
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ce1a5fd03aa2744375c2c407d285c17b321d4b31de28920e548d9bf2f0616574",
+          "blobBytes": 7541031,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/circle-alpha-2048",
+      "spec": {
+        "name": "circle-alpha-2048",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "circle": true
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "3be6bb683aae100b4d2b068286b92fc9685de9b02ae42c3a571453611c9020b7",
+      "nativeBlobBytes": 6548428,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 227533,
+          "differentChannels": 299426,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 2,
+            "native": 173,
+            "worker": 172
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e0015bf5e035918d5c1b4f97cd5061e5e7eb177cc86b59bf4caf394c9c43da2c",
+          "blobBytes": 6547155,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 227533,
+          "differentChannels": 299426,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 2,
+            "native": 173,
+            "worker": 172
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e0015bf5e035918d5c1b4f97cd5061e5e7eb177cc86b59bf4caf394c9c43da2c",
+          "blobBytes": 6547155,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/circle-background-2048",
+      "spec": {
+        "name": "circle-background-2048",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "circle": true,
+          "backgroundColor": "#173655"
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "081982a7eb443ec4b89ce119211e4d634ddac6849babd0b7f8b35c6d36b10309",
+      "nativeBlobBytes": 6535757,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 227533,
+          "differentChannels": 299426,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 2,
+            "native": 173,
+            "worker": 172
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "c2016423ca00d5bc727c1f9d65f805d20b38675ed3a551ac6877e64cf88f82c5",
+          "blobBytes": 6534873,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 227533,
+          "differentChannels": 299426,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 2,
+            "native": 173,
+            "worker": 172
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "c2016423ca00d5bc727c1f9d65f805d20b38675ed3a551ac6877e64cf88f82c5",
+          "blobBytes": 6534873,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/rotated90-2048",
+      "spec": {
+        "name": "rotated90-2048",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "rotation": 90
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "49846d6c919cffc5f73576b9bcff6f74c8cbe8c02dfedb2e8ac3ead60b05001e",
+      "nativeBlobBytes": 7645019,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 222169,
+          "differentChannels": 295294,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 367,
+            "y": 76,
+            "channel": 1,
+            "native": 30,
+            "worker": 31
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "b1134635e0913fe34a57af8780507ce5d69d2091ae14895ac3abac9d1ec202aa",
+          "blobBytes": 7643401,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 222169,
+          "differentChannels": 295294,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 367,
+            "y": 76,
+            "channel": 1,
+            "native": 30,
+            "worker": 31
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "b1134635e0913fe34a57af8780507ce5d69d2091ae14895ac3abac9d1ec202aa",
+          "blobBytes": 7643401,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/rotated180-2048",
+      "spec": {
+        "name": "rotated180-2048",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "rotation": 180
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "2232a5653f873e48a9c1ff4d10446bd27fe4d154ff4766b9f946ed5c366e1bf7",
+      "nativeBlobBytes": 7562322,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 243768,
+          "differentChannels": 322044,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 280,
+            "y": 279,
+            "channel": 2,
+            "native": 2,
+            "worker": 1
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "896bef34ba154f570c715b44b2771481dee629958b43ef293dbb13c77c31b5fc",
+          "blobBytes": 7559548,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 243768,
+          "differentChannels": 322044,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 280,
+            "y": 279,
+            "channel": 2,
+            "native": 2,
+            "worker": 1
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "896bef34ba154f570c715b44b2771481dee629958b43ef293dbb13c77c31b5fc",
+          "blobBytes": 7559548,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-12mp.jpg/rotated270-2048",
+      "spec": {
+        "name": "rotated270-2048",
+        "frame": {
+          "topLeftX": -124.625,
+          "topLeftY": 218.12499999999997,
+          "bottomRightX": 3250.25,
+          "bottomRightY": 3281.125
+        },
+        "options": {
+          "rotation": 270
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "3c83776edc5feeb9a17ca1f7d28419f6c213709209da133347c5a16262ec2593",
+      "nativeBlobBytes": 7643331,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 229808,
+          "differentChannels": 304437,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 97,
+            "y": 0,
+            "channel": 0,
+            "native": 133,
+            "worker": 134
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "cfbcb4455d2a0b6279b80a3609b6a475b647ddc9ed281a937eecbd86b5fc39a6",
+          "blobBytes": 7640766,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 229808,
+          "differentChannels": 304437,
+          "maxChannelDelta": 48,
+          "first": {
+            "x": 97,
+            "y": 0,
+            "channel": 0,
+            "native": 133,
+            "worker": 134
+          },
+          "dimensions": [
+            4000,
+            3000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "cfbcb4455d2a0b6279b80a3609b6a475b647ddc9ed281a937eecbd86b5fc39a6",
+          "blobBytes": 7640766,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/full-letterbox-256",
+      "spec": {
+        "name": "full-letterbox-256",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 8000,
+          "bottomRightY": 6000
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "237ecc2e52d062f1f72bb62536eff078a5796abe1238b118740b26144404c196",
+      "nativeBlobBytes": 136335,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 16162,
+          "differentChannels": 18713,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 5,
+            "y": 34,
+            "channel": 1,
+            "native": 21,
+            "worker": 20
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "7de76aae3c07624bfaac44f82c97e84931cdd8b54c82ae0520a04bb0a58873b1",
+          "blobBytes": 136359,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 16162,
+          "differentChannels": 18713,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 5,
+            "y": 34,
+            "channel": 1,
+            "native": 21,
+            "worker": 20
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "7de76aae3c07624bfaac44f82c97e84931cdd8b54c82ae0520a04bb0a58873b1",
+          "blobBytes": 136359,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/square-256",
+      "spec": {
+        "name": "square-256",
+        "frame": {
+          "topLeftX": 1000,
+          "topLeftY": 0,
+          "bottomRightX": 7000,
+          "bottomRightY": 6000
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "2d5368e3dc27192847c3f3e88119d7fe1ba02e228221e6e152df73ddb8ff3c32",
+      "nativeBlobBytes": 174123,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "2d5368e3dc27192847c3f3e88119d7fe1ba02e228221e6e152df73ddb8ff3c32",
+          "blobBytes": 174123,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "2d5368e3dc27192847c3f3e88119d7fe1ba02e228221e6e152df73ddb8ff3c32",
+          "blobBytes": 174123,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/fractional-bars-256",
+      "spec": {
+        "name": "fractional-bars-256",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "3480d6936332bc90e9cb3096227e7d53febdbfc2c6d230169d2a49720dbd5f63",
+      "nativeBlobBytes": 146860,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 80,
+            "y": 12,
+            "channel": 0,
+            "native": 163,
+            "worker": 162
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6d084051a5d20f63a4e3c59efe8ab825155e4e710897e85c9c95ac37c34aa2d9",
+          "blobBytes": 146802,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 80,
+            "y": 12,
+            "channel": 0,
+            "native": 163,
+            "worker": 162
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6d084051a5d20f63a4e3c59efe8ab825155e4e710897e85c9c95ac37c34aa2d9",
+          "blobBytes": 146802,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/circle-alpha-256",
+      "spec": {
+        "name": "circle-alpha-256",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "circle": true
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "a8ed99f08c0f9600ca53e04b76ad12e9b9f0ec2f7dc14ce6b1f63de4a01f241e",
+      "nativeBlobBytes": 130247,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1480,
+          "differentChannels": 1530,
+          "maxChannelDelta": 3,
+          "first": {
+            "x": 109,
+            "y": 14,
+            "channel": 2,
+            "native": 141,
+            "worker": 142
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "fbb61063366ef206982a0a2b368e3820419a3061304e2b2947a3cfe93ec7f6ce",
+          "blobBytes": 130233,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1480,
+          "differentChannels": 1530,
+          "maxChannelDelta": 3,
+          "first": {
+            "x": 109,
+            "y": 14,
+            "channel": 2,
+            "native": 141,
+            "worker": 142
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "fbb61063366ef206982a0a2b368e3820419a3061304e2b2947a3cfe93ec7f6ce",
+          "blobBytes": 130233,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/circle-background-256",
+      "spec": {
+        "name": "circle-background-256",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "circle": true,
+          "backgroundColor": "#173655"
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "7445b7d4ba46fcfc9c4a5caca114a55165fe55cf68f558a00e31ae7775830054",
+      "nativeBlobBytes": 129200,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1480,
+          "differentChannels": 1530,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 109,
+            "y": 14,
+            "channel": 2,
+            "native": 141,
+            "worker": 142
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6804d5d9718ee28e8d4b1f4d03edb31dc64ccb6691cf74359784cecf931c2cb9",
+          "blobBytes": 129182,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1480,
+          "differentChannels": 1530,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 109,
+            "y": 14,
+            "channel": 2,
+            "native": 141,
+            "worker": 142
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6804d5d9718ee28e8d4b1f4d03edb31dc64ccb6691cf74359784cecf931c2cb9",
+          "blobBytes": 129182,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/rotated90-256",
+      "spec": {
+        "name": "rotated90-256",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "rotation": 90
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "98bb9084185dab34389b9fa2141cfbc1c9255a83efd26a200b2496e125502a56",
+      "nativeBlobBytes": 148762,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 54,
+            "y": 9,
+            "channel": 0,
+            "native": 89,
+            "worker": 90
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "03d8e48aea6d7b968f373692725a291297b907c015dfb4b93e34266a59a8f824",
+          "blobBytes": 148737,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 54,
+            "y": 9,
+            "channel": 0,
+            "native": 89,
+            "worker": 90
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "03d8e48aea6d7b968f373692725a291297b907c015dfb4b93e34266a59a8f824",
+          "blobBytes": 148737,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/rotated180-256",
+      "spec": {
+        "name": "rotated180-256",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "rotation": 180
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "54e59052c01133e857441f0307cf241c726722dbb8bf4a11fe5c73f0464e6cfa",
+      "nativeBlobBytes": 147527,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 110,
+            "y": 35,
+            "channel": 2,
+            "native": 39,
+            "worker": 38
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "b5a862f4eaff1072ecdceb7a90f15df93ae81a1a5bb5d703324954b4b62c1598",
+          "blobBytes": 147520,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 110,
+            "y": 35,
+            "channel": 2,
+            "native": 39,
+            "worker": 38
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "b5a862f4eaff1072ecdceb7a90f15df93ae81a1a5bb5d703324954b4b62c1598",
+          "blobBytes": 147520,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/rotated270-256",
+      "spec": {
+        "name": "rotated270-256",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "rotation": 270
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "b9623cc3cd1098cf4b445af7f36d2bdc5fbabfe0bf25e2c3086f6bc7a975dd4c",
+      "nativeBlobBytes": 148568,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 33,
+            "y": 0,
+            "channel": 1,
+            "native": 97,
+            "worker": 98
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "2bd111f7e7c23f2d67fa7947aee4e0f1999b78dfba725f517543db558d531950",
+          "blobBytes": 148567,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1728,
+          "differentChannels": 1780,
+          "maxChannelDelta": 1,
+          "first": {
+            "x": 33,
+            "y": 0,
+            "channel": 1,
+            "native": 97,
+            "worker": 98
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "2bd111f7e7c23f2d67fa7947aee4e0f1999b78dfba725f517543db558d531950",
+          "blobBytes": 148567,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/full-letterbox-2048",
+      "spec": {
+        "name": "full-letterbox-2048",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 8000,
+          "bottomRightY": 6000
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "d28c20867a95380f32bf3c4b605e709241fa34db25f60a3c52693a6ee649373d",
+      "nativeBlobBytes": 7126950,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "d28c20867a95380f32bf3c4b605e709241fa34db25f60a3c52693a6ee649373d",
+          "blobBytes": 7126950,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "d28c20867a95380f32bf3c4b605e709241fa34db25f60a3c52693a6ee649373d",
+          "blobBytes": 7126950,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/square-2048",
+      "spec": {
+        "name": "square-2048",
+        "frame": {
+          "topLeftX": 1000,
+          "topLeftY": 0,
+          "bottomRightX": 7000,
+          "bottomRightY": 6000
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "abb269c2abf2c4cde96cb39e68c8853b4f8db7b5437f4016bb10675321bda89d",
+      "nativeBlobBytes": 9048118,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "abb269c2abf2c4cde96cb39e68c8853b4f8db7b5437f4016bb10675321bda89d",
+          "blobBytes": 9048118,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "abb269c2abf2c4cde96cb39e68c8853b4f8db7b5437f4016bb10675321bda89d",
+          "blobBytes": 9048118,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/fractional-bars-2048",
+      "spec": {
+        "name": "fractional-bars-2048",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "fba807fc7da61dc2dbf4982afad1ccfe1c3e547bcce22928a891253c22565aab",
+      "nativeBlobBytes": 7558547,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 102790,
+          "differentChannels": 121965,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 255,
+            "y": 95,
+            "channel": 2,
+            "native": 169,
+            "worker": 168
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6a73e72afda2c62e409764c86787277fbc67bf3a8e4c35691c5adf803cfc8fcc",
+          "blobBytes": 7559260,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 102790,
+          "differentChannels": 121965,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 255,
+            "y": 95,
+            "channel": 2,
+            "native": 169,
+            "worker": 168
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6a73e72afda2c62e409764c86787277fbc67bf3a8e4c35691c5adf803cfc8fcc",
+          "blobBytes": 7559260,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/circle-alpha-2048",
+      "spec": {
+        "name": "circle-alpha-2048",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "circle": true
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "49fc3d23bfe65c520bfda2464ae7c5546a4a8637ca117048f7375bfdea2d80c4",
+      "nativeBlobBytes": 6557817,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 87736,
+          "differentChannels": 103794,
+          "maxChannelDelta": 8,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 0,
+            "native": 156,
+            "worker": 155
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "4fcca91bc8a220710276aa56041bed6726d93ff907acb320e0a6fc5ce0bf026c",
+          "blobBytes": 6557755,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 87736,
+          "differentChannels": 103794,
+          "maxChannelDelta": 8,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 0,
+            "native": 156,
+            "worker": 155
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "4fcca91bc8a220710276aa56041bed6726d93ff907acb320e0a6fc5ce0bf026c",
+          "blobBytes": 6557755,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/circle-background-2048",
+      "spec": {
+        "name": "circle-background-2048",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "circle": true,
+          "backgroundColor": "#173655"
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "e5430f979f13726776691cae35e1971c3b7c5d33b872d2b42c7926bbad9af66e",
+      "nativeBlobBytes": 6548334,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 87736,
+          "differentChannels": 103794,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 0,
+            "native": 156,
+            "worker": 155
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ed9502cc980077ccda7b0bb8d1dd65a8a631587184a3681f7eb77bf580cc327c",
+          "blobBytes": 6548310,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 87736,
+          "differentChannels": 103794,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 1024,
+            "y": 96,
+            "channel": 0,
+            "native": 156,
+            "worker": 155
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ed9502cc980077ccda7b0bb8d1dd65a8a631587184a3681f7eb77bf580cc327c",
+          "blobBytes": 6548310,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/rotated90-2048",
+      "spec": {
+        "name": "rotated90-2048",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "rotation": 90
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "6189db029d73f80bba411f750f6a5d86ff91de2ff9a2493db4d839d5ea91bdd9",
+      "nativeBlobBytes": 7662798,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 102817,
+          "differentChannels": 122009,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 292,
+            "y": 76,
+            "channel": 0,
+            "native": 13,
+            "worker": 14
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "118a681d0cee22e4353ba582308b553fa8a8fb3be1d86007560920de7042aedd",
+          "blobBytes": 7662578,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 102817,
+          "differentChannels": 122009,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 292,
+            "y": 76,
+            "channel": 0,
+            "native": 13,
+            "worker": 14
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "118a681d0cee22e4353ba582308b553fa8a8fb3be1d86007560920de7042aedd",
+          "blobBytes": 7662578,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/rotated180-2048",
+      "spec": {
+        "name": "rotated180-2048",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "rotation": 180
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "bdb4a4517f08d9687e80332b945558d0c4fe7a071e6efaf345c6f80c6cf27eed",
+      "nativeBlobBytes": 7579828,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 102809,
+          "differentChannels": 121999,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 547,
+            "y": 282,
+            "channel": 2,
+            "native": 3,
+            "worker": 2
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e4ca5d83ad5b5ea4db014af4a27ffb1ea4d6f2469777c15ea5e7e7c7f8073a88",
+          "blobBytes": 7580026,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 102809,
+          "differentChannels": 121999,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 547,
+            "y": 282,
+            "channel": 2,
+            "native": 3,
+            "worker": 2
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "e4ca5d83ad5b5ea4db014af4a27ffb1ea4d6f2469777c15ea5e7e7c7f8073a88",
+          "blobBytes": 7580026,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "photo-48mp.jpg/rotated270-2048",
+      "spec": {
+        "name": "rotated270-2048",
+        "frame": {
+          "topLeftX": -249.625,
+          "topLeftY": 435.62499999999994,
+          "bottomRightX": 6500.25,
+          "bottomRightY": 6562.375
+        },
+        "options": {
+          "rotation": 270
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "ee67c0e9aa133c8cd23761d34b471121fe2017c653cc1e1eb429f15393d1ec1b",
+      "nativeBlobBytes": 7660211,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 102795,
+          "differentChannels": 121970,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 188,
+            "y": 0,
+            "channel": 1,
+            "native": 180,
+            "worker": 179
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "c9c36ddf7cc421620238fb628177863a002ed612068bcc666bf8de4d89f82641",
+          "blobBytes": 7660500,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 102795,
+          "differentChannels": 121970,
+          "maxChannelDelta": 2,
+          "first": {
+            "x": 188,
+            "y": 0,
+            "channel": 1,
+            "native": 180,
+            "worker": 179
+          },
+          "dimensions": [
+            8000,
+            6000
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "c9c36ddf7cc421620238fb628177863a002ed612068bcc666bf8de4d89f82641",
+          "blobBytes": 7660500,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/full-letterbox-256",
+      "spec": {
+        "name": "full-letterbox-256",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 1600,
+          "bottomRightY": 1200
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "b46be81935f3f1c8eacfa28c8db13038606be08acb68fcd5cf4c657803011626",
+      "nativeBlobBytes": 2092,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1526,
+          "differentChannels": 4578,
+          "maxChannelDelta": 204,
+          "first": {
+            "x": 16,
+            "y": 47,
+            "channel": 0,
+            "native": 204,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "0b8a0c1a5183b5c1af606878c6f5cd8ff541b2d85160a6b2acac12401faf211a",
+          "blobBytes": 1899,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1526,
+          "differentChannels": 4578,
+          "maxChannelDelta": 204,
+          "first": {
+            "x": 16,
+            "y": 47,
+            "channel": 0,
+            "native": 204,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "0b8a0c1a5183b5c1af606878c6f5cd8ff541b2d85160a6b2acac12401faf211a",
+          "blobBytes": 1899,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/square-256",
+      "spec": {
+        "name": "square-256",
+        "frame": {
+          "topLeftX": 200,
+          "topLeftY": 0,
+          "bottomRightX": 1400,
+          "bottomRightY": 1200
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "817188c4964da11a90bfcac35fce294497e9e131613848b62493ee476985bd32",
+      "nativeBlobBytes": 2306,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1578,
+          "differentChannels": 4480,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 0,
+            "y": 20,
+            "channel": 0,
+            "native": 191,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6312e55033708a988fc539fd80b9120f9d2d1fb710bdb3078809d3e287eeb3ce",
+          "blobBytes": 2098,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1578,
+          "differentChannels": 4480,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 0,
+            "y": 20,
+            "channel": 0,
+            "native": 191,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6312e55033708a988fc539fd80b9120f9d2d1fb710bdb3078809d3e287eeb3ce",
+          "blobBytes": 2098,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/fractional-bars-256",
+      "spec": {
+        "name": "fractional-bars-256",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "6aa28b55fd160874eec2b37950ace54b63944622f4af028d82f8cfef70f4d864",
+      "nativeBlobBytes": 2198,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 28,
+            "y": 13,
+            "channel": 0,
+            "native": 255,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "3abaf12d66dd9dfeca1550c9aa7a402569647b7de8e0c9ff9484c3cba0cc19c4",
+          "blobBytes": 2071,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 28,
+            "y": 13,
+            "channel": 0,
+            "native": 255,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "3abaf12d66dd9dfeca1550c9aa7a402569647b7de8e0c9ff9484c3cba0cc19c4",
+          "blobBytes": 2071,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/circle-alpha-256",
+      "spec": {
+        "name": "circle-alpha-256",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "circle": true
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "6e97337d6e9ce03cea19e24e22648f5f1f48fe4ec44650b7875f4f8417c3eff5",
+      "nativeBlobBytes": 3898,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1165,
+          "differentChannels": 3541,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 107,
+            "y": 13,
+            "channel": 0,
+            "native": 255,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "18c80d7078642000c5e3a36ef1260d2095f826c94f3170dc1f5bf0900d474fc1",
+          "blobBytes": 3777,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1165,
+          "differentChannels": 3541,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 107,
+            "y": 13,
+            "channel": 0,
+            "native": 255,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "18c80d7078642000c5e3a36ef1260d2095f826c94f3170dc1f5bf0900d474fc1",
+          "blobBytes": 3777,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/circle-background-256",
+      "spec": {
+        "name": "circle-background-256",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "circle": true,
+          "backgroundColor": "#173655"
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "fa8eb22352face319a14f4fa5651a701cb3c014d22eb86ef94a9dcd9a0c83f1e",
+      "nativeBlobBytes": 3852,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1164,
+          "differentChannels": 2174,
+          "maxChannelDelta": 12,
+          "first": {
+            "x": 107,
+            "y": 13,
+            "channel": 0,
+            "native": 24,
+            "worker": 23
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ac4c8cee559475aa94c1c0f31f975ff6e95d1ec0babcab5f328a2f33f39015fc",
+          "blobBytes": 3677,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1164,
+          "differentChannels": 2174,
+          "maxChannelDelta": 12,
+          "first": {
+            "x": 107,
+            "y": 13,
+            "channel": 0,
+            "native": 24,
+            "worker": 23
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "ac4c8cee559475aa94c1c0f31f975ff6e95d1ec0babcab5f328a2f33f39015fc",
+          "blobBytes": 3677,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/rotated90-256",
+      "spec": {
+        "name": "rotated90-256",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "rotation": 90
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "b56d2aa44a5aabf91d35f5d92f4278a7588c90c50d89fa3f166aef6ebfa10e16",
+      "nativeBlobBytes": 2408,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 147,
+            "y": 27,
+            "channel": 0,
+            "native": 219,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "73468a99db9a6a7547e084925a21e55cb6afbad7cc6bb57f1f2d549130ffc12c",
+          "blobBytes": 2149,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 147,
+            "y": 27,
+            "channel": 0,
+            "native": 219,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "73468a99db9a6a7547e084925a21e55cb6afbad7cc6bb57f1f2d549130ffc12c",
+          "blobBytes": 2149,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/rotated180-256",
+      "spec": {
+        "name": "rotated180-256",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "rotation": 180
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "5f1cc207e79f6bc4eaba0768b39ca7ece2f40430a580aa935814b643ba670ddd",
+      "nativeBlobBytes": 2271,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 0,
+            "y": 51,
+            "channel": 1,
+            "native": 153,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "059b3cb46e195d4a1f26c0697d48d13e302caeb65387df50cd0997e75d7de6fd",
+          "blobBytes": 2049,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 0,
+            "y": 51,
+            "channel": 1,
+            "native": 153,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "059b3cb46e195d4a1f26c0697d48d13e302caeb65387df50cd0997e75d7de6fd",
+          "blobBytes": 2049,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/rotated270-256",
+      "spec": {
+        "name": "rotated270-256",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "rotation": 270
+        },
+        "width": 256,
+        "height": 256
+      },
+      "nativeDecodedSha256": "1d268479cb700493eb6dfaecd36d9428a3a3e700ca000d5e951a4e38ccf62f88",
+      "nativeBlobBytes": 2399,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 108,
+            "y": 0,
+            "channel": 2,
+            "native": 255,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "4d8ca3b3028d0f95e1238a4c8a5db31a374f5bbeadfa48428c32036f660b6621",
+          "blobBytes": 2002,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1474,
+          "differentChannels": 4462,
+          "maxChannelDelta": 255,
+          "first": {
+            "x": 108,
+            "y": 0,
+            "channel": 2,
+            "native": 255,
+            "worker": 0
+          },
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "4d8ca3b3028d0f95e1238a4c8a5db31a374f5bbeadfa48428c32036f660b6621",
+          "blobBytes": 2002,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/full-letterbox-2048",
+      "spec": {
+        "name": "full-letterbox-2048",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 1600,
+          "bottomRightY": 1200
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "cc72f892b7f7c9585f45f643d28b9f2adc47bca897da352fbf392fc66b37d1c6",
+      "nativeBlobBytes": 78301,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "cc72f892b7f7c9585f45f643d28b9f2adc47bca897da352fbf392fc66b37d1c6",
+          "blobBytes": 78301,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "cc72f892b7f7c9585f45f643d28b9f2adc47bca897da352fbf392fc66b37d1c6",
+          "blobBytes": 78301,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/square-2048",
+      "spec": {
+        "name": "square-2048",
+        "frame": {
+          "topLeftX": 200,
+          "topLeftY": 0,
+          "bottomRightX": 1400,
+          "bottomRightY": 1200
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "21b5e9b81edb079e9d9506c5e45348ae680e3bdd69a486f346f315fdc4650195",
+      "nativeBlobBytes": 80143,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "21b5e9b81edb079e9d9506c5e45348ae680e3bdd69a486f346f315fdc4650195",
+          "blobBytes": 80143,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "21b5e9b81edb079e9d9506c5e45348ae680e3bdd69a486f346f315fdc4650195",
+          "blobBytes": 80143,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/fractional-bars-2048",
+      "spec": {
+        "name": "fractional-bars-2048",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "195fa32576cd9755591f2c8df7b6d600d42560f4e8f0f313ef6c428ecd2e5544",
+      "nativeBlobBytes": 79398,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "195fa32576cd9755591f2c8df7b6d600d42560f4e8f0f313ef6c428ecd2e5544",
+          "blobBytes": 79398,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "195fa32576cd9755591f2c8df7b6d600d42560f4e8f0f313ef6c428ecd2e5544",
+          "blobBytes": 79398,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/circle-alpha-2048",
+      "spec": {
+        "name": "circle-alpha-2048",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "circle": true
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "8e310a5455ec8f8c23399435403673d413d43e37926b8621260605219e69ac0d",
+      "nativeBlobBytes": 92899,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "8e310a5455ec8f8c23399435403673d413d43e37926b8621260605219e69ac0d",
+          "blobBytes": 92899,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "8e310a5455ec8f8c23399435403673d413d43e37926b8621260605219e69ac0d",
+          "blobBytes": 92899,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/circle-background-2048",
+      "spec": {
+        "name": "circle-background-2048",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "circle": true,
+          "backgroundColor": "#173655"
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "89546d7cb2d31af38286ce9876b8f7d446609e325719da9cabe3a3cb68f44973",
+      "nativeBlobBytes": 93088,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "89546d7cb2d31af38286ce9876b8f7d446609e325719da9cabe3a3cb68f44973",
+          "blobBytes": 93088,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "89546d7cb2d31af38286ce9876b8f7d446609e325719da9cabe3a3cb68f44973",
+          "blobBytes": 93088,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/rotated90-2048",
+      "spec": {
+        "name": "rotated90-2048",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "rotation": 90
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "6a0aa456b2c9c896ef7e01b4ed677f0baf5d0bbdfe7a7721474edef998ac42c8",
+      "nativeBlobBytes": 78474,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6a0aa456b2c9c896ef7e01b4ed677f0baf5d0bbdfe7a7721474edef998ac42c8",
+          "blobBytes": 78474,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "6a0aa456b2c9c896ef7e01b4ed677f0baf5d0bbdfe7a7721474edef998ac42c8",
+          "blobBytes": 78474,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/rotated180-2048",
+      "spec": {
+        "name": "rotated180-2048",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "rotation": 180
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "cf6b98c0e03f0ad96db67d80f63f816adcaa2321c308fd023c64f4da77d6a030",
+      "nativeBlobBytes": 79308,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "cf6b98c0e03f0ad96db67d80f63f816adcaa2321c308fd023c64f4da77d6a030",
+          "blobBytes": 79308,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "cf6b98c0e03f0ad96db67d80f63f816adcaa2321c308fd023c64f4da77d6a030",
+          "blobBytes": 79308,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "transparent.png/rotated270-2048",
+      "spec": {
+        "name": "rotated270-2048",
+        "frame": {
+          "topLeftX": -49.625,
+          "topLeftY": 87.625,
+          "bottomRightX": 1300.25,
+          "bottomRightY": 1312.375
+        },
+        "options": {
+          "rotation": 270
+        },
+        "width": 2048,
+        "height": 2048
+      },
+      "nativeDecodedSha256": "db0df93044f6f216c29906fa7fc6892b679c3c0f230feac3392acb97691c501f",
+      "nativeBlobBytes": 80609,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "db0df93044f6f216c29906fa7fc6892b679c3c0f230feac3392acb97691c501f",
+          "blobBytes": 80609,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            1600,
+            1200
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "db0df93044f6f216c29906fa7fc6892b679c3c0f230feac3392acb97691c501f",
+          "blobBytes": 80609,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-1/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 400,
+        "height": 240,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "1eb846bcdca77a24e226a6c2b920252a3bb59f741f93bc467cd14125fa11280a",
+      "nativeBlobBytes": 2578,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "1eb846bcdca77a24e226a6c2b920252a3bb59f741f93bc467cd14125fa11280a",
+          "blobBytes": 2578,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "1eb846bcdca77a24e226a6c2b920252a3bb59f741f93bc467cd14125fa11280a",
+          "blobBytes": 2578,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "values": [
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            0,
+            254
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-1/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 240,
+        "height": 400,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "f4dcfe3ffedafb3ef0228e73d81afbba366bf59129d2fab0ab26c75e06062f6c",
+      "nativeBlobBytes": 2960,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              0,
+              1,
+              2
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "f4dcfe3ffedafb3ef0228e73d81afbba366bf59129d2fab0ab26c75e06062f6c",
+          "blobBytes": 2960,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              0,
+              1,
+              2
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "f4dcfe3ffedafb3ef0228e73d81afbba366bf59129d2fab0ab26c75e06062f6c",
+          "blobBytes": 2960,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          3,
+          0,
+          1,
+          2
+        ],
+        "values": [
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            255,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-1/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -12.125,
+          "topLeftY": 18.025,
+          "bottomRightX": 325.25,
+          "bottomRightY": 262.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "67659d8e22f202d24ff2e6058db93b00a466c8eb53c0b42390f647ce2f92cbe6",
+      "nativeBlobBytes": 5217,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "67659d8e22f202d24ff2e6058db93b00a466c8eb53c0b42390f647ce2f92cbe6",
+          "blobBytes": 5217,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "67659d8e22f202d24ff2e6058db93b00a466c8eb53c0b42390f647ce2f92cbe6",
+          "blobBytes": 5217,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-2/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 400,
+        "height": 240,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "220fa075cae123ecf5cd447b875afe934a4e2d1761daf5c5a71a3ec84a8003e2",
+      "nativeBlobBytes": 2449,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              0,
+              3,
+              2
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "220fa075cae123ecf5cd447b875afe934a4e2d1761daf5c5a71a3ec84a8003e2",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              0,
+              3,
+              2
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "220fa075cae123ecf5cd447b875afe934a4e2d1761daf5c5a71a3ec84a8003e2",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          1,
+          0,
+          3,
+          2
+        ],
+        "values": [
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            255,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-2/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 240,
+        "height": 400,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "b278a1378322cfc5e3465daea01e0fee1d997f95e12dba066095047e086471be",
+      "nativeBlobBytes": 2985,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              1,
+              0,
+              3
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "b278a1378322cfc5e3465daea01e0fee1d997f95e12dba066095047e086471be",
+          "blobBytes": 2985,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              1,
+              0,
+              3
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "b278a1378322cfc5e3465daea01e0fee1d997f95e12dba066095047e086471be",
+          "blobBytes": 2985,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          2,
+          1,
+          0,
+          3
+        ],
+        "values": [
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            254
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-2/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -12.125,
+          "topLeftY": 18.025,
+          "bottomRightX": 325.25,
+          "bottomRightY": 262.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "34b8c43c8e3f4297f5ca764cfc6d3a03ddfed5b4b61afc52451b0169f109a346",
+      "nativeBlobBytes": 5196,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "34b8c43c8e3f4297f5ca764cfc6d3a03ddfed5b4b61afc52451b0169f109a346",
+          "blobBytes": 5196,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "34b8c43c8e3f4297f5ca764cfc6d3a03ddfed5b4b61afc52451b0169f109a346",
+          "blobBytes": 5196,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-3/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 400,
+        "height": 240,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "784c3fb3ff8e87f47e27693a6cea4a8c6c2a48455a8691db434896fb1d3d4451",
+      "nativeBlobBytes": 2449,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              3,
+              0,
+              1
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "784c3fb3ff8e87f47e27693a6cea4a8c6c2a48455a8691db434896fb1d3d4451",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              3,
+              0,
+              1
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "784c3fb3ff8e87f47e27693a6cea4a8c6c2a48455a8691db434896fb1d3d4451",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          2,
+          3,
+          0,
+          1
+        ],
+        "values": [
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-3/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 240,
+        "height": 400,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "9f38b4aab9976ffbad35c109c474c7e84b886f686f39888acb41852971db3778",
+      "nativeBlobBytes": 2866,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              2,
+              3,
+              0
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "9f38b4aab9976ffbad35c109c474c7e84b886f686f39888acb41852971db3778",
+          "blobBytes": 2866,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              2,
+              3,
+              0
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "9f38b4aab9976ffbad35c109c474c7e84b886f686f39888acb41852971db3778",
+          "blobBytes": 2866,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          1,
+          2,
+          3,
+          0
+        ],
+        "values": [
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            254,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-3/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -12.125,
+          "topLeftY": 18.025,
+          "bottomRightX": 325.25,
+          "bottomRightY": 262.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "42d200ee2771c018e89952c23be75d1993a541d05aee373354fddcfc82be64a1",
+      "nativeBlobBytes": 5228,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "42d200ee2771c018e89952c23be75d1993a541d05aee373354fddcfc82be64a1",
+          "blobBytes": 5228,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "42d200ee2771c018e89952c23be75d1993a541d05aee373354fddcfc82be64a1",
+          "blobBytes": 5228,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-4/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 400,
+        "height": 240,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "90bd1ee69e6236ea3232c5090c278ad80c3231133183086ef2fd7ce3372e9d02",
+      "nativeBlobBytes": 2449,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              2,
+              1,
+              0
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "90bd1ee69e6236ea3232c5090c278ad80c3231133183086ef2fd7ce3372e9d02",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              2,
+              1,
+              0
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "90bd1ee69e6236ea3232c5090c278ad80c3231133183086ef2fd7ce3372e9d02",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "values": [
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            254,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-4/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 400,
+          "bottomRightY": 240
+        },
+        "width": 240,
+        "height": 400,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "29b297c8ec72ebea06b8cd7cbce3f4c46f926780e849fc40b2683f46014f7039",
+      "nativeBlobBytes": 2864,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              3,
+              2,
+              1
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "29b297c8ec72ebea06b8cd7cbce3f4c46f926780e849fc40b2683f46014f7039",
+          "blobBytes": 2864,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              3,
+              2,
+              1
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "29b297c8ec72ebea06b8cd7cbce3f4c46f926780e849fc40b2683f46014f7039",
+          "blobBytes": 2864,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          0,
+          3,
+          2,
+          1
+        ],
+        "values": [
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-4/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -12.125,
+          "topLeftY": 18.025,
+          "bottomRightX": 325.25,
+          "bottomRightY": 262.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "a1115e6d2c45f8088463e6e531b0e34439842259bbadd29cc9e9a105d9316444",
+      "nativeBlobBytes": 5167,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a1115e6d2c45f8088463e6e531b0e34439842259bbadd29cc9e9a105d9316444",
+          "blobBytes": 5167,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            400,
+            240
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a1115e6d2c45f8088463e6e531b0e34439842259bbadd29cc9e9a105d9316444",
+          "blobBytes": 5167,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-5/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 240,
+        "height": 400,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "29b297c8ec72ebea06b8cd7cbce3f4c46f926780e849fc40b2683f46014f7039",
+      "nativeBlobBytes": 2864,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              3,
+              2,
+              1
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "29b297c8ec72ebea06b8cd7cbce3f4c46f926780e849fc40b2683f46014f7039",
+          "blobBytes": 2864,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              3,
+              2,
+              1
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "29b297c8ec72ebea06b8cd7cbce3f4c46f926780e849fc40b2683f46014f7039",
+          "blobBytes": 2864,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          0,
+          3,
+          2,
+          1
+        ],
+        "values": [
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-5/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 400,
+        "height": 240,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "220fa075cae123ecf5cd447b875afe934a4e2d1761daf5c5a71a3ec84a8003e2",
+      "nativeBlobBytes": 2449,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              0,
+              3,
+              2
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "220fa075cae123ecf5cd447b875afe934a4e2d1761daf5c5a71a3ec84a8003e2",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              0,
+              3,
+              2
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "220fa075cae123ecf5cd447b875afe934a4e2d1761daf5c5a71a3ec84a8003e2",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          1,
+          0,
+          3,
+          2
+        ],
+        "values": [
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            255,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-5/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -7.125,
+          "topLeftY": 29.624999999999996,
+          "bottomRightX": 195.25,
+          "bottomRightY": 437.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "3f5dc4d14c9804177785e71b5d697f4c07738b3817943fe008aa8aafe42955cc",
+      "nativeBlobBytes": 5206,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 2067,
+          "differentChannels": 3656,
+          "maxChannelDelta": 92,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 2,
+            "native": 2,
+            "worker": 0
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "12a1b72de7ebf06ac7756201b348983162d8d7636cc2439887a2039c6ff4d843",
+          "blobBytes": 5013,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 2067,
+          "differentChannels": 3656,
+          "maxChannelDelta": 92,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 2,
+            "native": 2,
+            "worker": 0
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "12a1b72de7ebf06ac7756201b348983162d8d7636cc2439887a2039c6ff4d843",
+          "blobBytes": 5013,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-6/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 240,
+        "height": 400,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "f4dcfe3ffedafb3ef0228e73d81afbba366bf59129d2fab0ab26c75e06062f6c",
+      "nativeBlobBytes": 2960,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              0,
+              1,
+              2
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "f4dcfe3ffedafb3ef0228e73d81afbba366bf59129d2fab0ab26c75e06062f6c",
+          "blobBytes": 2960,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              0,
+              1,
+              2
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "f4dcfe3ffedafb3ef0228e73d81afbba366bf59129d2fab0ab26c75e06062f6c",
+          "blobBytes": 2960,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          3,
+          0,
+          1,
+          2
+        ],
+        "values": [
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            255,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-6/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 400,
+        "height": 240,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "784c3fb3ff8e87f47e27693a6cea4a8c6c2a48455a8691db434896fb1d3d4451",
+      "nativeBlobBytes": 2449,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              3,
+              0,
+              1
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "784c3fb3ff8e87f47e27693a6cea4a8c6c2a48455a8691db434896fb1d3d4451",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              3,
+              0,
+              1
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ]
+            ]
+          },
+          "decodedSha256": "784c3fb3ff8e87f47e27693a6cea4a8c6c2a48455a8691db434896fb1d3d4451",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          2,
+          3,
+          0,
+          1
+        ],
+        "values": [
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-6/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -7.125,
+          "topLeftY": 29.624999999999996,
+          "bottomRightX": 195.25,
+          "bottomRightY": 437.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "d9ed22ae98ebda28302dcf25b62de8dd91875ca5307b942650f4fb8c548d3c4c",
+      "nativeBlobBytes": 5219,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1725,
+          "differentChannels": 3364,
+          "maxChannelDelta": 91,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 0,
+            "native": 5,
+            "worker": 0
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "8670f0ae7fd79ff7ae71ff8f6d4039c182fc5dcac6f84d9dbe7fd7294502d2f0",
+          "blobBytes": 4990,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1725,
+          "differentChannels": 3364,
+          "maxChannelDelta": 91,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 0,
+            "native": 5,
+            "worker": 0
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "8670f0ae7fd79ff7ae71ff8f6d4039c182fc5dcac6f84d9dbe7fd7294502d2f0",
+          "blobBytes": 4990,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-7/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 240,
+        "height": 400,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "b278a1378322cfc5e3465daea01e0fee1d997f95e12dba066095047e086471be",
+      "nativeBlobBytes": 2985,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              1,
+              0,
+              3
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "b278a1378322cfc5e3465daea01e0fee1d997f95e12dba066095047e086471be",
+          "blobBytes": 2985,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              2,
+              1,
+              0,
+              3
+            ],
+            "values": [
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "b278a1378322cfc5e3465daea01e0fee1d997f95e12dba066095047e086471be",
+          "blobBytes": 2985,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          2,
+          1,
+          0,
+          3
+        ],
+        "values": [
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            254
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-7/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 400,
+        "height": 240,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "90bd1ee69e6236ea3232c5090c278ad80c3231133183086ef2fd7ce3372e9d02",
+      "nativeBlobBytes": 2449,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              2,
+              1,
+              0
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "90bd1ee69e6236ea3232c5090c278ad80c3231133183086ef2fd7ce3372e9d02",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              3,
+              2,
+              1,
+              0
+            ],
+            "values": [
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "90bd1ee69e6236ea3232c5090c278ad80c3231133183086ef2fd7ce3372e9d02",
+          "blobBytes": 2449,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "values": [
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            254,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-7/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -7.125,
+          "topLeftY": 29.624999999999996,
+          "bottomRightX": 195.25,
+          "bottomRightY": 437.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "5c63d5ce31db2187b2929e58abea5c4fda0b3d73a9f4f95bf86b153a2a906ca8",
+      "nativeBlobBytes": 5180,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1467,
+          "differentChannels": 2558,
+          "maxChannelDelta": 52,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 0,
+            "native": 250,
+            "worker": 255
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "9ad5d3144801f8287863defeaec90cea153e4d69ced938e1b0f57d93fdf1c134",
+          "blobBytes": 5048,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1467,
+          "differentChannels": 2558,
+          "maxChannelDelta": 52,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 0,
+            "native": 250,
+            "worker": 255
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "9ad5d3144801f8287863defeaec90cea153e4d69ced938e1b0f57d93fdf1c134",
+          "blobBytes": 5048,
+          "mime": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "exif-8/full",
+      "spec": {
+        "name": "full",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 240,
+        "height": 400,
+        "oracle": 0
+      },
+      "nativeDecodedSha256": "9f38b4aab9976ffbad35c109c474c7e84b886f686f39888acb41852971db3778",
+      "nativeBlobBytes": 2866,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              2,
+              3,
+              0
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "9f38b4aab9976ffbad35c109c474c7e84b886f686f39888acb41852971db3778",
+          "blobBytes": 2866,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              1,
+              2,
+              3,
+              0
+            ],
+            "values": [
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                254,
+                0,
+                0
+              ]
+            ]
+          },
+          "decodedSha256": "9f38b4aab9976ffbad35c109c474c7e84b886f686f39888acb41852971db3778",
+          "blobBytes": 2866,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          1,
+          2,
+          3,
+          0
+        ],
+        "values": [
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            0,
+            254
+          ],
+          [
+            254,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-8/rotated90",
+      "spec": {
+        "name": "rotated90",
+        "frame": {
+          "topLeftX": 0,
+          "topLeftY": 0,
+          "bottomRightX": 240,
+          "bottomRightY": 400
+        },
+        "width": 400,
+        "height": 240,
+        "options": {
+          "rotation": 90
+        },
+        "oracle": 90
+      },
+      "nativeDecodedSha256": "1eb846bcdca77a24e226a6c2b920252a3bb59f741f93bc467cd14125fa11280a",
+      "nativeBlobBytes": 2578,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "1eb846bcdca77a24e226a6c2b920252a3bb59f741f93bc467cd14125fa11280a",
+          "blobBytes": 2578,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": true,
+          "differentPixels": 0,
+          "differentChannels": 0,
+          "maxChannelDelta": 0,
+          "first": null,
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": {
+            "pass": true,
+            "order": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "values": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                255,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ]
+            ]
+          },
+          "decodedSha256": "1eb846bcdca77a24e226a6c2b920252a3bb59f741f93bc467cd14125fa11280a",
+          "blobBytes": 2578,
+          "mime": "image/png"
+        }
+      ],
+      "nativeOrientation": {
+        "pass": true,
+        "order": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "values": [
+          [
+            254,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            1
+          ],
+          [
+            255,
+            255,
+            1
+          ],
+          [
+            0,
+            0,
+            254
+          ]
+        ]
+      }
+    },
+    {
+      "name": "exif-8/fractional-circle",
+      "spec": {
+        "name": "fractional-circle",
+        "frame": {
+          "topLeftX": -7.125,
+          "topLeftY": 29.624999999999996,
+          "bottomRightX": 195.25,
+          "bottomRightY": 437.375
+        },
+        "width": 256,
+        "height": 256,
+        "options": {
+          "circle": true
+        }
+      },
+      "nativeDecodedSha256": "1913355f1802a01d097b19fc44e22d6e7ebb49a0ebf3732ff88ace68ddd3657b",
+      "nativeBlobBytes": 5076,
+      "nativeMime": "image/png",
+      "comparisons": [
+        {
+          "input": "image",
+          "equal": false,
+          "differentPixels": 1761,
+          "differentChannels": 2889,
+          "maxChannelDelta": 62,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 0,
+            "native": 2,
+            "worker": 0
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a1004e99ef914715372c8572c0d5229e67aedc177b461b69af1a2a0c08883a78",
+          "blobBytes": 4937,
+          "mime": "image/png"
+        },
+        {
+          "input": "blob",
+          "equal": false,
+          "differentPixels": 1761,
+          "differentChannels": 2889,
+          "maxChannelDelta": 62,
+          "first": {
+            "x": 142,
+            "y": 3,
+            "channel": 0,
+            "native": 2,
+            "worker": 0
+          },
+          "dimensions": [
+            240,
+            400
+          ],
+          "dimensionsEqual": true,
+          "orientation": null,
+          "decodedSha256": "a1004e99ef914715372c8572c0d5229e67aedc177b461b69af1a2a0c08883a78",
+          "blobBytes": 4937,
+          "mime": "image/png"
+        }
+      ]
+    }
+  ],
+  "timing": [],
+  "errors": [],
+  "finishedAt": "2026-10-07T03:04:08.246Z",
+  "pixelEqualityPassed": false,
+  "allChecksPassed": false
+}

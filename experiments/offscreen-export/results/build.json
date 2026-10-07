@@ -1,0 +1,105 @@
+{
+  "head": "1708e6f854ccdd8b038754292d4e7cb151fb0a7f",
+  "bun": "1.4.2",
+  "substitutions": [
+    [
+      "document.createElement(\"canvas\")",
+      "new OffscreenCanvas(1, 1)",
+      2
+    ],
+    [
+      "image: HTMLImageElement,",
+      "image: ImageBitmap,",
+      1
+    ],
+    [
+      "): HTMLCanvasElement {",
+      "): OffscreenCanvas {",
+      1
+    ],
+    [
+      "image.naturalWidth",
+      "image.width",
+      1
+    ],
+    [
+      "image.naturalHeight",
+      "image.height",
+      1
+    ]
+  ],
+  "drawSourceSha256": "f7e4c1a5623175d7174c0d05545876d2817d598f44178dbb2990e6ac53e93a85",
+  "adaptedDrawSha256": "e8c5b46289f6b8baafdf9ee1d2fd8bdf1dcb4afe38de916a21d5b263d7b6aac9",
+  "sources": {
+    "src/canvas/draw.ts": "f7e4c1a5623175d7174c0d05545876d2817d598f44178dbb2990e6ac53e93a85",
+    "src/utils/limits.ts": "c5a3c7919c086e11995a1204b5407cf30b74684ef9ee36ad79f11ada9dd73898",
+    "src/utils/points.ts": "e6d739eb029d72ff1164fc1eed92d2d8fbf3b571b583846ae93aaffa6c75e844",
+    "src/utils/rotation.ts": "b3c8aba02c94e51ebc170f8a7aeebd56c1dad5cd2a1a07641dc0e0452fe4c5cb",
+    "experiments/offscreen-export/build.mjs": "dd96ee0650229936400e6c76bbf9b7e09fbf51ca0e19711d5934ca0b61d2246c",
+    "experiments/offscreen-export/loader.mjs": "28c9088e97ec82899b55d4971b194239e0a1d82b3b04764d3495f19c7cb29e4e",
+    "experiments/offscreen-export/worker.ts": "bf0507c8623c9d4dee7089669ba73e1aedc45ac28b9ce97fb4556b51e5ec7f93",
+    "experiments/offscreen-export/harness.mjs": "5f8f46e11e8e260575a1d91f29f22258dd97ddfed71f5c20fd3a24db4d661321",
+    "experiments/offscreen-export/run.mjs": "0301f61e9fdf45bd20f44f15e1aa87d75b8089dd142cc7dbeb0f471748d8391c"
+  },
+  "sizes": {
+    "node": "v24.16.0",
+    "files": [
+      {
+        "name": "native.js",
+        "raw": 2455,
+        "gzip9": 1131,
+        "sha256": "4471be3b31cbc11eb74b2cfd5905f0b6b6cd8aa691466ed5ca9bc88673d1f084"
+      },
+      {
+        "name": "loader.js",
+        "raw": 1096,
+        "gzip9": 608,
+        "sha256": "9d27d61862e7ff045400c55e17d920ea6bcdd4c8651f0b116a14f1354bfdb713"
+      },
+      {
+        "name": "worker.js",
+        "raw": 2924,
+        "gzip9": 1328,
+        "sha256": "0dbbb9c47a347a72a35d6d99f1b0104ff48574fbe8d2b24efa293bdb52390e2b"
+      },
+      {
+        "name": "harness.js",
+        "raw": 6394,
+        "gzip9": 2864,
+        "sha256": "baead960988e9f91ea03dcf7210eef0fba9d4efa0b1dee3213bd67ed3b051752"
+      },
+      {
+        "name": "croppie.js",
+        "raw": 24266,
+        "gzip9": 8238,
+        "sha256": "011e37d903481586556c98348351cc689ca6ff6df2b71846cd1485b633d640fc"
+      },
+      {
+        "name": "croppie.css",
+        "raw": 4257,
+        "gzip9": 1354,
+        "sha256": "6652d810fc6622db70adb139b3a159f37e3c4978b36f302708fa2c378319aae0"
+      }
+    ],
+    "isolatedNative": {
+      "raw": 2455,
+      "gzip9": 1131
+    },
+    "isolatedWorkerIncludingLoader": {
+      "raw": 4020,
+      "gzip9": 1936
+    },
+    "fullNative": {
+      "raw": 28523,
+      "gzip9": 9592
+    },
+    "fullNativePlusWorker": {
+      "raw": 32543,
+      "gzip9": 11528
+    },
+    "wholeBenchmarkRuntime": {
+      "raw": 12869,
+      "gzip9": 5931
+    }
+  }
+}
