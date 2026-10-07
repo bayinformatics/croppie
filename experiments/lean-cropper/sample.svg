@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="800" viewBox="0 0 1000 800">
+<rect width="1000" height="800" fill="#d0e4ed"/>
+<path d="M0 480Q230 200 500 470T1000 430V800H0Z" fill="#2f747a"/>
+<path d="M0 640Q320 380 610 620T1000 610V800H0Z" fill="#163c56"/>
+<circle cx="736" cy="214" r="106" fill="#f5b632"/>
+<path d="m610 400 80 220h-160z" fill="#e4f1f5"/><path d="m610 400 110 185h-95z" fill="#ef7585"/>
+<path d="m510 640 230-20-55 48H552z" fill="#f5b632"/>
+<g fill="#163c56" font-family="sans-serif"><text x="76" y="134" font-size="56" font-weight="700">A little perspective.</text><text x="78" y="182" font-size="24">Pan, turn, and choose your view.</text></g>
+<g fill="#e4f1f5"><circle cx="82" cy="715" r="5"/><circle cx="132" cy="735" r="5"/><circle cx="182" cy="715" r="5"/></g>
+</svg>

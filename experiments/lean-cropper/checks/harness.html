@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Lean verification harness</title>
+<link rel="stylesheet" href="../dist/core.css">
+<style>body{margin:20px}#host{width:640px;height:480px}.compare .lc-crop{visibility:hidden}.compare .lc-stage{background:white}.compare .lc-stage:focus-visible{outline:none}</style>
+<div id="host"></div>
+<script type="module">
+import {LeanCropper} from '../dist/core.js';
+import {toCanvas,toBlob} from '../dist/export.js';
+window.api={LeanCropper,toCanvas,toBlob};
+window.lc=new LeanCropper(document.querySelector('#host'));
+window.ready=lc.load('./fixtures/landmarks.png');
+</script>

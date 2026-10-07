@@ -1,0 +1,26 @@
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+
+const root = fileURLToPath(new URL('.', import.meta.url)), out = join(root, 'dist');
+await mkdir(out, { recursive: true });
+async function bundle(entry: string, name: string, native = false) {
+  const result = await Bun.build({ entrypoints: [join(root, entry)], target: 'browser', minify: true,
+    plugins: native ? [{ name: 'native-matrix', setup(b) {
+      b.onResolve({ filter: /^\.\/affine$/ }, () => ({ path: join(root, 'bench/dom-affine.ts') }));
+    } }] : [],
+  });
+  if (!result.success || result.outputs.length !== 1) throw new Error(result.logs.join('\n'));
+  await writeFile(join(out, name), await result.outputs[0]!.text());
+}
+await bundle('src/core.ts', 'core.js');
+await bundle('src/export.ts', 'export.js');
+await bundle('src/demo.ts', 'demo.js');
+await bundle('src/core.ts', 'core-dommatrix.js', true);
+await bundle('src/demo.ts', 'demo-dommatrix.js', true);
+await bundle('src/affine.ts', 'affine.js');
+await bundle('bench/dom-affine.ts', 'affine-dommatrix.js');
+for (const name of ['core.css', 'demo.css']) await bundle(`src/${name}`, name);
+for (const name of ['index.html', 'sample.svg']) await writeFile(join(out, name), await readFile(join(root, name)));
+const measurement = Bun.spawnSync(['node', join(root, 'measure.mjs')], { env: { ...process.env, LEAN_BUN_VERSION: Bun.version }, stdout: 'inherit', stderr: 'inherit' });
+if (measurement.exitCode) throw new Error('Size measurement failed');

@@ -1,0 +1,819 @@
+{
+  "baseline": "76540ff3ec7f95b6adae2615f630e80cbc33c523",
+  "recordedAt": "2026-10-07T02:45:07.895Z",
+  "host": "darwin-arm64",
+  "sizes": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "zlib": "1.3.1-e00f703",
+    "maps": false,
+    "sizes": {
+      "core.js": {
+        "raw": 9258,
+        "gzip9": 3479
+      },
+      "export.js": {
+        "raw": 922,
+        "gzip9": 569
+      },
+      "core.css": {
+        "raw": 1363,
+        "gzip9": 579
+      },
+      "demo.js": {
+        "raw": 12392,
+        "gzip9": 4711
+      },
+      "demo.css": {
+        "raw": 2752,
+        "gzip9": 1153
+      },
+      "index.html": {
+        "raw": 2812,
+        "gzip9": 1237
+      },
+      "sample.svg": {
+        "raw": 806,
+        "gzip9": 419
+      },
+      "core-dommatrix.js": {
+        "raw": 9301,
+        "gzip9": 3476
+      },
+      "demo-dommatrix.js": {
+        "raw": 12435,
+        "gzip9": 4709
+      },
+      "affine.js": {
+        "raw": 446,
+        "gzip9": 267
+      },
+      "affine-dommatrix.js": {
+        "raw": 429,
+        "gzip9": 223
+      }
+    },
+    "totals": {
+      "library": {
+        "files": [
+          "core.js",
+          "export.js",
+          "core.css"
+        ],
+        "raw": 11543,
+        "gzip9": 4627
+      },
+      "fullDemo": {
+        "files": [
+          "demo.js",
+          "core.css",
+          "demo.css",
+          "index.html",
+          "sample.svg"
+        ],
+        "raw": 20125,
+        "gzip9": 8099
+      },
+      "fullDemoWithoutSample": {
+        "files": [
+          "demo.js",
+          "core.css",
+          "demo.css",
+          "index.html"
+        ],
+        "raw": 19319,
+        "gzip9": 7680
+      },
+      "nativeDemo": {
+        "files": [
+          "demo-dommatrix.js",
+          "core.css",
+          "demo.css",
+          "index.html",
+          "sample.svg"
+        ],
+        "raw": 20168,
+        "gzip9": 8097
+      }
+    }
+  },
+  "artifactSHA256": {
+    "core.js": "c276333cd1aac036e82771643a7a018195fd09ed366cda3f8c07679fc7ea926e",
+    "export.js": "cf72594c684ef1accdc13f467715ffe2e41468007cfc2946660493fd5ee8c87e",
+    "core.css": "9039b06f24890e5bdb4ae96e99df645104c69425955fe1b7a28d8d0e2cc01d22",
+    "demo.js": "b351a345b73f2e41af79f0aa5ff4571536a22fe02d3dc98f1d69b16494d46198",
+    "demo.css": "3f24860b27bfec4b242aa3caef72ad60f33017794f8e528f04e2ff5a20e6738a",
+    "index.html": "4e986c2f3d3d79378bcb920f26368b690473961c029168b0c4fe967d947568df",
+    "sample.svg": "dad767b6b603e0fed5b3ca5d2736f91298d668c1233f6545247b19de433b7e1c",
+    "core-dommatrix.js": "cc7d3ae2134e164cdf0858e29beae6555822898ad748ec5c35769a81fbf0326e",
+    "demo-dommatrix.js": "e77213f86bc5f9deb1ed3e22725529be80ef6d82be0bf7a9fddbe80f30aa4d56",
+    "affine.js": "ffb736dc090225c2122fea17eb9e4e2ece22b23ecc828866629167bbee343882",
+    "affine-dommatrix.js": "74145f1eb507e549ceab23d8cd80931b2ea889e46c8ba39c379a107b5c1d70d7"
+  },
+  "model": {
+    "passed": true,
+    "assertions": 4969,
+    "seededTransforms": 400,
+    "resizeCombinations": 60
+  },
+  "browsers": [
+    {
+      "browser": "chromium",
+      "version": "153.0.8010.12",
+      "checks": [
+        "state round-trip, copy isolation, invalid-state rejection",
+        "CSS/export agreement: angle37",
+        "CSS/export agreement: horizontal-flip",
+        "CSS/export agreement: both-flips",
+        "mouse pan and anchored wheel zoom",
+        "free/fixed corner drag, keyboard resize, keyboard pan",
+        "real multi-touch anchored pinch and cancellation",
+        "responsive stage and restore preserve source crop",
+        "EXIF orientations 1–8: browser preview, export, independent Pillow reference",
+        "original full-resolution detail survives a 10× preview reduction",
+        "real 1600px/5120px JPEG load and PNG/JPEG export",
+        "failed/racing loads, reset, canvas lifetime, destroy",
+        "DOMMatrix alternative agrees with numeric affine implementation",
+        "working desktop/mobile demo and labeled native controls"
+      ],
+      "downsampleDimensions": [
+        320,
+        182
+      ],
+      "pageErrors": []
+    },
+    {
+      "browser": "firefox",
+      "version": "155.0",
+      "checks": [
+        "state round-trip, copy isolation, invalid-state rejection",
+        "CSS/export agreement: angle37",
+        "CSS/export agreement: horizontal-flip",
+        "CSS/export agreement: both-flips",
+        "mouse pan and anchored wheel zoom",
+        "free/fixed corner drag, keyboard resize, keyboard pan",
+        "responsive stage and restore preserve source crop",
+        "EXIF orientations 1–8: browser preview, export, independent Pillow reference",
+        "original full-resolution detail survives a 10× preview reduction",
+        "real 1600px/5120px JPEG load and PNG/JPEG export",
+        "failed/racing loads, reset, canvas lifetime, destroy",
+        "DOMMatrix alternative agrees with numeric affine implementation",
+        "working desktop/mobile demo and labeled native controls"
+      ],
+      "downsampleDimensions": [
+        320,
+        182
+      ],
+      "pageErrors": []
+    },
+    {
+      "browser": "webkit",
+      "version": "26.6",
+      "checks": [
+        "state round-trip, copy isolation, invalid-state rejection",
+        "CSS/export agreement: angle37",
+        "CSS/export agreement: horizontal-flip",
+        "CSS/export agreement: both-flips",
+        "mouse pan and anchored wheel zoom",
+        "free/fixed corner drag, keyboard resize, keyboard pan",
+        "responsive stage and restore preserve source crop",
+        "EXIF orientations 1–8: browser preview, export, independent Pillow reference",
+        "original full-resolution detail survives a 10× preview reduction",
+        "real 1600px/5120px JPEG load and PNG/JPEG export",
+        "failed/racing loads, reset, canvas lifetime, destroy",
+        "DOMMatrix alternative agrees with numeric affine implementation",
+        "working desktop/mobile demo and labeled native controls"
+      ],
+      "downsampleDimensions": [
+        320,
+        182
+      ],
+      "pageErrors": []
+    }
+  ],
+  "pixels": [
+    {
+      "name": "chromium/angle37/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.005516975308641976,
+      "fractionOver20": 0.000011574074074074073,
+      "blurredMeanAbsoluteRGB": 0.005466820987654321,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "chromium/horizontal-flip/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.008325617283950619,
+      "fractionOver20": 0.00005787037037037037,
+      "blurredMeanAbsoluteRGB": 0.008217592592592592,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "chromium/both-flips/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0005787037037037037,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.0006327160493827161,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "chromium/resized-stage/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.010898268398268398,
+      "fractionOver20": 0.00005681818181818182,
+      "blurredMeanAbsoluteRGB": 0.010879329004329004,
+      "offEdgeErrors": 0,
+      "pixels": 123200
+    },
+    {
+      "name": "chromium/EXIF-1/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-1/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-2/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-2/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-3/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-3/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-4/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-4/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-5/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-5/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-6/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-6/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-7/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-7/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-8/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-8/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/full-resolution-source",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 3840000
+    },
+    {
+      "name": "firefox/angle37/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.8408757716049384,
+      "fractionOver20": 0.04177083333333333,
+      "blurredMeanAbsoluteRGB": 0.5751466049382716,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "firefox/horizontal-flip/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.9541628086419756,
+      "fractionOver20": 0.044537037037037035,
+      "blurredMeanAbsoluteRGB": 0.616574074074074,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "firefox/both-flips/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.9098881172839504,
+      "fractionOver20": 0.04438657407407407,
+      "blurredMeanAbsoluteRGB": 0.6043364197530864,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "firefox/resized-stage/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.7453977272727272,
+      "fractionOver20": 0.04126623376623376,
+      "blurredMeanAbsoluteRGB": 0.5788474025974025,
+      "offEdgeErrors": 0,
+      "pixels": 123200
+    },
+    {
+      "name": "firefox/EXIF-1/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-1/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-2/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-2/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-3/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-3/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-4/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-4/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-5/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-5/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-6/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-6/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-7/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-7/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-8/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-8/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/full-resolution-source",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 3840000
+    },
+    {
+      "name": "webkit/angle37/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.8369521604938273,
+      "fractionOver20": 0.05039351851851852,
+      "blurredMeanAbsoluteRGB": 0.5217862654320987,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "webkit/horizontal-flip/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.9183256172839507,
+      "fractionOver20": 0.052592592592592594,
+      "blurredMeanAbsoluteRGB": 0.5579243827160494,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "webkit/both-flips/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.875354938271605,
+      "fractionOver20": 0.05148148148148148,
+      "blurredMeanAbsoluteRGB": 0.5205324074074074,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "webkit/resized-stage/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.781279761904762,
+      "fractionOver20": 0.0475,
+      "blurredMeanAbsoluteRGB": 0.5014015151515151,
+      "offEdgeErrors": 0,
+      "pixels": 123200
+    },
+    {
+      "name": "webkit/EXIF-1/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-1/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-2/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-2/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-3/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-3/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-4/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-4/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-5/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-5/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-6/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-6/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-7/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-7/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-8/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-8/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/full-resolution-source",
+      "passed": true,
+      "meanAbsoluteRGB": 0,
+      "fractionOver20": 0,
+      "blurredMeanAbsoluteRGB": 0,
+      "offEdgeErrors": 0,
+      "pixels": 3840000
+    }
+  ],
+  "quality": {
+    "source": "docs/images/garden-5120.jpg",
+    "reference": "Pillow Lanczos; left/reference, middle/direct, right/progressive in comparison PNGs",
+    "caution": "One photo, one output size, local browser builds; not a production quality certification or performance result.",
+    "results": [
+      {
+        "browser": "chromium",
+        "method": "direct",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 4.672098214285714,
+        "PSNRdB": 31.28869768350873
+      },
+      {
+        "browser": "chromium",
+        "method": "progressive",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 3.221697573260073,
+        "PSNRdB": 34.94265644674491
+      },
+      {
+        "browser": "firefox",
+        "method": "direct",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 11.690447573260073,
+        "PSNRdB": 22.903426574254944
+      },
+      {
+        "browser": "firefox",
+        "method": "progressive",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 3.4482886904761902,
+        "PSNRdB": 34.51668967336768
+      },
+      {
+        "browser": "webkit",
+        "method": "direct",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 10.043801510989011,
+        "PSNRdB": 24.180907376971707
+      },
+      {
+        "browser": "webkit",
+        "method": "progressive",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 0.4400812728937729,
+        "PSNRdB": 49.96416514588131
+      }
+    ]
+  },
+  "note": "Functional and image-quality evidence only. Concurrent local load/export timings are deliberately excluded; no production-parity or speedup claim."
+}
