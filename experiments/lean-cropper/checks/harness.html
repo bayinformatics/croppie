@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Lean verification harness</title>
+<link rel="stylesheet" href="../dist/core.css">
+<style>body{margin:20px}#host{width:640px;height:480px}.compare .lc-crop{visibility:hidden}.compare .lc-stage{background:white}.compare .lc-stage:focus-visible{outline:none}</style>
+<div id="host"></div>
+<script type="module">
+import {LeanCropper} from '../dist/core.js';
+import {toCanvas,toBlob} from '../dist/export.js';
+import {drawCroppedImage} from '../dist/production-export.js';
+import {readJpegOrientation,readBlobOrientation} from '../dist/exif.js';
+window.api={LeanCropper,toCanvas,toBlob,drawCroppedImage,readJpegOrientation,readBlobOrientation};
+// This suite preserves the original free-mode geometry checks. Fill has a separate suite.
+window.lc=new LeanCropper(document.querySelector('#host'),{coverage:'free'});
+window.ready=lc.load('./fixtures/landmarks.png');
+</script>
