@@ -8,8 +8,8 @@ This is the exporter half of the experiment, based on `a00608009bc60a9dbf1144ad2
 
 | Commit | Contents |
 | --- | --- |
-| `ee6076195a2dc774d119a4b27b6f1c0b8e6f8627` | `src/export.ts` and new `src/resample.ts` under `experiments/lean-cropper` |
-| `46e2c40020bb9b0ddd45e5cfe5feff2ef7003be9` | New dedicated `checks/export.check.ts` and `checks/export.check.mjs` |
+| `7d7d4a39f420972f4c67a63e8ec10ec0ef0dd2ac` | `src/export.ts` and new `src/resample.ts` under `experiments/lean-cropper` |
+| `964a9c48d27046457e40c6d4c71ba253eba8d7dd` | New dedicated `checks/export.check.ts` and `checks/export.check.mjs` |
 | Report commit following those commits | This document only |
 
 No production source/config, core/model/affine/CSS, demo, common tests/build/README, dependencies, or historical evidence was changed. The public `toCanvas(cropper, options)` / `toBlob(cropper, options)` contract remains structural; `getState()` locally accepts optional `mask: 'rect' | 'circle'`, and a missing mask means rectangle.

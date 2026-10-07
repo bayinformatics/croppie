@@ -106,6 +106,25 @@ try {
       hybrid.setMask('rect');
       return {cornerAssertions:assertions,notifications,interactiveCanvasAllocations,source:'opaque 801x533 + 1x1 PNG',defaultCoverage:'fill'};
     });
+    const keyboard = await page.evaluate(() => {
+      const original = hybrid.getState(), before = JSON.stringify(original);
+      const shortcuts = [{key:'+',ctrlKey:true},{key:'=',ctrlKey:true},{key:'-',metaKey:true},{key:'ArrowLeft',altKey:true},{key:'ArrowUp',ctrlKey:true}];
+      for (const target of [hybrid.element, hybrid.element.querySelector('[data-handle="se"]')]) {
+        for (const shortcut of shortcuts) {
+          const event = new KeyboardEvent('keydown', {...shortcut,bubbles:true,cancelable:true}); target.dispatchEvent(event);
+          if (event.defaultPrevented || JSON.stringify(hybrid.getState()) !== before) throw new Error('Browser shortcut was intercepted');
+        }
+      }
+      const zoom = new KeyboardEvent('keydown',{key:'+',shiftKey:true,bubbles:true,cancelable:true});
+      hybrid.element.dispatchEvent(zoom);
+      if (!zoom.defaultPrevented || JSON.stringify(hybrid.getState()) === before) throw new Error('Shift-plus no longer zooms');
+      const viewport = {...hybrid.getState().viewport,x:40}; hybrid.setViewport(viewport);
+      const move = new KeyboardEvent('keydown',{key:'ArrowRight',shiftKey:true,bubbles:true,cancelable:true});
+      hybrid.element.querySelector('[data-handle="move"]').dispatchEvent(move);
+      if (!move.defaultPrevented || Math.abs(hybrid.getState().viewport.x-50)>1e-7) throw new Error('Shift-arrow no longer moves by ten pixels');
+      hybrid.setState(original);
+      return {reservedShortcuts:10,shiftZoom:true,shiftMove:true};
+    });
     await page.evaluate(() => new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     const beforeResize = await page.evaluate(()=>hybrid.getState());
     await page.evaluate(()=>hybridHost.style.width='560px');
@@ -143,6 +162,13 @@ try {
     await page.getByLabel('Aspect ratio').selectOption('1.3333333333333333');
     await page.getByLabel('Crop shape').selectOption('circle');
     assert.equal(await page.getByLabel('Aspect ratio').inputValue(),'1');
+    for (const value of ['', '0', '1.5']) {
+      await page.getByLabel('Export width (px)').fill(value);
+      await page.getByRole('button',{name:'Export PNG',exact:true}).click();
+      assert.match(await page.locator('#status').textContent(),/1 pixel or more.*whole number/);
+      assert.equal(await page.locator('#export-width').evaluate(el=>el===document.activeElement),true);
+      assert.equal(await page.getByRole('button',{name:'Export PNG',exact:true}).isDisabled(),false);
+    }
     await page.getByLabel('Export width (px)').fill('320');
     await page.getByRole('button',{name:'Export PNG',exact:true}).click();
     await page.getByRole('link',{name:'Download PNG'}).waitFor();
@@ -184,7 +210,7 @@ try {
     await page.evaluate(async()=>{window.restoreEncoder();window.failPendingExport();await Promise.resolve();await Promise.resolve();});
     assert.ok((await page.locator('#status').textContent()).startsWith('160 × 240 image ready'),'Stale encoding error replaced current status');
     assert.deepEqual(pageErrors,[]);
-    results.push({browser:name,version:browser.version(),...model,maskPixels:{rectPixel,circlePixel},demoExport:rendered,staleExportSuppressed:true,passed:true});
+    results.push({browser:name,version:browser.version(),...model,keyboard,maskPixels:{rectPixel,circlePixel},demoExport:rendered,staleExportSuppressed:true,passed:true});
     await browser.close();browser=undefined;
     console.log(`${name}: fill/free, affine coverage, masks, sizing, restore, resize and demo passed`);
   }

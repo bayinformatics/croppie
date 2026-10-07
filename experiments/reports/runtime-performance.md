@@ -1,15 +1,15 @@
 # Runtime performance experiment
 
-Integrate **05725a2** and **365c5cc** for the compatible runtime improvements. Keep the canvas-release experiments out of production: **5f9881f was reverted by b660237** after real WebKit pixel regressions. The final source tree contains only the two hot-path changes.
+The compatible runtime improvements are integrated as **b9d01a8** and **fa6df92**. Keep the canvas-release experiments out of production: the rejected changes are retained in the [early-release](../performance/scratch-release-early.patch) and [after-final](../performance/scratch-release-after-final.patch) patches, with their WebKit failures below.
 
-Baseline: `76540ff3ec7f95b6adae2615f630e80cbc33c523`. Final measured source: `b660237` (equivalent to `365c5cc` for source/tests). Date: October 6, 2026, America/Denver.
+Baseline: `76540ff3ec7f95b6adae2615f630e80cbc33c523`. The raw runs record local-only worker revision `b660237`, after its rejected canvas change was reverted. Its accepted hot-path patches match integrated commits `b9d01a8` and `fa6df92`; the integrated tree also contains the separate size optimizations, so the historical byte totals below do not describe the combined tree. Date: October 6, 2026, America/Denver.
 
 ## Accepted changes and evidence
 
 | Change | Measured work avoided | Compatibility checks |
 | --- | --- | --- |
-| `05725a2`: calculate update payloads only while the live update-listener set is nonempty | For 1,000 small wheel or programmatic zoom changes without subscribers, public `get()` invocations fall from 1,000 to **0**. For a 1,000-event alternating drag, they fall from 999 to **0**; the first move is stationary. | Logical state and preview transform stay synchronous. Existing listeners still receive one shared snapshot per event; nested zoom, removal/re-registration, and listeners added during `rotate` retain their ordering. |
-| `365c5cc`: write slider value and spoken percentage only when the current DOM differs | For 1,000 small wheel changes, small programmatic zoom changes, or unchanged-zoom requests, `aria-valuetext` mutation records fall from 1,000 to **0**. | Reads the current DOM instead of caching it, so externally altered/clamped sliders still repair immediately. Percentage changes are visible before update callbacks. |
+| `b9d01a8`: calculate update payloads only while the live update-listener set is nonempty | For 1,000 small wheel or programmatic zoom changes without subscribers, public `get()` invocations fall from 1,000 to **0**. For a 1,000-event alternating drag, they fall from 999 to **0**; the first move is stationary. | Logical state and preview transform stay synchronous. Existing listeners still receive one shared snapshot per event; nested zoom, removal/re-registration, and listeners added during `rotate` retain their ordering. |
+| `fa6df92`: write slider value and spoken percentage only when the current DOM differs | For 1,000 small wheel changes, small programmatic zoom changes, or unchanged-zoom requests, `aria-valuetext` mutation records fall from 1,000 to **0**. | Reads the current DOM instead of caching it, so externally altered/clamped sliders still repair immediately. Percentage changes are visible before update callbacks. |
 
 The subscribed workload still produces exactly 999 drag updates and 1,000 wheel/programmatic updates, each with one data snapshot. Public API, types, exports, gesture handlers, CSS classes, EXIF behavior, image binding and object-URL lifetime, and export algorithms are unchanged. No animation-frame batching, worker export, or additional asynchronous state was introduced.
 
@@ -75,7 +75,7 @@ Frame batching was also left unchanged: the current methods write the DOM before
 Run from the repository root. Dependencies were installed with the frozen lockfile and no dependency changes.
 
 ```sh
-export PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH
+# Use Bun 1.4.2 from .bun-version on PATH.
 bun install --frozen-lockfile
 bun test
 bun run lint
@@ -89,12 +89,17 @@ PROFILE_BROWSER=webkit bun experiments/performance/runtime-profile.mjs /tmp/runt
 
 The comparison builds the pinned baseline in a temporary directory and the current source independently. It exits nonzero if any within-engine output hash, encoded length, or draw sequence differs. Expected final result: all three equality flags true. Production-size measurements use the same pinned Bun build options and Node compressors for each variant.
 
-Rejected experiments are applied only to temporary copies by the helper; these commands deliberately **exit 1** on WebKit's pixel mismatch:
+Rejected experiments are applied only to temporary copies by the helper. These two comparisons deliberately **exit 1** on WebKit's pixel mismatch:
 
 ```sh
 PROFILE_BROWSER=webkit PROFILE_CANVAS_PATCH=experiments/performance/scratch-release-early.patch bun experiments/performance/runtime-profile.mjs /tmp/runtime-early-release.json
 PROFILE_BROWSER=webkit PROFILE_CANVAS_PATCH=experiments/performance/scratch-release-after-final.patch bun experiments/performance/runtime-profile.mjs /tmp/runtime-after-final.json
+```
+
+The standalone probe is diagnostic: it exits 0 after recording per-mode channel differences. Inspect the `early` rows in its JSON:
+
+```sh
 PROFILE_BROWSER=webkit bun experiments/performance/scratch-release-probe.mjs /tmp/runtime-scratch-probe.json
 ```
 
-Integration: cherry-pick the two accepted source/test commits and the independent experiment/report commit. Do not cherry-pick `5f9881f` in isolation; the branch's `b660237` undo ensures it is absent from the final tree. Parent-owned performance tests, bundle measurement script, Playwright configuration, and build scripts were not edited.
+Integration is complete in `b9d01a8` and `fa6df92`; no canvas-release patch is active. Raw JSON retains its original local-worker revision fields. The reproduction commands above compare the current integrated source against the pinned baseline, with each variant using its own stylesheet.

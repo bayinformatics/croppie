@@ -1,6 +1,6 @@
-# Hybrid cropper: 6.17 kB with restored quality and coverage
+# Hybrid cropper: 6.19 kB with restored quality and coverage
 
-The hybrid combines the lean prototype's single affine model with progressive native export, arbitrary-angle image coverage, circle/ellipse masks, proportional sizing, and optional production EXIF reporting. Its **widget, exporter, and required CSS total 6,172 bytes gzip9**. The production package remains unchanged; this is an isolated candidate interface, not a Croppie-compatible release.
+The hybrid combines the lean prototype's single affine model with progressive native export, arbitrary-angle image coverage, circle/ellipse masks, proportional sizing, and optional production EXIF reporting. Its **widget, exporter, and required CSS total 6,188 bytes gzip9**. The production package remains unchanged; this is an isolated candidate interface, not a Croppie-compatible release.
 
 [Run and interface guide](../lean-cropper/README.md) · [Recorded parent verification](../lean-cropper/recorded/hybrid-verification.json) · [Desktop](../lean-cropper/recorded/hybrid-desktop.png) · [Mobile layout](../lean-cropper/recorded/hybrid-mobile.png)
 
@@ -10,17 +10,17 @@ Measured with Bun **1.4.2**, Node **24.16.0**, zlib **1.3.1-e00f703**, gzip leve
 
 | Browser asset | Raw bytes | gzip9 bytes |
 | --- | ---: | ---: |
-| Core: state, constraints, input, DOM, lifetime | 11,565 | 4,293 |
+| Core: state, constraints, input, DOM, lifetime | 11,597 | 4,309 |
 | Quality exporter and its geometry/resampling helpers | 2,705 | 1,285 |
 | Required widget CSS | 1,408 | 594 |
-| **Embeddable component** | **15,678** | **6,172** |
-| **Component plus optional JPEG metadata module** | **16,818** | **6,769** |
+| **Embeddable component** | **15,710** | **6,188** |
+| **Component plus optional JPEG metadata module** | **16,850** | **6,785** |
 
-The optional metadata entry adds 1,140 raw / **597 gzip bytes**. The complete demo adds its control panel, HTML, page styling and sample: **26,198 raw / 10,152 gzip bytes**; excluding only the sample yields 9,733 gzip bytes. Test-only production/DOMMatrix bundles are not requested by the demo. Exact hashes and loading graphs are in the recorded JSON.
+The optional metadata entry adds 1,140 raw / **597 gzip bytes**. The complete demo adds its control panel, HTML, page styling and sample: **26,381 raw / 10,232 gzip bytes**; excluding only the sample yields 9,813 gzip bytes. Test-only production/DOMMatrix bundles are not requested by the demo. Current hashes and loading graphs are in `reviewFixes.sizes` in the recorded JSON; its top-level `sizes` preserves the earlier snapshot.
 
-The earlier lean component was 4,627 gzip bytes. Restoring these behaviors costs **1,545 bytes**, inside the proposed 6–7 kB component budget. The existing production package is 9,020 gzip bytes, but it has a different interface and compatibility contract; these figures do not establish a drop-in replacement saving.
+The earlier lean component was 4,627 gzip bytes. Restoring these behaviors costs **1,561 bytes**, inside the proposed 6–7 kB component budget. The existing production package is 9,020 gzip bytes, but it has a different interface and compatibility contract; these figures do not establish a drop-in replacement saving.
 
-The hybrid source is based on `a006080` and integrated through `a2286b3`; `8e6923f` makes Circle automatically select and lock Square in the demo, while keeping Ellipse available. This toolbar change leaves the component payload unchanged. Two supervised Orca workers owned coverage/core and quality export; the parent reviewed, integrated, independently reran their checks, and added demo, metadata, and reliability validation. Both worker terminals were released after acceptance. Nothing was pushed or published.
+The hybrid source is based on `a006080` and integrated through `a2286b3`; `8e6923f` makes Circle automatically select and lock Square in the demo, while keeping Ellipse available. That toolbar change leaves the component payload unchanged. The later review fixes reserve Ctrl/Cmd/Alt shortcuts (+16 gzip bytes) and explain invalid demo export widths. Current sizes and source hashes are captured under `reviewFixes` in the recorded verification file. Two supervised Orca workers owned coverage/core and quality export; the parent reviewed, integrated, independently reran their checks, and added demo, metadata, and reliability validation. Both worker terminals were released after acceptance. This describes the pre-PR validation; publication status is separate from these recorded measurements.
 
 ## What now works
 

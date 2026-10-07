@@ -1,4 +1,4 @@
-// Usage: OFFSCREEN_FIXTURES=/absolute/path/to/images bun experiments/offscreen-export/run.mjs
+// Generate fixtures with tests/performance/fixtures.py, then run with the pinned Bun.
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { cpus, release, totalmem } from "node:os";
@@ -7,8 +7,8 @@ import { chromium, firefox, webkit } from "@playwright/test";
 import { build, root } from "./build.mjs";
 
 const fixtures = resolve(process.env.OFFSCREEN_FIXTURES ||
-  "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/performance/images");
-const output = resolve(process.env.OFFSCREEN_OUTPUT || "experiments/offscreen-export/results");
+  join(root, ".cache/performance/images"));
+const output = resolve(process.env.OFFSCREEN_OUTPUT || join(root, ".cache/offscreen-export"));
 const phase = process.env.OFFSCREEN_PHASE || "all";
 const browsers = (process.env.OFFSCREEN_BROWSERS || "chromium,firefox,webkit").split(",");
 const warmups = Number(process.env.OFFSCREEN_WARMUPS || 4);

@@ -6,11 +6,11 @@ Measured with Bun 1.4.2 and Node gzip level 9:
 
 | Selected browser assets | gzip9 |
 | --- | ---: |
-| Widget + quality exporter + required CSS | **6,172 bytes** |
-| The same, with optional JPEG EXIF reporting | **6,769 bytes** |
-| Complete demo, including controls, HTML, both stylesheets, and sample SVG | **10,152 bytes** |
+| Widget + quality exporter + required CSS | **6,188 bytes** |
+| The same, with optional JPEG EXIF reporting | **6,785 bytes** |
+| Complete demo, including controls, HTML, both stylesheets, and sample SVG | **10,232 bytes** |
 
-The original single-pass prototype was 4,627 bytes for the widget/export/CSS subtotal. The restored guarantees cost 1,545 bytes. Totals sum independently compressed response bodies; demo JS already bundles core/export, so standalone bundles are not counted again. Read the [hybrid validation report](../reports/hybrid-validation.md) for measured results and limits, and the [original experiment report](../reports/lean-redesign.md) for historical evidence.
+The original single-pass prototype was 4,627 bytes for the widget/export/CSS subtotal. The restored guarantees cost 1,561 bytes. Totals sum independently compressed response bodies; demo JS already bundles core/export, so standalone bundles are not counted again. Read the [hybrid validation report](../reports/hybrid-validation.md) for measured results and limits, and the [original experiment report](../reports/lean-redesign.md) for historical evidence.
 
 ## Run and use
 
@@ -64,6 +64,8 @@ const orientation = await readBlobOrientation(file);
 
 These JPEG helpers reuse the production parser, including its bounded header scan. They report metadata; they do not orient the image. The browser handles visual orientation once.
 
+The demo server serves only built assets, test fixtures, the check harness, and the two comparison photographs. Repository files, symlink escapes, and non-local Host/Origin requests are rejected.
+
 The demo offers **Circle** as a single choice: it selects and locks Square automatically, including after a new image loads. **Ellipse** allows oval crops with an editable aspect ratio. The lower-level mask interface remains general for custom controls.
 
 ## Geometry and guarantees
@@ -85,6 +87,7 @@ node_modules/.bin/tsc -p experiments/lean-cropper/tsconfig.json
 bun experiments/lean-cropper/checks/model.check.ts
 bun experiments/lean-cropper/checks/coverage.check.ts
 node experiments/lean-cropper/checks/export.check.mjs
+node experiments/lean-cropper/checks/server.check.mjs
 python3 experiments/lean-cropper/checks/make-fixtures.py
 LEAN_PORT=42972 LEAN_EVIDENCE=.cache/hybrid/common node experiments/lean-cropper/checks/browser.check.mjs
 LEAN_EVIDENCE=.cache/hybrid/common python3 experiments/lean-cropper/checks/quality.py

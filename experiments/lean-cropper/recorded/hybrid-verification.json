@@ -6877,5 +6877,274 @@
       "staleExportSuppressed": true,
       "passed": true
     }
-  ]
+  ],
+  "reviewFixes": {
+    "recordedAt": "2026-10-07T20:37:41.833877+00:00",
+    "basedOn": "15e1b6bc063115165f5edeb65a13622450f963e8",
+    "sourceSha256": {
+      "experiments/lean-cropper/src/core.ts": "872a3865904f5e67349563bc026514cfa45e74fc79c41250e40f598db124702d",
+      "experiments/lean-cropper/src/demo.ts": "9e2e99ec8ae5a30115461cc13888de26294e69d387e36678caccfb989966863c",
+      "experiments/lean-cropper/serve.ts": "9502c5bdb68bc1ed7b98415343d1ad1cc79eefd7703f3f9582e8180041d6f3f2",
+      "experiments/lean-cropper/checks/hybrid.check.mjs": "297d8c01a01218c5f417a40f487073b725e566bf39e3aeda433c88cda598ae72",
+      "experiments/lean-cropper/checks/server.check.mjs": "ea0bf37ca1660f84f8c0cb5172a951f4db79d6c0105d1d20d56c7efe9d82804e"
+    },
+    "notes": "Targeted checks after Matthewsreview. Earlier exporter and coverage sections retain their original run provenance; exporter and model code did not change. Current built asset sizes and hashes are in reviewFixes.sizes; the top-level sizes preserve the pre-review snapshot.",
+    "hybridBrowserChecks": [
+      {
+        "browser": "chromium",
+        "version": "153.0.8010.12",
+        "cornerAssertions": 3728,
+        "notifications": 810,
+        "interactiveCanvasAllocations": 0,
+        "source": "opaque 801x533 + 1x1 PNG",
+        "defaultCoverage": "fill",
+        "keyboard": {
+          "reservedShortcuts": 10,
+          "shiftZoom": true,
+          "shiftMove": true
+        },
+        "maskPixels": {
+          "rectPixel": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "circlePixel": [
+            162,
+            167,
+            175,
+            255
+          ]
+        },
+        "demoExport": [
+          320,
+          320
+        ],
+        "staleExportSuppressed": true,
+        "passed": true
+      },
+      {
+        "browser": "firefox",
+        "version": "155.0",
+        "cornerAssertions": 3728,
+        "notifications": 810,
+        "interactiveCanvasAllocations": 0,
+        "source": "opaque 801x533 + 1x1 PNG",
+        "defaultCoverage": "fill",
+        "keyboard": {
+          "reservedShortcuts": 10,
+          "shiftZoom": true,
+          "shiftMove": true
+        },
+        "maskPixels": {
+          "rectPixel": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "circlePixel": [
+            162,
+            167,
+            175,
+            255
+          ]
+        },
+        "demoExport": [
+          320,
+          320
+        ],
+        "staleExportSuppressed": true,
+        "passed": true
+      },
+      {
+        "browser": "webkit",
+        "version": "26.6",
+        "cornerAssertions": 3728,
+        "notifications": 810,
+        "interactiveCanvasAllocations": 0,
+        "source": "opaque 801x533 + 1x1 PNG",
+        "defaultCoverage": "fill",
+        "keyboard": {
+          "reservedShortcuts": 10,
+          "shiftZoom": true,
+          "shiftMove": true
+        },
+        "maskPixels": {
+          "rectPixel": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "circlePixel": [
+            162,
+            167,
+            175,
+            255
+          ]
+        },
+        "demoExport": [
+          320,
+          320
+        ],
+        "staleExportSuppressed": true,
+        "passed": true
+      }
+    ],
+    "commonBrowserChecks": {
+      "scenarios": 40,
+      "pixelComparisons": 63,
+      "engines": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "passed": true
+    },
+    "serverIsolation": {
+      "allowedAssets": true,
+      "repositoryFilesBlocked": true,
+      "symlinkEscapesBlocked": true,
+      "encodedTraversalBlocked": true,
+      "hostHeaderCheckedWithRawHttp": true,
+      "foreignOriginBlocked": true,
+      "methodsRestricted": true,
+      "passed": true
+    },
+    "nativePrivatePatch": {
+      "base": "afcdf46",
+      "applies": true,
+      "proxyFailureReproduced": true
+    },
+    "offscreenPortability": {
+      "invokedFrom": "/tmp",
+      "browser": "firefox",
+      "fixtureOverride": false,
+      "outputOverride": false,
+      "allChecksPassed": true
+    },
+    "sizes": {
+      "bun": "1.4.2",
+      "node": "v24.16.0",
+      "zlib": "1.3.1-e00f703",
+      "maps": false,
+      "sizes": {
+        "core.js": {
+          "raw": 11597,
+          "gzip9": 4309,
+          "sha256": "cbb3523e49ea05b59ab3a2d048b38cda1181be859347e7d5e6159c96b873832f"
+        },
+        "export.js": {
+          "raw": 2705,
+          "gzip9": 1285,
+          "sha256": "3c1034b77d06ad81cdefc3adad02925b8055ad216a67d7f4e902dacadc932d57"
+        },
+        "exif.js": {
+          "raw": 1140,
+          "gzip9": 597,
+          "sha256": "d5b2bffd5be2c93413ed956a044c1a68a4eebe121b34cc80f08f9d20a6ebacef"
+        },
+        "core.css": {
+          "raw": 1408,
+          "gzip9": 594,
+          "sha256": "c477055bacc6ebeaea8ebe4597305cc054eb5982f5a0f233ba2376aa4d78faec"
+        },
+        "demo.js": {
+          "raw": 17926,
+          "gzip9": 6647,
+          "sha256": "275505f3c459a6c1f21fbc4619d8262f1a294d4214fff92013225d77672f828b"
+        },
+        "demo.css": {
+          "raw": 2752,
+          "gzip9": 1153,
+          "sha256": "3f24860b27bfec4b242aa3caef72ad60f33017794f8e528f04e2ff5a20e6738a"
+        },
+        "index.html": {
+          "raw": 3489,
+          "gzip9": 1419,
+          "sha256": "673694d92050cf35bf0da855a5f3a8c26138e83e4537c0df2dccb5896f5c69f8"
+        },
+        "sample.svg": {
+          "raw": 806,
+          "gzip9": 419,
+          "sha256": "dad767b6b603e0fed5b3ca5d2736f91298d668c1233f6545247b19de433b7e1c"
+        },
+        "core-dommatrix.js": {
+          "raw": 11624,
+          "gzip9": 4311,
+          "sha256": "46d49a418cd293df9db23785359a0bff252c81f85753f70bc44c8cf3ad83e3d1"
+        },
+        "demo-dommatrix.js": {
+          "raw": 17912,
+          "gzip9": 6626,
+          "sha256": "3b92358090904f49167670b3c59f29cf39c138ca10f97ef2c191798d1278a19d"
+        },
+        "affine.js": {
+          "raw": 446,
+          "gzip9": 267,
+          "sha256": "ffb736dc090225c2122fea17eb9e4e2ece22b23ecc828866629167bbee343882"
+        },
+        "affine-dommatrix.js": {
+          "raw": 429,
+          "gzip9": 223,
+          "sha256": "74145f1eb507e549ceab23d8cd80931b2ea889e46c8ba39c379a107b5c1d70d7"
+        }
+      },
+      "totals": {
+        "library": {
+          "files": [
+            "core.js",
+            "export.js",
+            "core.css"
+          ],
+          "raw": 15710,
+          "gzip9": 6188
+        },
+        "libraryWithMetadata": {
+          "files": [
+            "core.js",
+            "export.js",
+            "core.css",
+            "exif.js"
+          ],
+          "raw": 16850,
+          "gzip9": 6785
+        },
+        "fullDemo": {
+          "files": [
+            "demo.js",
+            "core.css",
+            "demo.css",
+            "index.html",
+            "sample.svg"
+          ],
+          "raw": 26381,
+          "gzip9": 10232
+        },
+        "fullDemoWithoutSample": {
+          "files": [
+            "demo.js",
+            "core.css",
+            "demo.css",
+            "index.html"
+          ],
+          "raw": 25575,
+          "gzip9": 9813
+        },
+        "nativeDemo": {
+          "files": [
+            "demo-dommatrix.js",
+            "core.css",
+            "demo.css",
+            "index.html",
+            "sample.svg"
+          ],
+          "raw": 26367,
+          "gzip9": 10211
+        }
+      }
+    }
+  }
 }

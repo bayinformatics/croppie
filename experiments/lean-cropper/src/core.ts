@@ -202,7 +202,7 @@ export class LeanCropper {
     this.zoom(Math.exp(-clamp(delta, -200, 200) * .002), this.local(e));
   };
   private key = (e: KeyboardEvent) => {
-    if (!this.state) return;
+    if (!this.state || e.ctrlKey || e.metaKey || e.altKey) return;
     const k = e.key, n = e.shiftKey ? 10 : 1;
     const dx = k === 'ArrowLeft' ? -n : k === 'ArrowRight' ? n : 0;
     const dy = k === 'ArrowUp' ? -n : k === 'ArrowDown' ? n : 0;

@@ -2,7 +2,9 @@
 
 Date: 2026-10-06 (America/Denver). Worker task: `task_c4cf2174b2dd`, dispatch: `ctx_a39b60d410cc`.
 
-**Recommended candidate: 8,987 bytes gzip9, down from 9,559: 572 bytes / 5.98%.** JavaScript saves 58 bytes; CSS saves 514 bytes. The npm package and docs build both receive the reduction. No features, exports, runtime dependencies, or public types were removed.
+**Isolated size-only candidate: 8,987 bytes gzip9, down from 9,559: 572 bytes / 5.98%.** JavaScript saves 58 bytes; CSS saves 514 bytes. The npm package and docs build both receive the reduction. No features, exports, runtime dependencies, or public types were removed.
+
+The combined production result after the runtime changes is **9,020 gzip bytes**; see [parent validation](parent-validation.md). The numbers below preserve the earlier size-only measurement.
 
 Native-private members saved more JavaScript, but **failed public methods through an empty Proxy**. That experiment is rejected and reverted. Passing the original 870 tests and matching public declarations did not prove behavioral compatibility.
 
@@ -10,18 +12,18 @@ Native-private members saved more JavaScript, but **failed public methods throug
 
 Baseline: `76540ff3ec7f95b6adae2615f630e80cbc33c523`.
 
-Final implementation measured: `2a2ec3e9b8062d460b9ce3f184db39dff8c1fc76`.
+Size-only implementation: `f8b7e9435338d1b272b5cbac1ec763bc2d7a113f`, source-identical to the measured worker revision. The accepted changes were cherry-picked with identical patches; the table uses reachable integrated commits.
 
 Accepted commits, in integration order:
 
 | Commit | Change | Incremental gzip9 saving |
 | --- | --- | ---: |
-| `1c344653f4219676f664444e429b271c42b88024` | Build package and docs CSS with Bun minification; retain both CSS export aliases and the CSS declaration stub | 514 CSS bytes |
-| `fdba7026d4cfb570baf7968ed0b10a2d0f091238` | Add two transparent-Proxy public-API regression tests | 0 |
-| `3284778db4236e4dd84f92994bbc5752713112ec` | Keep the mount element, viewport element, and overlay element local to DOM assembly | 36 JS bytes |
-| `2a2ec3e9b8062d460b9ce3f184db39dff8c1fc76` | Move pure `initialTransform` and `resolveBindRotation` helpers to module scope | 22 JS bytes |
+| `b89639d5d2542e25d805c7c581dd8351916d98b0` | Build package and docs CSS with Bun minification; retain both CSS export aliases and the CSS declaration stub | 514 CSS bytes |
+| `afcdf46c3e9ff119a9c90f27441762bf8e1cfb75` | Add two transparent-Proxy public-API regression tests | 0 |
+| `40d0dca068443f454839597b21dbfe6ccfb8eb6d` | Keep the mount element, viewport element, and overlay element local to DOM assembly | 36 JS bytes |
+| `f8b7e9435338d1b272b5cbac1ec763bc2d7a113f` | Move pure `initialTransform` and `resolveBindRotation` helpers to module scope | 22 JS bytes |
 
-Experimental evidence is also retained in history: `8e10a55229ff4123e224550512e88b5bbc00fdd9` converts 41 private members to native-private members; `7d51552d3cdb7e5fcef63d74c53633a0dd58aa0d` reverts it. **Do not cherry-pick the native-private commit into production.** The accepted commits above do not require it or its revert. This report is committed separately from implementation.
+The rejected change is retained as a [source-only native-private patch](../performance/native-private.patch), applicable to `b89639d` (also to `afcdf46`, which adds the Proxy checks). **Do not apply this patch to production.** It converts 41 private members and fails the empty-Proxy public API checks; it is absent from the integrated source. The original worker commit and its revert were local-only. This report is committed separately from implementation.
 
 The source changes preserve the original DOM assembly order, public method signatures, error messages, validation, EXIF support, event ordering, object-URL cleanup, gesture handling, and output drawing/downsampling. No parent-owned performance tests, measurement script, or root Playwright configuration were changed. The lockfile is unchanged.
 
@@ -38,12 +40,12 @@ The earlier Bun 1.2.15 research numbers are not used as the baseline. Fresh pinn
 | Revision / experiment | JS raw | JS gzip9 | CSS raw | CSS gzip9 | Sum raw | Sum gzip9 | Status |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | Baseline `76540ff` | 24,127 | 8,205 | 4,257 | 1,354 | 28,384 | 9,559 | Reference |
-| CSS minification `1c34465` | 24,127 | 8,205 | 2,901 | 840 | 27,028 | 9,045 | Accepted |
-| Native-private `8e10a55` + minified CSS | 21,660 | 7,912 | 2,901 | 840 | 24,561 | 8,752 | **Rejected: Proxy regression** |
-| Constructor locals `3284778` + minified CSS | 23,969 | 8,169 | 2,901 | 840 | 26,870 | 9,009 | Accepted |
-| Pure helpers `2a2ec3e` + previous accepted changes | 23,874 | 8,147 | 2,901 | 840 | 26,775 | 8,987 | **Final recommendation** |
+| CSS minification `b89639d` | 24,127 | 8,205 | 2,901 | 840 | 27,028 | 9,045 | Accepted |
+| Native-private patch + minified CSS | 21,660 | 7,912 | 2,901 | 840 | 24,561 | 8,752 | **Rejected: Proxy regression** |
+| Constructor locals `40d0dca` + minified CSS | 23,969 | 8,169 | 2,901 | 840 | 26,870 | 9,009 | Accepted |
+| Pure helpers `f8b7e94` + previous accepted changes | 23,874 | 8,147 | 2,901 | 840 | 26,775 | 8,987 | **Final recommendation** |
 
-At the baseline, CSS-only, native-private, and final measurement checkpoints, `docs/croppie.js` and `docs/croppie.css` were byte-identical to their `dist` counterparts. The constructor-locals-only checkpoint measured the production JS build; its unchanged CSS is from `1c34465`.
+At the baseline, CSS-only, native-private, and final measurement checkpoints, `docs/croppie.js` and `docs/croppie.css` were byte-identical to their `dist` counterparts. The constructor-locals-only checkpoint measured the production JS build; its unchanged CSS is from `b89639d`.
 
 SHA-256 of the independently measured files:
 
@@ -54,13 +56,15 @@ SHA-256 of the independently measured files:
 
 ## Commands to reproduce sizes
 
+Use Bun 1.4.2 from `.bun-version` on your PATH. Temporary paths in the historical validation notes below describe the original worker environment; they are not prerequisites for these commands.
+
 Run from a checkout of the baseline or final implementation above. Do not compare artifacts built by another Bun version.
 
 ```sh
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun --revision
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun install --frozen-lockfile
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun run build
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun run build:docs
+bun --revision
+bun install --frozen-lockfile
+bun run build
+bun run build:docs
 node --input-type=module <<'JS'
 import { readdirSync, readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -88,6 +92,8 @@ for (const dir of ['dist', 'docs']) {
 JS
 ```
 
+The committed Proxy check is `bun test tests/integration/croppie-proxy.test.ts`. To reproduce the rejected behavior, use a disposable checkout of `afcdf46`, apply the native-private patch, and run that check; failure is expected.
+
 ## Validation and exact failures
 
 | Check | Baseline | Final compatible candidate |
@@ -104,11 +110,11 @@ JS
 Commands used for non-browser validation:
 
 ```sh
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun test
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun run typecheck
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun run lint
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun run check:package
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH npm publish --dry-run --ignore-scripts
+bun test
+bun run typecheck
+bun run lint
+bun run check:package
+npm publish --dry-run --ignore-scripts
 ```
 
 `check:package` passed declaration-specifier checks, `publint --strict --pack bun`, and the repository's are-the-types-wrong checks. Its pre-existing ignored `node10` / `node16-cjs` resolution diagnostics still appear; neither their configuration nor package exports was changed. Final declaration comparison removed comments, whitespace, and private-only declarations from `Croppie.d.ts`: the remaining public declaration was identical. All 23 other `.d.ts` files were byte-identical to baseline.
@@ -126,8 +132,8 @@ Other observed failures during exploration:
 The root `playwright.config.ts` was left untouched. Temporary configurations imported it and used port **42731**, a static server rooted at this worktree, and output outside the repository so other workers could use their own servers. Chromium screenshot expectations and tolerances remained those from the repository; screenshots were not updated.
 
 ```sh
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bunx --no-install playwright test --config=/tmp/croppie-performance-2026-10-06/bundle-size-worker/playwright.config.ts
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bunx --no-install playwright test --config=/tmp/croppie-performance-2026-10-06/bundle-size-worker/playwright-browsers.config.ts --grep 'result\(\)|EXIF'
+bunx --no-install playwright test --config=/tmp/croppie-performance-2026-10-06/bundle-size-worker/playwright.config.ts
+bunx --no-install playwright test --config=/tmp/croppie-performance-2026-10-06/bundle-size-worker/playwright-browsers.config.ts --grep 'result\(\)|EXIF'
 ```
 
 The first temporary configuration was:
@@ -175,7 +181,7 @@ Changing all 41 TypeScript-private members to native-private members reduced JS 
 The exact baseline/candidate probe instantiated the compiled bundle with a 100×100 square viewport, wrapped the instance in `new Proxy(instance, {})`, and called each operation below on a fresh instance. It used the existing happy-dom preload:
 
 ```sh
-PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun --preload ./tests/integration/setup.ts /tmp/croppie-performance-2026-10-06/bundle-size-worker/check-proxy.ts
+bun --preload ./tests/integration/setup.ts /tmp/croppie-performance-2026-10-06/bundle-size-worker/check-proxy.ts
 ```
 
 | Public operation | Baseline | Native-private candidate |
@@ -187,7 +193,7 @@ PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun --preload ./tests/integ
 
 Bun reported `Cannot access private method or acessor` for the method accesses and `Cannot access invalid private field` for field accesses. The coordinator independently confirmed the same public regression in a browser. The falsified assumption was that preserving declared public types while changing only private members guarantees API compatibility. The final code keeps TypeScript-private instance state and passes the two new Proxy regression tests, including bind, events, rotation, reset, zoom, and destruction. No bound-method workaround or artificial short source names were introduced.
 
-The same four-operation probe was also rerun against the final **compiled** bundle. Baseline and final both passed all four operations; native-private still failed all four. Command: `PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH bun --preload ./tests/integration/setup.ts /tmp/croppie-performance-2026-10-06/bundle-size-worker/check-proxy-final.ts`. Results are saved in `final/proxy.json` beside the other local evidence.
+The same four-operation probe was also rerun against the final **compiled** bundle. Baseline and final both passed all four operations; native-private still failed all four. Command: `bun --preload ./tests/integration/setup.ts /tmp/croppie-performance-2026-10-06/bundle-size-worker/check-proxy-final.ts`. Results are saved in `final/proxy.json` beside the other local evidence.
 
 ### Other trials
 

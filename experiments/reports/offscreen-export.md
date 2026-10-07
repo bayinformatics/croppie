@@ -6,31 +6,32 @@ Firefox passes the tested cases, but its result does not satisfy the three-engin
 The recorded timing improvements in some paths do not override these failures.
 
 Measured October 6, 2026 (America/Denver), October 7 UTC, in the coordinator-granted
-quiet window. Production source HEAD: `1708e6f854ccdd8b038754292d4e7cb151fb0a7f`.
+quiet window. Recorded local-worker source HEAD: `1708e6f854ccdd8b038754292d4e7cb151fb0a7f`. Its report patch was integrated as `c390c8e`; the surrounding production tree differs because the integrated branch also contains the separate size optimizations.
 `src/canvas/draw.ts` is unchanged from baseline
 `76540ff3ec7f95b6adae2615f630e80cbc33c523`; SHA-256:
 `f7e4c1a5623175d7174c0d05545876d2817d598f44178dbb2990e6ac53e93a85`.
 Only `experiments/offscreen-export/**` and this report were added. No production integration.
-Experiment and raw evidence commit: `4208c37`.
+Experiment and raw evidence are integrated at `1e74746b9ea889f69e6cc238ac373db0d5ff45a0` (same patch as the original local-worker commit). Raw JSON keeps the original worker revision and paths as provenance.
 
 ## Reproduce and inspect
 
-From this worktree root with the existing frozen dependencies:
+From the repository root with Bun 1.4.2 on PATH and the existing frozen dependencies. Generate the local fixtures first; new runs default to `.cache/offscreen-export/`, leaving recorded evidence intact:
 
 ```sh
+python3 tests/performance/fixtures.py
+
 # Actual correctness run: exit 1, preserving the negative pixel results.
-OFFSCREEN_PHASE=correctness /tmp/croppie-performance-2026-10-06/tools/bun experiments/offscreen-export/run.mjs
+OFFSCREEN_PHASE=correctness bun experiments/offscreen-export/run.mjs
 
 # Actual timing run: exit 0; four warmups + ten samples for every variant/workload.
-OFFSCREEN_PHASE=timing /tmp/croppie-performance-2026-10-06/tools/bun experiments/offscreen-export/run.mjs
+OFFSCREEN_PHASE=timing bun experiments/offscreen-export/run.mjs
 
 # Build/byte accounting only, without overwriting retained evidence.
 OFFSCREEN_PHASE=build OFFSCREEN_OUTPUT=/tmp/croppie-offscreen-build \
-  /tmp/croppie-performance-2026-10-06/tools/bun experiments/offscreen-export/run.mjs
+  bun experiments/offscreen-export/run.mjs
 ```
 
-The default fixture path is
-`/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/performance/images`.
+The default fixture path is `.cache/performance/images` inside the checkout, independent of the invoking directory.
 Override it with `OFFSCREEN_FIXTURES=/absolute/path`. Use
 `OFFSCREEN_OUTPUT=/tmp/offscreen-repeat` to keep a rerun separate from the recorded JSON.
 The runner creates an ephemeral-port loopback server and closes it after the run.

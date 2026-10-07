@@ -74,12 +74,17 @@ for (const key of ['width', 'height'] as const) input(key).onchange = () => void
 });
 $('reset').onclick = () => void run(() => cropper.reset());
 $('export').onclick = () => void run(async () => {
+  const width = input('export-width').valueAsNumber;
+  if (!Number.isInteger(width) || width < 1) {
+    status.textContent = 'Enter an export width of 1 pixel or more, using a whole number.';
+    input('export-width').focus(); return;
+  }
   const generation = ++exportGeneration;
   $<HTMLButtonElement>('export').disabled = true;
   status.textContent = 'Exporting crop…';
   let url: string | undefined;
   try {
-    const blob = await toBlob(cropper, { width: input('export-width').valueAsNumber });
+    const blob = await toBlob(cropper, { width });
     if (generation !== exportGeneration) return;
     const image = new Image(); url = URL.createObjectURL(blob); image.src = url; image.alt = 'Exported crop';
     await image.decode();

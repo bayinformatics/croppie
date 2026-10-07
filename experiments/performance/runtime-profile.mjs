@@ -26,7 +26,9 @@ if (experimentPatch) {
 }
 const modules = {};
 const sizes = {};
+const styles = {};
 for (const [label, root] of Object.entries(sources)) {
+	styles[label] = readFileSync(join(root, "src/croppie.css"), "utf8");
 	const entry = join(temp, `${label}.ts`);
 	writeFileSync(
 		entry,
@@ -72,18 +74,19 @@ for (const [label, root] of Object.entries(sources)) {
 		),
 	);
 }
-const css = readFileSync(resolve("src/croppie.css"), "utf8");
 const server = Bun.serve({
 	hostname: "127.0.0.1",
 	port: 0,
 	fetch(request) {
-		const path = new URL(request.url).pathname;
+		const url = new URL(request.url), path = url.pathname;
 		if (modules[path])
 			return new Response(modules[path], {
 				headers: { "Content-Type": "text/javascript" },
 			});
+		const variant = url.searchParams.get("variant");
+		if (path !== "/" || !Object.hasOwn(styles, variant)) return new Response("Not found", { status: 404 });
 		return new Response(
-			`<!doctype html><style>${css}</style><div id="mount"></div>`,
+			`<!doctype html><style>${styles[variant]}</style><div id="mount"></div>`,
 			{ headers: { "Content-Type": "text/html" } },
 		);
 	},
@@ -117,7 +120,7 @@ try {
 		const page = await browser.newPage({
 			viewport: { width: 800, height: 600 },
 		});
-		await page.goto(server.url.href);
+		await page.goto(new URL(`/?variant=${label}`, server.url).href);
 		const result = await page.evaluate(
 			async ({ label }) => {
 				const { Croppie, drawCroppedImage } = await import(`/${label}.js`);

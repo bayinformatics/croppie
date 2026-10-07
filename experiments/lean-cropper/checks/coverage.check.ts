@@ -240,10 +240,10 @@ try {
         same(cropper.getState(), settled, 'reset restores fit with current mask');
         await frames();
         count = changes;
-        const cancelled = cropper.load(source(71, 19)).then(() => 'loaded', e => e.name);
+        const canceled = cropper.load(source(71, 19)).then(() => 'loaded', e => e.name);
         const finalURL = cropper.getSource().image.src;
         proxy.destroy(); proxy.destroy();
-        same(await cancelled, 'AbortError', 'destroy aborts pending decode');
+        same(await canceled, 'AbortError', 'destroy aborts pending decode');
         check(changes === count, 'destroyed decode cannot callback');
         same(host.childElementCount, 0, 'destroy releases owned DOM');
         let revoked = false; try { await fetch(finalURL); } catch { revoked = true; }
@@ -296,8 +296,8 @@ try {
           await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [touch(1, 140, 320), touch(2, 510, 320)] });
           await gestureCoverage('real pinch above minimum');
           await session.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
-          const cancelled = await state(); await page.mouse.move(20, 20);
-          assert.deepEqual(await state(), cancelled, 'cancelled pinch stops movement');
+          const canceled = await state(); await page.mouse.move(20, 20);
+          assert.deepEqual(await state(), canceled, 'canceled pinch stops movement');
         } finally { await session.detach(); }
       }
       await page.evaluate(() => (window as unknown as { coverageCropper: LeanCropper }).coverageCropper.destroy());

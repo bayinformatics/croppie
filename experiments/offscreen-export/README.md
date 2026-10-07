@@ -1,13 +1,13 @@
 # Offscreen export experiment
 
-Run the isolated comparison from the repository root with the existing frozen dependencies:
+Run the isolated comparison from the repository root with Bun 1.4.2 on PATH (see `.bun-version`) and the existing frozen dependencies:
 
 ```sh
-OFFSCREEN_FIXTURES=/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/performance/images \
-  /tmp/croppie-performance-2026-10-06/tools/bun experiments/offscreen-export/run.mjs
+python3 tests/performance/fixtures.py
+bun experiments/offscreen-export/run.mjs
 ```
 
-The command builds into `results/assets/`, starts its own loopback server on an ephemeral
+The command writes new results under `.cache/offscreen-export/` and builds into its `assets/` directory, starts its own loopback server on an ephemeral
 port, runs installed Chromium/Firefox/WebKit sequentially, writes raw JSON, and stops the
 server. It needs no package/config changes and makes no external image requests.
 **Exit 1 means a correctness/platform/measurement gate failed.** A recorded negative
@@ -16,7 +16,7 @@ experiment is intentional; the equality criterion is never relaxed.
 Set `OFFSCREEN_PHASE=correctness`, `timing`, or `build` to run just that phase;
 `OFFSCREEN_BROWSERS=chromium,firefox,webkit` selects engines. Defaults are four warmups
 and ten measured samples per variant; `OFFSCREEN_WARMUPS` and `OFFSCREEN_REPEATS`
-override them. `OFFSCREEN_OUTPUT=/tmp/my-offscreen-run` preserves the checked-in evidence.
+override them. `OFFSCREEN_FIXTURES` and `OFFSCREEN_OUTPUT` select other fixture and result directories. Defaults are anchored to the checkout; explicit relative overrides use the invoking directory. The checked-in `results/` evidence is left intact.
 
 The five timing variants are native, cold/reused image-transfer worker, and cold/reused
 Blob-decode worker. Native and image-transfer start from the same fully decoded
