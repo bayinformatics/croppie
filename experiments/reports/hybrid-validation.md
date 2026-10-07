@@ -16,11 +16,11 @@ Measured with Bun **1.4.2**, Node **24.16.0**, zlib **1.3.1-e00f703**, gzip leve
 | **Embeddable component** | **15,678** | **6,172** |
 | **Component plus optional JPEG metadata module** | **16,818** | **6,769** |
 
-The optional metadata entry adds 1,140 raw / **597 gzip bytes**. The complete demo adds its control panel, HTML, page styling and sample: **25,470 raw / 9,916 gzip bytes**; excluding only the sample yields 9,497 gzip bytes. Test-only production/DOMMatrix bundles are not requested by the demo. Exact hashes and loading graphs are in the recorded JSON.
+The optional metadata entry adds 1,140 raw / **597 gzip bytes**. The complete demo adds its control panel, HTML, page styling and sample: **26,198 raw / 10,152 gzip bytes**; excluding only the sample yields 9,733 gzip bytes. Test-only production/DOMMatrix bundles are not requested by the demo. Exact hashes and loading graphs are in the recorded JSON.
 
 The earlier lean component was 4,627 gzip bytes. Restoring these behaviors costs **1,545 bytes**, inside the proposed 6–7 kB component budget. The existing production package is 9,020 gzip bytes, but it has a different interface and compatibility contract; these figures do not establish a drop-in replacement saving.
 
-The hybrid source is based on `a006080` and integrated through `a2286b3`. Two supervised Orca workers owned coverage/core and quality export; the parent reviewed, integrated, independently reran their checks, and added demo, metadata, and reliability validation. Both worker terminals were released after acceptance. Nothing was pushed or published.
+The hybrid source is based on `a006080` and integrated through `a2286b3`; `8e6923f` makes Circle automatically select and lock Square in the demo, while keeping Ellipse available. This toolbar change leaves the component payload unchanged. Two supervised Orca workers owned coverage/core and quality export; the parent reviewed, integrated, independently reran their checks, and added demo, metadata, and reliability validation. Both worker terminals were released after acceptance. Nothing was pushed or published.
 
 ## What now works
 

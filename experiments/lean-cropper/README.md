@@ -8,7 +8,7 @@ Measured with Bun 1.4.2 and Node gzip level 9:
 | --- | ---: |
 | Widget + quality exporter + required CSS | **6,172 bytes** |
 | The same, with optional JPEG EXIF reporting | **6,769 bytes** |
-| Complete demo, including controls, HTML, both stylesheets, and sample SVG | **9,916 bytes** |
+| Complete demo, including controls, HTML, both stylesheets, and sample SVG | **10,152 bytes** |
 
 The original single-pass prototype was 4,627 bytes for the widget/export/CSS subtotal. The restored guarantees cost 1,545 bytes. Totals sum independently compressed response bodies; demo JS already bundles core/export, so standalone bundles are not counted again. Read the [hybrid validation report](../reports/hybrid-validation.md) for measured results and limits, and the [original experiment report](../reports/lean-redesign.md) for historical evidence.
 
@@ -63,6 +63,8 @@ const orientation = await readBlobOrientation(file);
 ```
 
 These JPEG helpers reuse the production parser, including its bounded header scan. They report metadata; they do not orient the image. The browser handles visual orientation once.
+
+The demo offers **Circle** as a single choice: it selects and locks Square automatically, including after a new image loads. **Ellipse** allows oval crops with an editable aspect ratio. The lower-level mask interface remains general for custom controls.
 
 ## Geometry and guarantees
 

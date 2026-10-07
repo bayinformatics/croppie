@@ -29,9 +29,9 @@
         "sha256": "c477055bacc6ebeaea8ebe4597305cc054eb5982f5a0f233ba2376aa4d78faec"
       },
       "demo.js": {
-        "raw": 17247,
-        "gzip9": 6391,
-        "sha256": "b9e106bdda759cb53d6c54ee6a3b27b779c7dc716b4c30b87cb3eb71ca6fcfc1"
+        "raw": 17743,
+        "gzip9": 6567,
+        "sha256": "198bdedf78905d964132771a54d6cef7ddc62e21161dcfaca7c1ea80aba9192a"
       },
       "demo.css": {
         "raw": 2752,
@@ -39,9 +39,9 @@
         "sha256": "3f24860b27bfec4b242aa3caef72ad60f33017794f8e528f04e2ff5a20e6738a"
       },
       "index.html": {
-        "raw": 3257,
-        "gzip9": 1359,
-        "sha256": "709bb88c07373523fabd05b03d85496bb6aae97d66b5d4aa49459c47a45af47e"
+        "raw": 3489,
+        "gzip9": 1419,
+        "sha256": "673694d92050cf35bf0da855a5f3a8c26138e83e4537c0df2dccb5896f5c69f8"
       },
       "sample.svg": {
         "raw": 806,
@@ -54,9 +54,9 @@
         "sha256": "0ff06d4cc2a270f5ee0ca11330d98564fe48b8e3e492bcd5a24736cf9938c7a8"
       },
       "demo-dommatrix.js": {
-        "raw": 17233,
-        "gzip9": 6366,
-        "sha256": "8bdd5540bf7515ea191baf7c47f14fdd0319bec7e2a9eeacc8d6483c845f7f12"
+        "raw": 17729,
+        "gzip9": 6542,
+        "sha256": "d071b60e56e8e50e29b3a47551e92727409939ca887ea55e9434dee158acb521"
       },
       "affine.js": {
         "raw": 446,
@@ -97,8 +97,8 @@
           "index.html",
           "sample.svg"
         ],
-        "raw": 25470,
-        "gzip9": 9916
+        "raw": 26198,
+        "gzip9": 10152
       },
       "fullDemoWithoutSample": {
         "files": [
@@ -107,8 +107,8 @@
           "demo.css",
           "index.html"
         ],
-        "raw": 24664,
-        "gzip9": 9497
+        "raw": 25392,
+        "gzip9": 9733
       },
       "nativeDemo": {
         "files": [
@@ -118,8 +118,8 @@
           "index.html",
           "sample.svg"
         ],
-        "raw": 25456,
-        "gzip9": 9891
+        "raw": 26184,
+        "gzip9": 10127
       }
     }
   },
@@ -6787,5 +6787,95 @@
       "passed": true,
       "failures": []
     }
-  }
+  },
+  "circleUiCommit": "8e6923f",
+  "circleUiBrowserChecks": [
+    {
+      "browser": "chromium",
+      "version": "153.0.8010.12",
+      "cornerAssertions": 3728,
+      "notifications": 810,
+      "interactiveCanvasAllocations": 0,
+      "source": "opaque 801x533 + 1x1 PNG",
+      "defaultCoverage": "fill",
+      "maskPixels": {
+        "rectPixel": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "circlePixel": [
+          162,
+          167,
+          175,
+          255
+        ]
+      },
+      "demoExport": [
+        320,
+        320
+      ],
+      "staleExportSuppressed": true,
+      "passed": true
+    },
+    {
+      "browser": "firefox",
+      "version": "155.0",
+      "cornerAssertions": 3728,
+      "notifications": 810,
+      "interactiveCanvasAllocations": 0,
+      "source": "opaque 801x533 + 1x1 PNG",
+      "defaultCoverage": "fill",
+      "maskPixels": {
+        "rectPixel": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "circlePixel": [
+          162,
+          167,
+          175,
+          255
+        ]
+      },
+      "demoExport": [
+        320,
+        320
+      ],
+      "staleExportSuppressed": true,
+      "passed": true
+    },
+    {
+      "browser": "webkit",
+      "version": "26.6",
+      "cornerAssertions": 3728,
+      "notifications": 810,
+      "interactiveCanvasAllocations": 0,
+      "source": "opaque 801x533 + 1x1 PNG",
+      "defaultCoverage": "fill",
+      "maskPixels": {
+        "rectPixel": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "circlePixel": [
+          162,
+          167,
+          175,
+          255
+        ]
+      },
+      "demoExport": [
+        320,
+        320
+      ],
+      "staleExportSuppressed": true,
+      "passed": true
+    }
+  ]
 }
