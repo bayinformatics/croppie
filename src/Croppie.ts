@@ -103,7 +103,6 @@ function describeValue(value: unknown): string {
  * ```
  */
 export class Croppie {
-	private readonly element: HTMLElement;
 	private readonly options: Required<
 		Pick<
 			CroppieOptions,
@@ -115,8 +114,6 @@ export class Croppie {
 	// DOM elements
 	private container: HTMLDivElement | null = null;
 	private boundaryEl: HTMLDivElement | null = null;
-	private viewportEl: HTMLDivElement | null = null;
-	private overlayEl: HTMLDivElement | null = null;
 	private previewEl: HTMLImageElement | null = null;
 	private sliderEl: HTMLInputElement | null = null;
 
@@ -173,7 +170,6 @@ export class Croppie {
 		// Dimensions and zoom limits given as numeric strings (data attributes) are numbers
 		// from here on, so no string reaches the arithmetic
 		const options = validateOptions(givenOptions);
-		this.element = element;
 
 		// Calculate default boundary (viewport + 100px padding)
 		const defaultBoundary: Boundary = {
@@ -210,18 +206,18 @@ export class Croppie {
 			this.zoomConfig.max,
 		);
 
-		this.createElements();
+		this.createElements(element);
 		this.attachEventHandlers();
 	}
 
 	/**
 	 * Creates all DOM elements
 	 */
-	private createElements(): void {
+	private createElements(element: HTMLElement): void {
 		this.container = createContainer(this.options.customClass);
 		this.boundaryEl = createBoundary(this.options.boundary);
-		this.viewportEl = createViewport(this.options.viewport);
-		this.overlayEl = createOverlay(
+		const viewportEl = createViewport(this.options.viewport);
+		const overlayEl = createOverlay(
 			this.options.boundary,
 			this.options.viewport,
 		);
@@ -229,8 +225,8 @@ export class Croppie {
 
 		// Assemble the DOM tree
 		this.boundaryEl.appendChild(this.previewEl);
-		this.boundaryEl.appendChild(this.overlayEl);
-		this.boundaryEl.appendChild(this.viewportEl);
+		this.boundaryEl.appendChild(overlayEl);
+		this.boundaryEl.appendChild(viewportEl);
 		this.container.appendChild(this.boundaryEl);
 
 		// Add zoom slider if enabled
@@ -256,7 +252,7 @@ export class Croppie {
 			});
 		}
 
-		this.element.appendChild(this.container);
+		element.appendChild(this.container);
 	}
 
 	/**
@@ -897,8 +893,6 @@ export class Croppie {
 
 		this.container = null;
 		this.boundaryEl = null;
-		this.viewportEl = null;
-		this.overlayEl = null;
 		this.previewEl = null;
 		this.sliderEl = null;
 		this.image = null;
