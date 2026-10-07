@@ -1,111 +1,102 @@
-# Lean cropper experiment
+# Hybrid cropper experiment
 
-Run this from the repository root with the existing frozen dependencies:
+The lean affine prototype now has **arbitrary-angle image coverage, progressive quality export, circular masks, and proportional output sizing**. Production Croppie remains unchanged. This is a candidate design for a future interface, not a drop-in replacement or a published package.
+
+Measured with Bun 1.4.2 and Node gzip level 9:
+
+| Selected browser assets | gzip9 |
+| --- | ---: |
+| Widget + quality exporter + required CSS | **6,172 bytes** |
+| The same, with optional JPEG EXIF reporting | **6,769 bytes** |
+| Complete demo, including controls, HTML, both stylesheets, and sample SVG | **9,916 bytes** |
+
+The original single-pass prototype was 4,627 bytes for the widget/export/CSS subtotal. The restored guarantees cost 1,545 bytes. Totals sum independently compressed response bodies; demo JS already bundles core/export, so standalone bundles are not counted again. Read the [hybrid validation report](../reports/hybrid-validation.md) for measured results and limits, and the [original experiment report](../reports/lean-redesign.md) for historical evidence.
+
+## Run and use
+
+Use the version in the root `.bun-version` and the existing frozen dependencies:
 
 ```sh
-export PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH
 bun experiments/lean-cropper/build.ts
 bun experiments/lean-cropper/serve.ts
 ```
 
-Open **http://127.0.0.1:4197/experiments/lean-cropper/dist/**. `LEAN_PORT` can choose another unused port; this experiment never uses the production test server on 4173. The default sample is original SVG artwork; the file input accepts browser-decodable images. There are no network fonts, frameworks, runtime packages, workers, or WASM.
-
-This is an API/design experiment from baseline `76540ff3ec7f95b6adae2615f630e80cbc33c523`, not a Croppie-compatible release. The complete demo is **8,099 gzip9 bytes**, including its HTML, controls, two stylesheets, and sample image. The widget, exporter, and required widget CSS alone are **4,627 gzip9 bytes**. They do not include the demo's file/rotation/flip/aspect/export control panel. See [the report](../reports/lean-redesign.md) for exact accounting, measured quality failures, and browser evidence.
-
-## Typed source API
+Open **http://127.0.0.1:4197/experiments/lean-cropper/dist/**. `LEAN_PORT` selects another unused port. This session's pinned Bun is `/tmp/croppie-performance-2026-10-06/tools/bun`; prepend that directory to `PATH` if your global Bun differs. No external fonts, frameworks, workers, WASM, or image-processing runtime dependencies are needed.
 
 ```ts
 import { LeanCropper, type CropState } from './src/core';
-import { toCanvas, toBlob } from './src/export';
+import { toBlob, toCanvas } from './src/export';
 import './src/core.css';
 
-// Give the host an explicit, nonzero width and height.
+// The host needs a visible, nonzero width and height.
 const cropper = new LeanCropper(host, {
-  aspect: 4 / 3, // null (the default) allows independent width/height
-  onChange(state) { /* detached snapshot; synchronous */ },
+  aspect: 1,             // null permits free aspect
+  coverage: 'fill',      // default: keep the whole crop covered
+  mask: 'circle',        // default is 'rect'
+  onChange(state) { /* detached snapshot, after the synchronous update */ },
 });
-
-await cropper.load(file); // Blob/File, or a URL fetched with normal CORS rules
-cropper.pan(20, -10); // stage CSS pixels
-cropper.zoom(1.2, { x: 150, y: 90 }); // factor; stage-space anchor
-cropper.rotate(37.25); // clockwise delta, around current crop center
-cropper.flip('horizontal'); // screen-axis reflection, around crop center
-cropper.flip('vertical');
-cropper.setAspect(null);
-cropper.setViewport({ x: 80, y: 60, width: 320, height: 240 });
+await cropper.load(file); // Blob/File or a URL fetched with normal CORS rules
+cropper.rotate(37.25);   // clockwise delta around the crop center
+cropper.flip('horizontal');
+cropper.zoom(1.2, { x: 150, y: 90 });
+cropper.pan(20, -10);
+cropper.setViewport({ x: 80, y: 60, width: 240, height: 240 });
 
 const saved: CropState = cropper.getState();
 cropper.setState(JSON.parse(JSON.stringify(saved)));
-const canvas = toCanvas(cropper, { width: 1200 }); // caller owns this canvas
 const blob = await toBlob(cropper, {
-  width: 1200, type: 'image/jpeg', quality: .9, background: '#fff',
+  width: 512, type: 'image/jpeg', quality: .9, background: '#fff',
 });
-cropper.reset(); // reset image/crop, retaining the current aspect choice
-cropper.destroy(); // idempotent; removes owned DOM/listeners/observer/object URL
+const canvas = toCanvas(cropper, { width: 512 }); // caller owns this canvas
+cropper.setCoverage('free'); // explicit permission for transparent crop edges
+cropper.setMask('rect');
+cropper.reset();
+cropper.destroy();
 ```
 
-`src/export.ts` imports only **types** from the core. Loading `core.js` never loads export code. `export.js` is independently importable and accepts an object exposing `getState()` and `getSource()`. The demo bundles both once in `demo.js`; do not additionally load the standalone core/export builds into that page.
-
-The source files are TypeScript; generated JavaScript is ESM. This experiment does not publish a package or declaration bundle. Import the TS source for static types.
-
-## State contract
+The exporter imports only core types. Applications that crop on a server can omit it; when included, progressive downsampling is the default. Optional tag reporting is a separate entry and is absent from core, export, and demo JS:
 
 ```ts
-interface CropState {
-  version: 1;
-  image: { width: number; height: number };
-  stage: { width: number; height: number };
-  transform: [number, number, number, number, number, number];
-  viewport: { x: number; y: number; width: number; height: number };
-  aspect: number | null;
-}
+import { readBlobOrientation, readJpegOrientation } from './src/exif';
+const orientation = await readBlobOrientation(file);
+// readJpegOrientation(bytes) accepts a Uint8Array instead.
 ```
 
-The affine tuple `[a,b,c,d,e,f]` maps **browser-oriented decoded source coordinates** into **stage CSS pixels**:
+These JPEG helpers reuse the production parser, including its bounded header scan. They report metadata; they do not orient the image. The browser handles visual orientation once.
 
-```text
-x' = a*x + c*y + e
-y' = b*x + d*y + f
-```
+## Geometry and guarantees
 
-CSS uses that exact tuple in `matrix(...)` with a top-left transform origin. Canvas left-composes crop translation and output scaling. No axis-aligned Croppie `points` are claimed to represent a rotated crop. The source-space crop is generally a four-corner polygon obtained by inverse-transforming the viewport corners.
+`CropState` remains version 1: oriented image dimensions, stage dimensions, `transform: [a,b,c,d,e,f]`, viewport `{x,y,width,height}`, aspect, and optional `mask: 'rect'|'circle'`. The matrix maps source pixels to stage CSS pixels. Existing states without `mask` normalize to rectangle. The original Blob is not serialized; dimensions are a basic consistency check, not an image identity check.
 
-`getState()` and `onChange` return detached copies. `setState()` checks version, image dimensions, finite/invertible geometry, viewport bounds, and aspect consistency. It assumes the caller has loaded the corresponding source; dimensions are not an image identity check. The Blob is deliberately not serialized. If the stage size differs, restore uniformly fits the saved stage into the current stage, preserving the selected source region. `ResizeObserver` uses the same operation; repeated layout changes may leave extra margins. `reset()` refits the current stage.
+1. **Coverage:** `fill` inverse-projects viewport corners into the original image and corrects zoom/pan only when needed. It supports arbitrary rotation, reflections, and valid shear. Attempts below the minimum do not drift toward the pointer. The minimum can exceed the normal zoom ceiling for tiny images. `free` retains unrestricted pan. Coverage is instance policy; restoring saved geometry obeys the current policy.
+2. **Masks and resizing:** `'circle'` is the ellipse inscribed in the viewport; choose aspect 1 for a circle. Preview and export use the same mask. Coverage conservatively covers its rectangular frame. `setViewport` clamps to the stage; fixed-aspect width drives height. Responsive resizing/restoring uniformly fits the saved stage and preserves the source correspondence. Reset refits while keeping the current aspect/mask; new loads use the constructor aspect and retain the selected mask/coverage.
+3. **Export:** inverse-project the crop, select a relevant source region with filtering support, progressively halve it, and apply the same affine map into output space. Large-photo tests match the actual production renderer. One requested dimension preserves aspect; two different-aspect dimensions contain-fit with transparent/background bars. Pixel-rounded matching shapes fill exactly. Positive finite sizes are validated before rounding and capped proportionally to 16,384 pixels per side / 16,777,216 pixels total.
+4. **Lifetime:** fetch/decode failures and superseded loads do not replace the previous good image; a new load or destroy prevents stale installation. Object URLs and observers are cleaned up. `getState`/callbacks return detached snapshots. `getSource` returns the original Blob and a borrowed image element; consumers must not mutate it. Returned canvases stay alive. Private Blob-output canvases are cleared after encoding; downsample intermediates are left to normal collection because early resets changed WebKit pixels.
+5. **Events:** state/DOM updates and `onChange` are synchronous. Invalid modes and non-finite derived geometry reject before installation. Repeating the same coverage or mask is a no-op. Callbacks run after state is committed; callback exceptions propagate and do not roll back that committed state.
 
-`setViewport()` clamps the rectangle to the stage, with a nominal 24px minimum. In fixed-aspect mode width drives height; a requested height should set width to `height * aspect`. `setAspect()` centers the new rectangle before clamping. The crop and image are independently movable. Image pan is unrestricted, and zoom clamps the area-equivalent scale to `.001…64`; image coverage is not enforced.
+## Verification
 
-## Original image and orientation
-
-`load()` retains the supplied Blob itself; URL inputs are fetched into a Blob. Its object URL backs the same `HTMLImageElement` in CSS and Canvas. Preview never replaces the source with a smaller raster. Browser orientation handling runs once, before the user transform. There is no EXIF parser, manual orientation matrix, `createImageBitmap` orientation override, data-URL rewriting, or metadata reader in the runtime.
-
-The browser supplies orientation-adjusted natural dimensions ([HTML image specification](https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-naturalwidth)). `getSource()` exposes the original Blob and a **borrowed** image element for the exporter; consumers must not mutate its `src`, dimensions, or styling. A failed or superseded load keeps the previous good image. Destroy or a newer load aborts fetches and prevents stale decoded images from installing. Browser image decoding itself is not cancelable here.
-
-Canvas encoding does not preserve source EXIF, ICC, or other metadata. PNG defaults to transparent gaps; use `background` to flatten them. A single provided width or height preserves crop aspect after rounding; providing both deliberately stretches to that output rectangle. Output is limited to 8,192 pixels per side and 16,777,216 total pixels; that is a guard, not a mobile-memory guarantee. `toCanvas()` leaves its result alive. `toBlob()` zeroes its private scratch canvas only after encoding completes (or throws).
-
-## Reproduce verification
-
-The build was measured with Bun 1.4.2 and Node 24.16.0 (`zlib` 1.3.1-e00f703). Existing root Playwright is 1.63.0; fixture/reference generation uses Python 3 and Pillow 10.4.0. If dependencies need installing on a fresh checkout, use the existing lockfile with `bun install --frozen-lockfile`; do not update it.
+Existing Playwright and Python/Pillow supply test tooling only. Build before the common browser checks. Every automated browser runner owns its server; use a different `LEAN_PORT` from any open manual demo.
 
 ```sh
-export PATH=/tmp/croppie-performance-2026-10-06/tools:$PATH
 node_modules/.bin/tsc -p experiments/lean-cropper/tsconfig.json
-bun experiments/lean-cropper/build.ts
-python3 experiments/lean-cropper/checks/make-fixtures.py
 bun experiments/lean-cropper/checks/model.check.ts
-node experiments/lean-cropper/checks/browser.check.mjs
-python3 experiments/lean-cropper/checks/quality.py
+bun experiments/lean-cropper/checks/coverage.check.ts
+node experiments/lean-cropper/checks/export.check.mjs
+python3 experiments/lean-cropper/checks/make-fixtures.py
+LEAN_PORT=42972 LEAN_EVIDENCE=.cache/hybrid/common node experiments/lean-cropper/checks/browser.check.mjs
+LEAN_EVIDENCE=.cache/hybrid/common python3 experiments/lean-cropper/checks/quality.py
+LEAN_PORT=42971 node experiments/lean-cropper/checks/hybrid.check.mjs
 ```
 
-The browser script starts and stops its own server on 4197, and fails if the port is occupied. Stop a manually started demo first. `LEAN_BROWSERS=chromium` selects a shorter diagnostic run; the recorded evidence uses Chromium, Firefox, and WebKit. Browser checks use `.check.mjs`, so root `bun test` does not accidentally run them. All generated assets, fixtures, screenshots, and traces remain under this directory and are ignored by Git. [Recorded evidence](recorded/verification.json) and selected screenshots are committed separately from the generated directories.
+`LEAN_BROWSERS=chromium` narrows common/coverage/hybrid checks; `HYBRID_EXPORT_BROWSERS` narrows exporter checks. Generated fixtures, bundles, and evidence are ignored. Test-only `production-export.js` and affine alternatives are not requested by the demo and are excluded from its payload accounting. The original [recorded evidence](recorded/verification.json) describes the earlier single-pass experiment; current results are linked from the hybrid report.
 
-The browser checks cover real mouse pan/wheel, keyboard crop controls, a real Chromium multi-touch pinch/cancel, arbitrary angles with horizontal/vertical flips, stage resize and serialized-state restore, EXIF 1–8 against independently oriented Pillow references, original-resolution detail, real 1600px/5120px JPEG load and PNG/JPEG output, transparency, concurrent/failed loads, reset/destroy, scratch cleanup, and mobile layout. Synthetic event support is not a substitute for physical phone testing; Firefox/WebKit multi-touch was not tested.
+## Remaining limits
 
-## Limits that matter
+1. No legacy Croppie methods/events/points adapter, undo history, snapping, or published declaration/package distribution. The stage must be visible and sized for initial load; very small crop handles can overlap.
+2. Resampling quality is validated for the rotation, uniform scaling, and reflection generated by the controls. Strong imported shear/nonuniform scaling can still alias. Chromium's native single pass is slightly sharper on some photos; the hybrid consistently uses the production progressive strategy.
+3. Per-canvas caps are not a total memory guarantee. Original image decoding, browser collection, and GPU allocation remain browser-managed. No file-size/decode-memory budget, tiling, or physical-device memory benchmark is implemented.
+4. No metadata preservation, HDR/ICC/wide-gamut guarantee, HEIC/RAW fallback, or animated-frame policy. Native MIME fallback applies. EXIF tag reporting is optional and JPEG-specific.
+5. Desktop Chromium/Firefox/WebKit, real Chromium multi-touch automation, keyboard controls, and responsive layout are tested. Physical Safari/iOS/Android, assistive technology, high contrast, localization, and rotated/skewed ancestors remain unvalidated.
 
-1. **Quality:** one native Canvas sampling pass is visibly worse than progressive downsampling for the tested 5120px→320px photo, especially in WebKit and Firefox. `imageSmoothingQuality='high'` does not establish quality parity. No worker/WASM or production resampler is included.
-2. **Geometry/UI:** no image coverage constraint, automatic rotation compensation, undo/redo, circular mask, snap lines, or legacy Croppie events/options/points. Corner handles can overlap on very small crops; labeled width/height fields remain available. Source-space shear is accepted by the affine state, but there is no shear control.
-3. **Lifecycle/memory:** requires a visible, sized host for initial load; no background decoder cancellation, tiled export, file-size cap, explicit decode-memory budget, or resource-use benchmark. Demo download URLs are reclaimed on replacement/unload. Back-forward cache handling is coded but not specifically tested. Simultaneous demo exports/file changes have no transactional UI policy.
-4. **Accessibility:** native labels/buttons, keyboard pan/zoom/crop, focus indicators, and a status region exist. No assistive-technology audit, high-contrast audit, localization, or touch-target certification; screen-reader instructions and announcements need production design.
-5. **Browsers/formats:** tested desktop Playwright builds at device scale 1, including a 390px layout. No real Safari/iOS/Android testing, old-browser fallbacks, HEIC/RAW guarantees, animated-frame policy, HDR/wide-gamut guarantees, or support for rotated/skewed ancestor CSS transforms. Decode/resample/color behavior remains browser-dependent.
-
-All runtime code and sample SVG were authored for this experiment; no third-party implementation was copied. Existing `docs/images/garden-*.jpg` assets are only referenced by tests. Root repository licensing continues to apply.
+Runtime code, sample SVG, and fixture logic were authored in this repository; production resampling/EXIF behavior is reused or adapted under the repository license. Tests use the existing garden photos; those photos are not part of the demo payload.

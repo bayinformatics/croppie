@@ -1,0 +1,6791 @@
+{
+  "recordedAt": "2026-10-07T19:01:01.553462+00:00",
+  "baselineCommit": "a00608009bc60a9dbf1144ad239291cb7fa5b6fc",
+  "implementationCommit": "a2286b340c8c6908477b50052d8f09c66c56f34d",
+  "sizes": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "zlib": "1.3.1-e00f703",
+    "maps": false,
+    "sizes": {
+      "core.js": {
+        "raw": 11565,
+        "gzip9": 4293,
+        "sha256": "d1ca756a23d73b595ec092c03ec628bebe700e78fbc82e406b98029fc1b30b3c"
+      },
+      "export.js": {
+        "raw": 2705,
+        "gzip9": 1285,
+        "sha256": "3c1034b77d06ad81cdefc3adad02925b8055ad216a67d7f4e902dacadc932d57"
+      },
+      "exif.js": {
+        "raw": 1140,
+        "gzip9": 597,
+        "sha256": "d5b2bffd5be2c93413ed956a044c1a68a4eebe121b34cc80f08f9d20a6ebacef"
+      },
+      "core.css": {
+        "raw": 1408,
+        "gzip9": 594,
+        "sha256": "c477055bacc6ebeaea8ebe4597305cc054eb5982f5a0f233ba2376aa4d78faec"
+      },
+      "demo.js": {
+        "raw": 17247,
+        "gzip9": 6391,
+        "sha256": "b9e106bdda759cb53d6c54ee6a3b27b779c7dc716b4c30b87cb3eb71ca6fcfc1"
+      },
+      "demo.css": {
+        "raw": 2752,
+        "gzip9": 1153,
+        "sha256": "3f24860b27bfec4b242aa3caef72ad60f33017794f8e528f04e2ff5a20e6738a"
+      },
+      "index.html": {
+        "raw": 3257,
+        "gzip9": 1359,
+        "sha256": "709bb88c07373523fabd05b03d85496bb6aae97d66b5d4aa49459c47a45af47e"
+      },
+      "sample.svg": {
+        "raw": 806,
+        "gzip9": 419,
+        "sha256": "dad767b6b603e0fed5b3ca5d2736f91298d668c1233f6545247b19de433b7e1c"
+      },
+      "core-dommatrix.js": {
+        "raw": 11592,
+        "gzip9": 4295,
+        "sha256": "0ff06d4cc2a270f5ee0ca11330d98564fe48b8e3e492bcd5a24736cf9938c7a8"
+      },
+      "demo-dommatrix.js": {
+        "raw": 17233,
+        "gzip9": 6366,
+        "sha256": "8bdd5540bf7515ea191baf7c47f14fdd0319bec7e2a9eeacc8d6483c845f7f12"
+      },
+      "affine.js": {
+        "raw": 446,
+        "gzip9": 267,
+        "sha256": "ffb736dc090225c2122fea17eb9e4e2ece22b23ecc828866629167bbee343882"
+      },
+      "affine-dommatrix.js": {
+        "raw": 429,
+        "gzip9": 223,
+        "sha256": "74145f1eb507e549ceab23d8cd80931b2ea889e46c8ba39c379a107b5c1d70d7"
+      }
+    },
+    "totals": {
+      "library": {
+        "files": [
+          "core.js",
+          "export.js",
+          "core.css"
+        ],
+        "raw": 15678,
+        "gzip9": 6172
+      },
+      "libraryWithMetadata": {
+        "files": [
+          "core.js",
+          "export.js",
+          "core.css",
+          "exif.js"
+        ],
+        "raw": 16818,
+        "gzip9": 6769
+      },
+      "fullDemo": {
+        "files": [
+          "demo.js",
+          "core.css",
+          "demo.css",
+          "index.html",
+          "sample.svg"
+        ],
+        "raw": 25470,
+        "gzip9": 9916
+      },
+      "fullDemoWithoutSample": {
+        "files": [
+          "demo.js",
+          "core.css",
+          "demo.css",
+          "index.html"
+        ],
+        "raw": 24664,
+        "gzip9": 9497
+      },
+      "nativeDemo": {
+        "files": [
+          "demo-dommatrix.js",
+          "core.css",
+          "demo.css",
+          "index.html",
+          "sample.svg"
+        ],
+        "raw": 25456,
+        "gzip9": 9891
+      }
+    }
+  },
+  "productionTests": {
+    "passed": 878,
+    "lint": true,
+    "typecheck": true,
+    "productionSourceChanged": false
+  },
+  "model": {
+    "assertions": 4969,
+    "seededTransforms": 400,
+    "resizeCombinations": 60
+  },
+  "coverage": [
+    {
+      "passed": true,
+      "initializationStates": 20000,
+      "seed": 27
+    },
+    {
+      "browser": "chromium",
+      "version": "153.0.8010.12",
+      "passed": true,
+      "assertions": 28409,
+      "observations": 1693,
+      "minimalityChecks": 168,
+      "seededSteps": 1680,
+      "seed": "0x5eedc0de",
+      "realGestureChecks": 8
+    },
+    {
+      "browser": "firefox",
+      "version": "155.0",
+      "passed": true,
+      "assertions": 28409,
+      "observations": 1693,
+      "minimalityChecks": 168,
+      "seededSteps": 1680,
+      "seed": "0x5eedc0de",
+      "realGestureChecks": 5
+    },
+    {
+      "browser": "webkit",
+      "version": "26.6",
+      "passed": true,
+      "assertions": 28409,
+      "observations": 1693,
+      "minimalityChecks": 168,
+      "seededSteps": 1680,
+      "seed": "0x5eedc0de",
+      "realGestureChecks": 5
+    }
+  ],
+  "parentHybrid": [
+    {
+      "browser": "chromium",
+      "version": "153.0.8010.12",
+      "cornerAssertions": 3728,
+      "notifications": 810,
+      "interactiveCanvasAllocations": 0,
+      "source": "opaque 801x533 + 1x1 PNG",
+      "defaultCoverage": "fill",
+      "maskPixels": {
+        "rectPixel": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "circlePixel": [
+          162,
+          167,
+          175,
+          255
+        ]
+      },
+      "demoExport": [
+        320,
+        320
+      ],
+      "staleExportSuppressed": true,
+      "passed": true
+    },
+    {
+      "browser": "firefox",
+      "version": "155.0",
+      "cornerAssertions": 3728,
+      "notifications": 810,
+      "interactiveCanvasAllocations": 0,
+      "source": "opaque 801x533 + 1x1 PNG",
+      "defaultCoverage": "fill",
+      "maskPixels": {
+        "rectPixel": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "circlePixel": [
+          162,
+          167,
+          175,
+          255
+        ]
+      },
+      "demoExport": [
+        320,
+        320
+      ],
+      "staleExportSuppressed": true,
+      "passed": true
+    },
+    {
+      "browser": "webkit",
+      "version": "26.6",
+      "cornerAssertions": 3728,
+      "notifications": 810,
+      "interactiveCanvasAllocations": 0,
+      "source": "opaque 801x533 + 1x1 PNG",
+      "defaultCoverage": "fill",
+      "maskPixels": {
+        "rectPixel": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "circlePixel": [
+          162,
+          167,
+          175,
+          255
+        ]
+      },
+      "demoExport": [
+        320,
+        320
+      ],
+      "staleExportSuppressed": true,
+      "passed": true
+    }
+  ],
+  "commonBrowser": [
+    {
+      "browser": "chromium",
+      "version": "153.0.8010.12",
+      "checks": [
+        "state round-trip, copy isolation, invalid-state rejection",
+        "CSS/export agreement: angle37",
+        "CSS/export agreement: horizontal-flip",
+        "CSS/export agreement: both-flips",
+        "mouse pan and anchored wheel zoom",
+        "free/fixed corner drag, keyboard resize, keyboard pan",
+        "real multi-touch anchored pinch and cancellation",
+        "responsive stage and restore preserve source crop",
+        "EXIF orientations 1\u20138: browser preview, export, independent Pillow reference",
+        "original full-resolution detail survives a 10\u00d7 preview reduction",
+        "real 1600px/5120px JPEG load and PNG/JPEG export",
+        "failed/racing loads, reset, canvas lifetime, destroy",
+        "DOMMatrix alternative agrees with numeric affine implementation",
+        "working desktop/mobile demo and labeled native controls"
+      ],
+      "timingsExploratory": [
+        {
+          "sourceWidth": 1600,
+          "originalBlob": true,
+          "compressedBytes": 383663,
+          "pngBytes": 2250670,
+          "jpegType": "image/jpeg",
+          "output": [
+            1200,
+            780
+          ],
+          "loadMs": 12.100000023841858,
+          "exportMs": 51.200000047683716
+        },
+        {
+          "sourceWidth": 5120,
+          "originalBlob": true,
+          "compressedBytes": 3345561,
+          "pngBytes": 2379000,
+          "jpegType": "image/jpeg",
+          "output": [
+            1200,
+            780
+          ],
+          "loadMs": 92.69999992847443,
+          "exportMs": 159.20000004768372
+        }
+      ],
+      "downsampleDimensions": [
+        320,
+        182
+      ],
+      "pageErrors": []
+    },
+    {
+      "browser": "firefox",
+      "version": "155.0",
+      "checks": [
+        "state round-trip, copy isolation, invalid-state rejection",
+        "CSS/export agreement: angle37",
+        "CSS/export agreement: horizontal-flip",
+        "CSS/export agreement: both-flips",
+        "mouse pan and anchored wheel zoom",
+        "free/fixed corner drag, keyboard resize, keyboard pan",
+        "responsive stage and restore preserve source crop",
+        "EXIF orientations 1\u20138: browser preview, export, independent Pillow reference",
+        "original full-resolution detail survives a 10\u00d7 preview reduction",
+        "real 1600px/5120px JPEG load and PNG/JPEG export",
+        "failed/racing loads, reset, canvas lifetime, destroy",
+        "DOMMatrix alternative agrees with numeric affine implementation",
+        "working desktop/mobile demo and labeled native controls"
+      ],
+      "timingsExploratory": [
+        {
+          "sourceWidth": 1600,
+          "originalBlob": true,
+          "compressedBytes": 383663,
+          "pngBytes": 2057889,
+          "jpegType": "image/jpeg",
+          "output": [
+            1200,
+            780
+          ],
+          "loadMs": 13,
+          "exportMs": 49
+        },
+        {
+          "sourceWidth": 5120,
+          "originalBlob": true,
+          "compressedBytes": 3345561,
+          "pngBytes": 2224813,
+          "jpegType": "image/jpeg",
+          "output": [
+            1200,
+            780
+          ],
+          "loadMs": 97,
+          "exportMs": 62
+        }
+      ],
+      "downsampleDimensions": [
+        320,
+        182
+      ],
+      "pageErrors": []
+    },
+    {
+      "browser": "webkit",
+      "version": "26.6",
+      "checks": [
+        "state round-trip, copy isolation, invalid-state rejection",
+        "CSS/export agreement: angle37",
+        "CSS/export agreement: horizontal-flip",
+        "CSS/export agreement: both-flips",
+        "mouse pan and anchored wheel zoom",
+        "free/fixed corner drag, keyboard resize, keyboard pan",
+        "responsive stage and restore preserve source crop",
+        "EXIF orientations 1\u20138: browser preview, export, independent Pillow reference",
+        "original full-resolution detail survives a 10\u00d7 preview reduction",
+        "real 1600px/5120px JPEG load and PNG/JPEG export",
+        "failed/racing loads, reset, canvas lifetime, destroy",
+        "DOMMatrix alternative agrees with numeric affine implementation",
+        "working desktop/mobile demo and labeled native controls"
+      ],
+      "timingsExploratory": [
+        {
+          "sourceWidth": 1600,
+          "originalBlob": true,
+          "compressedBytes": 383663,
+          "pngBytes": 2035608,
+          "jpegType": "image/jpeg",
+          "output": [
+            1200,
+            780
+          ],
+          "loadMs": 15,
+          "exportMs": 51
+        },
+        {
+          "sourceWidth": 5120,
+          "originalBlob": true,
+          "compressedBytes": 3345561,
+          "pngBytes": 2207418,
+          "jpegType": "image/jpeg",
+          "output": [
+            1200,
+            780
+          ],
+          "loadMs": 243,
+          "exportMs": 147
+        }
+      ],
+      "downsampleDimensions": [
+        320,
+        182
+      ],
+      "pageErrors": []
+    }
+  ],
+  "commonPixels": [
+    {
+      "name": "chromium/angle37/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.005516975308641976,
+      "fractionOver20": 1.1574074074074073e-05,
+      "blurredMeanAbsoluteRGB": 0.005466820987654321,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "chromium/horizontal-flip/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.008325617283950619,
+      "fractionOver20": 5.787037037037037e-05,
+      "blurredMeanAbsoluteRGB": 0.008217592592592592,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "chromium/both-flips/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0005787037037037037,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0006327160493827161,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "chromium/resized-stage/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.010898268398268398,
+      "fractionOver20": 5.681818181818182e-05,
+      "blurredMeanAbsoluteRGB": 0.010879329004329004,
+      "offEdgeErrors": 0,
+      "pixels": 123200
+    },
+    {
+      "name": "chromium/EXIF-1/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-1/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-2/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-2/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-3/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-3/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-4/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-4/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-5/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-5/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-6/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-6/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-7/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-7/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/EXIF-8/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/orientation-8/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "chromium/full-resolution-source",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 3840000
+    },
+    {
+      "name": "firefox/angle37/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.8408140432098765,
+      "fractionOver20": 0.04177083333333333,
+      "blurredMeanAbsoluteRGB": 0.5751350308641975,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "firefox/horizontal-flip/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.9541628086419756,
+      "fractionOver20": 0.044537037037037035,
+      "blurredMeanAbsoluteRGB": 0.616574074074074,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "firefox/both-flips/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.9098996913580246,
+      "fractionOver20": 0.04438657407407407,
+      "blurredMeanAbsoluteRGB": 0.6043364197530864,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "firefox/resized-stage/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.7453977272727272,
+      "fractionOver20": 0.04126623376623376,
+      "blurredMeanAbsoluteRGB": 0.5788474025974025,
+      "offEdgeErrors": 0,
+      "pixels": 123200
+    },
+    {
+      "name": "firefox/EXIF-1/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-1/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-2/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-2/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-3/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-3/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-4/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-4/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-5/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-5/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-6/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-6/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-7/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-7/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/EXIF-8/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/orientation-8/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "firefox/full-resolution-source",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 3840000
+    },
+    {
+      "name": "webkit/angle37/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.837283950617284,
+      "fractionOver20": 0.050381944444444444,
+      "blurredMeanAbsoluteRGB": 0.5221180555555556,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "webkit/horizontal-flip/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.9182253086419754,
+      "fractionOver20": 0.052569444444444446,
+      "blurredMeanAbsoluteRGB": 0.5581442901234568,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "webkit/both-flips/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.87616512345679,
+      "fractionOver20": 0.05158564814814815,
+      "blurredMeanAbsoluteRGB": 0.5206983024691357,
+      "offEdgeErrors": 0,
+      "pixels": 86400
+    },
+    {
+      "name": "webkit/resized-stage/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 1.782077922077922,
+      "fractionOver20": 0.04746753246753247,
+      "blurredMeanAbsoluteRGB": 0.5022700216450217,
+      "offEdgeErrors": 0,
+      "pixels": 123200
+    },
+    {
+      "name": "webkit/EXIF-1/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-1/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-2/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-2/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-3/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-3/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-4/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08401041666666666,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-4/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-5/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-5/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-6/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-6/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-7/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-7/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/EXIF-8/Pillow",
+      "passed": true,
+      "meanAbsoluteRGB": 0.08633680555555556,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.08421875000000001,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/orientation-8/CSS-vs-Canvas",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 38400
+    },
+    {
+      "name": "webkit/full-resolution-source",
+      "passed": true,
+      "meanAbsoluteRGB": 0.0,
+      "fractionOver20": 0.0,
+      "blurredMeanAbsoluteRGB": 0.0,
+      "offEdgeErrors": 0,
+      "pixels": 3840000
+    }
+  ],
+  "fullPhotoQuality": {
+    "source": "docs/images/garden-5120.jpg",
+    "reference": "Left to right: Pillow Lanczos, old single-pass, hybrid, actual production exporter. No reference scratch canvases are reset.",
+    "caution": "One photo, one output size, local browser builds; not a production quality certification or performance result.",
+    "results": [
+      {
+        "browser": "chromium",
+        "method": "direct",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 4.672098214285714,
+        "PSNRdB": 31.28869768350873,
+        "meanErrorToProduction": 1.849290293040293
+      },
+      {
+        "browser": "chromium",
+        "method": "hybrid",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 5.446983745421245,
+        "PSNRdB": 29.857692753857627,
+        "meanErrorToProduction": 0.0
+      },
+      {
+        "browser": "chromium",
+        "method": "production",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 5.446983745421245,
+        "PSNRdB": 29.857692753857627,
+        "meanErrorToProduction": 0.0
+      },
+      {
+        "browser": "firefox",
+        "method": "direct",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 11.690447573260073,
+        "PSNRdB": 22.903426574254944,
+        "meanErrorToProduction": 12.875652472527472
+      },
+      {
+        "browser": "firefox",
+        "method": "hybrid",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 5.17046130952381,
+        "PSNRdB": 30.629450635045416,
+        "meanErrorToProduction": 0.0
+      },
+      {
+        "browser": "firefox",
+        "method": "production",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 5.17046130952381,
+        "PSNRdB": 30.629450635045416,
+        "meanErrorToProduction": 0.0
+      },
+      {
+        "browser": "webkit",
+        "method": "direct",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 10.043801510989011,
+        "PSNRdB": 24.180907376971707,
+        "meanErrorToProduction": 11.035096153846155
+      },
+      {
+        "browser": "webkit",
+        "method": "hybrid",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 4.5293898809523805,
+        "PSNRdB": 31.31467003619987,
+        "meanErrorToProduction": 0.0
+      },
+      {
+        "browser": "webkit",
+        "method": "production",
+        "width": 320,
+        "height": 182,
+        "meanAbsoluteRGB": 4.5293898809523805,
+        "PSNRdB": 31.31467003619987,
+        "meanErrorToProduction": 0.0
+      }
+    ]
+  },
+  "exporter": {
+    "generatedAt": "2026-10-07T18:29:31.609Z",
+    "head": "90c98c480178c7ea6ea665fd01dc321ec34152ff",
+    "toolchain": {
+      "bun": "1.4.2",
+      "node": "v24.16.0",
+      "zlib": "1.3.1-e00f703",
+      "pillow": "10.4.0"
+    },
+    "fixtures": [
+      {
+        "name": "garden-5120.jpg",
+        "bytes": 3345561,
+        "sha256": "4ca9cf44dabbd0945dd940e649bc30f8dadbe2fb5b9ff85dbb4db31bbbd218ba"
+      },
+      {
+        "name": "photo-48mp.jpg",
+        "bytes": 11006443,
+        "sha256": "694d490c6411aced1d979e340a82ad53f075c125a1b392ee6c192342512fc7dc"
+      },
+      {
+        "name": "art.png",
+        "bytes": 6465,
+        "sha256": "54be977ea505299afee7fccdbaae0c08cf2fb22d6a467589bec4db3ce308586a"
+      },
+      {
+        "name": "detail.png",
+        "bytes": 14898,
+        "sha256": "95652a4ddd9b8c166c8c1a0e04752a8d3942d2798df8b7941ed1e40bd4305c83"
+      }
+    ],
+    "sizes": {
+      "core.js": {
+        "raw": 11509,
+        "gzip9": 4278
+      },
+      "export.js": {
+        "raw": 2705,
+        "gzip9": 1285
+      },
+      "core.css": {
+        "raw": 1408,
+        "gzip9": 594
+      },
+      "demo.js": {
+        "raw": 17165,
+        "gzip9": 6375
+      },
+      "demo.css": {
+        "raw": 2752,
+        "gzip9": 1153
+      },
+      "index.html": {
+        "raw": 3257,
+        "gzip9": 1359
+      },
+      "sample.svg": {
+        "raw": 806,
+        "gzip9": 419
+      }
+    },
+    "totals": {
+      "component": {
+        "files": [
+          "core.js",
+          "export.js",
+          "core.css"
+        ],
+        "raw": 15622,
+        "gzip9": 6157
+      },
+      "demo": {
+        "files": [
+          "demo.js",
+          "core.css",
+          "demo.css",
+          "index.html",
+          "sample.svg"
+        ],
+        "raw": 25388,
+        "gzip9": 9900
+      }
+    },
+    "browsers": [
+      {
+        "name": "chromium",
+        "version": "153.0.8010.12",
+        "checks": {
+          "sizes": {
+            "cases": [
+              {
+                "options": {},
+                "width": 1024,
+                "height": 768
+              },
+              {
+                "options": {
+                  "width": 0.1
+                },
+                "width": 1,
+                "height": 1
+              },
+              {
+                "options": {
+                  "height": 0.49
+                },
+                "width": 1,
+                "height": 1
+              },
+              {
+                "options": {
+                  "width": 6000,
+                  "height": 6000
+                },
+                "width": 4096,
+                "height": 4096
+              },
+              {
+                "options": {
+                  "width": 20000,
+                  "height": 100
+                },
+                "width": 16384,
+                "height": 82
+              },
+              {
+                "options": {
+                  "width": 1e+308,
+                  "height": 1e+308
+                },
+                "width": 4096,
+                "height": 4096
+              },
+              {
+                "options": {
+                  "width": 1e+308
+                },
+                "width": 4729,
+                "height": 3547
+              },
+              {
+                "options": {
+                  "height": 1e+308
+                },
+                "width": 4729,
+                "height": 3547
+              }
+            ],
+            "rejected": 20
+          },
+          "geometry": [
+            {
+              "degrees": 0,
+              "flipX": 1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 27476,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 90,
+              "flipX": -1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 26703,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 37.25,
+              "flipX": 1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 27306,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": -28.75,
+              "flipX": -1,
+              "flipY": 1,
+              "mask": "circle",
+              "shear": 0,
+              "checked": 27566,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 123.4,
+              "flipX": -1,
+              "flipY": -1,
+              "mask": "circle",
+              "shear": 0,
+              "checked": 27206,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 11.2,
+              "flipX": 1,
+              "flipY": -1,
+              "mask": "rect",
+              "shear": 0.7,
+              "checked": 27297,
+              "errors": 0,
+              "worst": 0
+            }
+          ],
+          "productionParity": [
+            {
+              "rotation": 0,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 0,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 90,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 90,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 180,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 180,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 270,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 270,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            }
+          ],
+          "detailAndLifetime": {
+            "detail": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "photoDetail": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "detailDraws": [
+              {
+                "image": true,
+                "source": [
+                  731,
+                  508,
+                  265,
+                  200
+                ],
+                "target": [
+                  731,
+                  508,
+                  265,
+                  200
+                ],
+                "canvas": [
+                  256,
+                  192
+                ]
+              }
+            ],
+            "photoDetailDraws": [
+              {
+                "image": true,
+                "source": [
+                  3009,
+                  2307,
+                  265,
+                  201
+                ],
+                "target": [
+                  3009,
+                  2307,
+                  265,
+                  201
+                ],
+                "canvas": [
+                  257,
+                  193
+                ]
+              }
+            ],
+            "formats": [
+              {
+                "requested": "image/png",
+                "actual": "image/png",
+                "bytes": 712
+              },
+              {
+                "requested": "image/jpeg",
+                "actual": "image/jpeg",
+                "bytes": 1180
+              },
+              {
+                "requested": "image/webp",
+                "actual": "image/webp",
+                "bytes": 744
+              },
+              {
+                "requested": "image/unsupported",
+                "actual": "image/png",
+                "bytes": 712
+              },
+              {
+                "requested": "image/png",
+                "actual": "image/png",
+                "bytes": 4210,
+                "corner": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "requested": "image/jpeg",
+                "actual": "image/jpeg",
+                "bytes": 3192,
+                "corner": [
+                  255,
+                  255,
+                  255,
+                  255
+                ]
+              },
+              {
+                "requested": "image/webp",
+                "actual": "image/webp",
+                "bytes": 2888,
+                "corner": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ],
+            "allocation": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "scratchPixels": 15937500
+          }
+        },
+        "quality": [
+          {
+            "spec": {
+              "name": "garden-full",
+              "source": "garden-5120.jpg"
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-full-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-full-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-full-progressive.png",
+              "production": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-full-production.png",
+              "old": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-full-old.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "productionDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 5.4745077838827845,
+                "psnr": 29.735605880686823
+              },
+              "single": {
+                "mae": 4.6698374542124546,
+                "psnr": 31.161916571096047
+              },
+              "progressive": {
+                "mae": 5.4745077838827845,
+                "psnr": 29.735605880686823
+              },
+              "production": {
+                "mae": 5.4745077838827845,
+                "psnr": 29.735605880686823
+              },
+              "old": {
+                "mae": 4.6698374542124546,
+                "psnr": 31.161916571096047
+              }
+            },
+            "plainLanczos": {
+              "hybrid": {
+                "mae": 5.446983745421245,
+                "psnr": 29.857692753857627
+              },
+              "single": {
+                "mae": 4.672098214285714,
+                "psnr": 31.28869768350873
+              },
+              "progressive": {
+                "mae": 5.446983745421245,
+                "psnr": 29.857692753857627
+              },
+              "production": {
+                "mae": 5.446983745421245,
+                "psnr": 29.857692753857627
+              },
+              "old": {
+                "mae": 4.672098214285714,
+                "psnr": 31.28869768350873
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-full",
+              "source": "photo-48mp.jpg"
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 240,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-full-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-full-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-full-progressive.png",
+              "production": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-full-production.png",
+              "old": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-full-old.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "productionDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 4.161948784722222,
+                "psnr": 32.784348099335844
+              },
+              "single": {
+                "mae": 4.096332465277778,
+                "psnr": 33.02666677668496
+              },
+              "progressive": {
+                "mae": 4.161948784722222,
+                "psnr": 32.784348099335844
+              },
+              "production": {
+                "mae": 4.161948784722222,
+                "psnr": 32.784348099335844
+              },
+              "old": {
+                "mae": 4.096332465277778,
+                "psnr": 33.02666677668496
+              }
+            },
+            "plainLanczos": {
+              "hybrid": {
+                "mae": 4.1459765625000005,
+                "psnr": 32.81496397803888
+              },
+              "single": {
+                "mae": 4.0827039930555555,
+                "psnr": 33.054045341883345
+              },
+              "progressive": {
+                "mae": 4.1459765625000005,
+                "psnr": 32.81496397803888
+              },
+              "production": {
+                "mae": 4.1459765625000005,
+                "psnr": 32.81496397803888
+              },
+              "old": {
+                "mae": 4.0827039930555555,
+                "psnr": 33.054045341883345
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "garden-angle37",
+              "source": "garden-5120.jpg",
+              "angle": 37.25
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                0.796002002534622,
+                0.6052939880428944,
+                -0.6052939880428944,
+                0.796002002534622,
+                1404.4508610838861,
+                -1252.2255280840209
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-angle37-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-angle37-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-angle37-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 5.580357142857143e-05,
+              "rmseRGBA": 0.00747017880833996,
+              "premultipliedRMSE": 0.00747017880833996,
+              "max": 1,
+              "changed": 13
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 5.72696314102564,
+                "psnr": 28.41637160683411
+              },
+              "single": {
+                "mae": 5.1658081501831505,
+                "psnr": 29.250236559640083
+              },
+              "progressive": {
+                "mae": 5.726957417582418,
+                "psnr": 28.416397356494873
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-angle-flip-circle",
+              "source": "photo-48mp.jpg",
+              "angle": -28.75,
+              "flip": true,
+              "circle": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                -0.8767267557075077,
+                0.48098876891938763,
+                0.48098876891938763,
+                0.8767267557075077,
+                6063.940716071867,
+                -1554.1353428000739
+              ],
+              "mask": "circle"
+            },
+            "width": 320,
+            "height": 240,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-angle-flip-circle-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-angle-flip-circle-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-angle-flip-circle-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 3.530451388888889,
+                "psnr": 32.76300053968581
+              },
+              "single": {
+                "mae": 3.401137152777778,
+                "psnr": 33.19085292648965
+              },
+              "progressive": {
+                "mae": 3.530451388888889,
+                "psnr": 32.76300053968581
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-fractional-letterbox",
+              "source": "photo-48mp.jpg",
+              "angle": 123.4,
+              "flip": true,
+              "fractional": true,
+              "letterbox": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                0.5504807400849957,
+                -0.8348478632634064,
+                -0.8348478632634064,
+                -0.5504807400849957,
+                4302.620629450237,
+                7990.833673308613
+              ]
+            },
+            "width": 320,
+            "height": 320,
+            "options": {
+              "width": 320,
+              "height": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-fractional-letterbox-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-fractional-letterbox-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-48mp-fractional-letterbox-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0.00024169921875,
+              "rmseRGBA": 0.015546678704790937,
+              "premultipliedRMSE": 0.015546678704790937,
+              "max": 1,
+              "changed": 99
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  320
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 2.703655598958333,
+                "psnr": 34.26192404952459
+              },
+              "single": {
+                "mae": 2.603346354166667,
+                "psnr": 34.73953063601535
+              },
+              "progressive": {
+                "mae": 2.703671875,
+                "psnr": 34.261890986061
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "garden-region",
+              "source": "garden-5120.jpg",
+              "region": true,
+              "angle": 19.3,
+              "fractional": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 1024,
+                "height": 583
+              },
+              "transform": [
+                0.9438009515832294,
+                0.330514392713223,
+                -0.330514392713223,
+                0.9438009515832294,
+                -1422.4057086735445,
+                -1930.2067322784078
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-region-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-region-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-garden-region-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 1.6251330700549451,
+              "rmseRGBA": 3.0121413253715352,
+              "premultipliedRMSE": 3.0121413253715352,
+              "max": 44,
+              "changed": 138607
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  1978,
+                  972,
+                  1186,
+                  916
+                ],
+                "target": [
+                  0,
+                  0,
+                  593,
+                  458
+                ],
+                "canvas": [
+                  593,
+                  458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  593,
+                  458
+                ],
+                "target": [
+                  1978,
+                  972,
+                  1186,
+                  916
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 3.4785313644688642,
+                "psnr": 33.945045004386365
+              },
+              "single": {
+                "mae": 3.8650240384615384,
+                "psnr": 32.973372613214224
+              },
+              "progressive": {
+                "mae": 3.792010073260073,
+                "psnr": 33.258730077365975
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "transparent-circle",
+              "source": "art.png",
+              "angle": 37.25,
+              "flip": true,
+              "circle": true,
+              "letterbox": true,
+              "fractional": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 1024,
+                "height": 768
+              },
+              "stage": {
+                "width": 1024,
+                "height": 768
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 1024,
+                "height": 768
+              },
+              "transform": [
+                -0.796002002534622,
+                -0.6052939880428944,
+                -0.6052939880428944,
+                0.796002002534622,
+                1151.985916706198,
+                388.24575290466703
+              ],
+              "mask": "circle"
+            },
+            "width": 320,
+            "height": 320,
+            "options": {
+              "width": 320,
+              "height": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-transparent-circle-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-transparent-circle-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-transparent-circle-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  1024,
+                  768
+                ],
+                "target": [
+                  0,
+                  0,
+                  512,
+                  384
+                ],
+                "canvas": [
+                  512,
+                  384
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  512,
+                  384
+                ],
+                "target": [
+                  0,
+                  0,
+                  1024,
+                  768
+                ],
+                "canvas": [
+                  320,
+                  320
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 0.5376399739583334,
+                "psnr": 40.32317592374426
+              },
+              "single": {
+                "mae": 0.6014876302083333,
+                "psnr": 39.20298111694953
+              },
+              "progressive": {
+                "mae": 0.5376399739583334,
+                "psnr": 40.32317592374426
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "shear-limit",
+              "source": "garden-5120.jpg",
+              "shear": true,
+              "angle": 17.5
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                0.9537169507482269,
+                0.3007057995042731,
+                2.3196099872275955,
+                1.779899344785266,
+                -3262.3469502996813,
+                -1906.5101417554642
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-shear-limit-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-shear-limit-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-shear-limit-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 4.2552827380952385,
+                "psnr": 29.874864470387948
+              },
+              "single": {
+                "mae": 6.693767170329671,
+                "psnr": 25.507873634232077
+              },
+              "progressive": {
+                "mae": 4.2552827380952385,
+                "psnr": 29.874864470387948
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "anisotropic-limit",
+              "source": "garden-5120.jpg",
+              "anisotropic": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 233.20000000000002
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                0.07999999821186066,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 15,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-anisotropic-limit-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-anisotropic-limit-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-anisotropic-limit-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  15
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 13.800277777777778,
+                "psnr": 23.079812794148992
+              },
+              "single": {
+                "mae": 18.572222222222223,
+                "psnr": 20.126825544375446
+              },
+              "progressive": {
+                "mae": 13.800277777777778,
+                "psnr": 23.079812794148992
+              }
+            }
+          }
+        ],
+        "exif": [
+          {
+            "orientation": 1,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-1.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 2,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-2.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 3,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-3.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 4,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-4.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 5,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-5.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 6,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-6.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 7,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-7.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 8,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/chromium-exif-8.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          }
+        ],
+        "errors": []
+      },
+      {
+        "name": "firefox",
+        "version": "155.0",
+        "checks": {
+          "sizes": {
+            "cases": [
+              {
+                "options": {},
+                "width": 1024,
+                "height": 768
+              },
+              {
+                "options": {
+                  "width": 0.1
+                },
+                "width": 1,
+                "height": 1
+              },
+              {
+                "options": {
+                  "height": 0.49
+                },
+                "width": 1,
+                "height": 1
+              },
+              {
+                "options": {
+                  "width": 6000,
+                  "height": 6000
+                },
+                "width": 4096,
+                "height": 4096
+              },
+              {
+                "options": {
+                  "width": 20000,
+                  "height": 100
+                },
+                "width": 16384,
+                "height": 82
+              },
+              {
+                "options": {
+                  "width": 1e+308,
+                  "height": 1e+308
+                },
+                "width": 4096,
+                "height": 4096
+              },
+              {
+                "options": {
+                  "width": 1e+308
+                },
+                "width": 4729,
+                "height": 3547
+              },
+              {
+                "options": {
+                  "height": 1e+308
+                },
+                "width": 4729,
+                "height": 3547
+              }
+            ],
+            "rejected": 20
+          },
+          "geometry": [
+            {
+              "degrees": 0,
+              "flipX": 1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 27476,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 90,
+              "flipX": -1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 26703,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 37.25,
+              "flipX": 1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 27306,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": -28.75,
+              "flipX": -1,
+              "flipY": 1,
+              "mask": "circle",
+              "shear": 0,
+              "checked": 27566,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 123.4,
+              "flipX": -1,
+              "flipY": -1,
+              "mask": "circle",
+              "shear": 0,
+              "checked": 27206,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 11.2,
+              "flipX": 1,
+              "flipY": -1,
+              "mask": "rect",
+              "shear": 0.7,
+              "checked": 27297,
+              "errors": 0,
+              "worst": 0
+            }
+          ],
+          "productionParity": [
+            {
+              "rotation": 0,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 0,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 90,
+              "circle": false,
+              "meanRGBA": 0.4496053059895833,
+              "rmseRGBA": 7.470164996277832,
+              "premultipliedRMSE": 1.272100262164459,
+              "max": 255,
+              "changed": 2392
+            },
+            {
+              "rotation": 90,
+              "circle": true,
+              "meanRGBA": 0.4199625651041667,
+              "rmseRGBA": 7.397017034089091,
+              "premultipliedRMSE": 1.1780768957630972,
+              "max": 255,
+              "changed": 2016
+            },
+            {
+              "rotation": 180,
+              "circle": false,
+              "meanRGBA": 0.5218505859375,
+              "rmseRGBA": 9.346450670533642,
+              "premultipliedRMSE": 1.1084133128565785,
+              "max": 255,
+              "changed": 1854
+            },
+            {
+              "rotation": 180,
+              "circle": true,
+              "meanRGBA": 0.3621622721354167,
+              "rmseRGBA": 7.562809372976365,
+              "premultipliedRMSE": 0.9874665441947389,
+              "max": 255,
+              "changed": 1634
+            },
+            {
+              "rotation": 270,
+              "circle": false,
+              "meanRGBA": 0.19329833984375,
+              "rmseRGBA": 5.529371959302694,
+              "premultipliedRMSE": 0.7552834011308173,
+              "max": 238,
+              "changed": 930
+            },
+            {
+              "rotation": 270,
+              "circle": true,
+              "meanRGBA": 0.19482421875,
+              "rmseRGBA": 5.530089405663838,
+              "premultipliedRMSE": 0.769211575211161,
+              "max": 238,
+              "changed": 973
+            }
+          ],
+          "detailAndLifetime": {
+            "detail": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "photoDetail": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "detailDraws": [
+              {
+                "image": true,
+                "source": [
+                  731,
+                  508,
+                  265,
+                  200
+                ],
+                "target": [
+                  731,
+                  508,
+                  265,
+                  200
+                ],
+                "canvas": [
+                  256,
+                  192
+                ]
+              }
+            ],
+            "photoDetailDraws": [
+              {
+                "image": true,
+                "source": [
+                  3009,
+                  2307,
+                  265,
+                  201
+                ],
+                "target": [
+                  3009,
+                  2307,
+                  265,
+                  201
+                ],
+                "canvas": [
+                  257,
+                  193
+                ]
+              }
+            ],
+            "formats": [
+              {
+                "requested": "image/png",
+                "actual": "image/png",
+                "bytes": 394
+              },
+              {
+                "requested": "image/jpeg",
+                "actual": "image/jpeg",
+                "bytes": 1449
+              },
+              {
+                "requested": "image/webp",
+                "actual": "image/webp",
+                "bytes": 262
+              },
+              {
+                "requested": "image/unsupported",
+                "actual": "image/png",
+                "bytes": 394
+              },
+              {
+                "requested": "image/png",
+                "actual": "image/png",
+                "bytes": 3767,
+                "corner": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "requested": "image/jpeg",
+                "actual": "image/jpeg",
+                "bytes": 4224,
+                "corner": [
+                  255,
+                  255,
+                  255,
+                  255
+                ]
+              },
+              {
+                "requested": "image/webp",
+                "actual": "image/webp",
+                "bytes": 2212,
+                "corner": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ],
+            "allocation": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "scratchPixels": 15937500
+          }
+        },
+        "quality": [
+          {
+            "spec": {
+              "name": "garden-full",
+              "source": "garden-5120.jpg"
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-full-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-full-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-full-progressive.png",
+              "production": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-full-production.png",
+              "old": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-full-old.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "productionDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 5.1430402930402925,
+                "psnr": 30.49362070712781
+              },
+              "single": {
+                "mae": 11.67268772893773,
+                "psnr": 22.918132666252852
+              },
+              "progressive": {
+                "mae": 5.1430402930402925,
+                "psnr": 30.49362070712781
+              },
+              "production": {
+                "mae": 5.1430402930402925,
+                "psnr": 30.49362070712781
+              },
+              "old": {
+                "mae": 11.67268772893773,
+                "psnr": 22.918132666252852
+              }
+            },
+            "plainLanczos": {
+              "hybrid": {
+                "mae": 5.17046130952381,
+                "psnr": 30.629450635045416
+              },
+              "single": {
+                "mae": 11.690447573260073,
+                "psnr": 22.903426574254944
+              },
+              "progressive": {
+                "mae": 5.17046130952381,
+                "psnr": 30.629450635045416
+              },
+              "production": {
+                "mae": 5.17046130952381,
+                "psnr": 30.629450635045416
+              },
+              "old": {
+                "mae": 11.690447573260073,
+                "psnr": 22.903426574254944
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-full",
+              "source": "photo-48mp.jpg"
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 240,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-full-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-full-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-full-progressive.png",
+              "production": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-full-production.png",
+              "old": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-full-old.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "productionDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 4.096332465277778,
+                "psnr": 33.02666677668496
+              },
+              "single": {
+                "mae": 11.943229166666667,
+                "psnr": 22.76905161360281
+              },
+              "progressive": {
+                "mae": 4.096332465277778,
+                "psnr": 33.02666677668496
+              },
+              "production": {
+                "mae": 4.096332465277778,
+                "psnr": 33.02666677668496
+              },
+              "old": {
+                "mae": 11.943229166666667,
+                "psnr": 22.76905161360281
+              }
+            },
+            "plainLanczos": {
+              "hybrid": {
+                "mae": 4.0827039930555555,
+                "psnr": 33.054045341883345
+              },
+              "single": {
+                "mae": 11.937291666666667,
+                "psnr": 22.77253909756056
+              },
+              "progressive": {
+                "mae": 4.0827039930555555,
+                "psnr": 33.054045341883345
+              },
+              "production": {
+                "mae": 4.0827039930555555,
+                "psnr": 33.054045341883345
+              },
+              "old": {
+                "mae": 11.937291666666667,
+                "psnr": 22.77253909756056
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "garden-angle37",
+              "source": "garden-5120.jpg",
+              "angle": 37.25
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                0.796002002534622,
+                0.6052939880428944,
+                -0.6052939880428944,
+                0.796002002534622,
+                1404.4508610838861,
+                -1252.2255280840209
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-angle37-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-angle37-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-angle37-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0.00023609203296703297,
+              "rmseRGBA": 0.024948435833724136,
+              "premultipliedRMSE": 0.024948435833724136,
+              "max": 5,
+              "changed": 31
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 5.4054716117216115,
+                "psnr": 29.03235943924568
+              },
+              "single": {
+                "mae": 9.479527243589743,
+                "psnr": 23.68720742411392
+              },
+              "progressive": {
+                "mae": 5.405488782051282,
+                "psnr": 29.03237565264032
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-angle-flip-circle",
+              "source": "photo-48mp.jpg",
+              "angle": -28.75,
+              "flip": true,
+              "circle": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                -0.8767267557075077,
+                0.48098876891938763,
+                0.48098876891938763,
+                0.8767267557075077,
+                6063.940716071867,
+                -1554.1353428000739
+              ],
+              "mask": "circle"
+            },
+            "width": 320,
+            "height": 240,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-angle-flip-circle-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-angle-flip-circle-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-angle-flip-circle-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 3.339175347222222,
+                "psnr": 33.57838055701127
+              },
+              "single": {
+                "mae": 9.351948784722222,
+                "psnr": 23.879065051607622
+              },
+              "progressive": {
+                "mae": 3.339175347222222,
+                "psnr": 33.57838055701127
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-fractional-letterbox",
+              "source": "photo-48mp.jpg",
+              "angle": 123.4,
+              "flip": true,
+              "fractional": true,
+              "letterbox": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                0.5504807400849956,
+                -0.8348478632634065,
+                -0.8348478632634065,
+                -0.5504807400849956,
+                4302.620629450237,
+                7990.833673308613
+              ]
+            },
+            "width": 320,
+            "height": 320,
+            "options": {
+              "width": 320,
+              "height": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-fractional-letterbox-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-fractional-letterbox-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-48mp-fractional-letterbox-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0.00027099609375,
+              "rmseRGBA": 0.021594179626695707,
+              "premultipliedRMSE": 0.021594179626695707,
+              "max": 4,
+              "changed": 80
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  320
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 2.602314453125,
+                "psnr": 34.743622783435846
+              },
+              "single": {
+                "mae": 7.202841796875,
+                "psnr": 25.107913876960968
+              },
+              "progressive": {
+                "mae": 2.602330729166667,
+                "psnr": 34.74359621123383
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "garden-region",
+              "source": "garden-5120.jpg",
+              "region": true,
+              "angle": 19.3,
+              "fractional": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 1024,
+                "height": 583
+              },
+              "transform": [
+                0.9438009515832294,
+                0.330514392713223,
+                -0.330514392713223,
+                0.9438009515832294,
+                -1422.4057086735445,
+                -1930.2067322784078
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-region-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-region-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-garden-region-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 1.8402429601648351,
+              "rmseRGBA": 3.4947707943754738,
+              "premultipliedRMSE": 3.4947707943754738,
+              "max": 54,
+              "changed": 140050
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  1978,
+                  972,
+                  1186,
+                  916
+                ],
+                "target": [
+                  0,
+                  0,
+                  593,
+                  458
+                ],
+                "canvas": [
+                  593,
+                  458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  593,
+                  458
+                ],
+                "target": [
+                  1978,
+                  972,
+                  1186,
+                  916
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 3.3445512820512824,
+                "psnr": 34.33647620879639
+              },
+              "single": {
+                "mae": 6.123431776556777,
+                "psnr": 28.937817895410106
+              },
+              "progressive": {
+                "mae": 3.899067078754579,
+                "psnr": 32.948576420988175
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "transparent-circle",
+              "source": "art.png",
+              "angle": 37.25,
+              "flip": true,
+              "circle": true,
+              "letterbox": true,
+              "fractional": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 1024,
+                "height": 768
+              },
+              "stage": {
+                "width": 1024,
+                "height": 768
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 1024,
+                "height": 768
+              },
+              "transform": [
+                -0.796002002534622,
+                -0.6052939880428944,
+                -0.6052939880428944,
+                0.796002002534622,
+                1151.985916706198,
+                388.24575290466703
+              ],
+              "mask": "circle"
+            },
+            "width": 320,
+            "height": 320,
+            "options": {
+              "width": 320,
+              "height": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-transparent-circle-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-transparent-circle-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-transparent-circle-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  1024,
+                  768
+                ],
+                "target": [
+                  0,
+                  0,
+                  512,
+                  384
+                ],
+                "canvas": [
+                  512,
+                  384
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  512,
+                  384
+                ],
+                "target": [
+                  0,
+                  0,
+                  1024,
+                  768
+                ],
+                "canvas": [
+                  320,
+                  320
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 0.6422330729166666,
+                "psnr": 39.85324590864039
+              },
+              "single": {
+                "mae": 0.8545833333333333,
+                "psnr": 35.87665399674418
+              },
+              "progressive": {
+                "mae": 0.6422330729166666,
+                "psnr": 39.85324590864039
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "shear-limit",
+              "source": "garden-5120.jpg",
+              "shear": true,
+              "angle": 17.5
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                0.9537169507482269,
+                0.3007057995042731,
+                2.3196099872275955,
+                1.779899344785266,
+                -3262.3469502996813,
+                -1906.5101417554642
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-shear-limit-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-shear-limit-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-shear-limit-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 6.706994047619048,
+                "psnr": 25.50225912317949
+              },
+              "single": {
+                "mae": 8.678313873626372,
+                "psnr": 23.319000199502298
+              },
+              "progressive": {
+                "mae": 6.706994047619048,
+                "psnr": 25.50225912317949
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "anisotropic-limit",
+              "source": "garden-5120.jpg",
+              "anisotropic": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 233.20000000000002
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                0.08,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 15,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-anisotropic-limit-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-anisotropic-limit-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-anisotropic-limit-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  15
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 18.78590277777778,
+                "psnr": 20.007184348794876
+              },
+              "single": {
+                "mae": 25.704583333333336,
+                "psnr": 17.318846764714266
+              },
+              "progressive": {
+                "mae": 18.78590277777778,
+                "psnr": 20.007184348794876
+              }
+            }
+          }
+        ],
+        "exif": [
+          {
+            "orientation": 1,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-1.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 2,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-2.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 3,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-3.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 4,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-4.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 5,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-5.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 6,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-6.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 7,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-7.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          },
+          {
+            "orientation": 8,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/firefox-exif-8.png",
+            "metrics": {
+              "mae": 0,
+              "psnr": 100
+            }
+          }
+        ],
+        "errors": []
+      },
+      {
+        "name": "webkit",
+        "version": "26.6",
+        "checks": {
+          "sizes": {
+            "cases": [
+              {
+                "options": {},
+                "width": 1024,
+                "height": 768
+              },
+              {
+                "options": {
+                  "width": 0.1
+                },
+                "width": 1,
+                "height": 1
+              },
+              {
+                "options": {
+                  "height": 0.49
+                },
+                "width": 1,
+                "height": 1
+              },
+              {
+                "options": {
+                  "width": 6000,
+                  "height": 6000
+                },
+                "width": 4096,
+                "height": 4096
+              },
+              {
+                "options": {
+                  "width": 20000,
+                  "height": 100
+                },
+                "width": 16384,
+                "height": 82
+              },
+              {
+                "options": {
+                  "width": 1e+308,
+                  "height": 1e+308
+                },
+                "width": 4096,
+                "height": 4096
+              },
+              {
+                "options": {
+                  "width": 1e+308
+                },
+                "width": 4729,
+                "height": 3547
+              },
+              {
+                "options": {
+                  "height": 1e+308
+                },
+                "width": 4729,
+                "height": 3547
+              }
+            ],
+            "rejected": 20
+          },
+          "geometry": [
+            {
+              "degrees": 0,
+              "flipX": 1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 27476,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 90,
+              "flipX": -1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 26703,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 37.25,
+              "flipX": 1,
+              "flipY": 1,
+              "mask": "rect",
+              "shear": 0,
+              "checked": 27306,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": -28.75,
+              "flipX": -1,
+              "flipY": 1,
+              "mask": "circle",
+              "shear": 0,
+              "checked": 27566,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 123.4,
+              "flipX": -1,
+              "flipY": -1,
+              "mask": "circle",
+              "shear": 0,
+              "checked": 27206,
+              "errors": 0,
+              "worst": 0
+            },
+            {
+              "degrees": 11.2,
+              "flipX": 1,
+              "flipY": -1,
+              "mask": "rect",
+              "shear": 0.7,
+              "checked": 27297,
+              "errors": 0,
+              "worst": 0
+            }
+          ],
+          "productionParity": [
+            {
+              "rotation": 0,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 0,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 90,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 90,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 180,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 180,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 270,
+              "circle": false,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            {
+              "rotation": 270,
+              "circle": true,
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            }
+          ],
+          "detailAndLifetime": {
+            "detail": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "photoDetail": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "detailDraws": [
+              {
+                "image": true,
+                "source": [
+                  731,
+                  508,
+                  265,
+                  200
+                ],
+                "target": [
+                  731,
+                  508,
+                  265,
+                  200
+                ],
+                "canvas": [
+                  256,
+                  192
+                ]
+              }
+            ],
+            "photoDetailDraws": [
+              {
+                "image": true,
+                "source": [
+                  3009,
+                  2307,
+                  265,
+                  201
+                ],
+                "target": [
+                  3009,
+                  2307,
+                  265,
+                  201
+                ],
+                "canvas": [
+                  257,
+                  193
+                ]
+              }
+            ],
+            "formats": [
+              {
+                "requested": "image/png",
+                "actual": "image/png",
+                "bytes": 1111
+              },
+              {
+                "requested": "image/jpeg",
+                "actual": "image/jpeg",
+                "bytes": 1767
+              },
+              {
+                "requested": "image/webp",
+                "actual": "image/png",
+                "bytes": 1111
+              },
+              {
+                "requested": "image/unsupported",
+                "actual": "image/png",
+                "bytes": 1111
+              },
+              {
+                "requested": "image/png",
+                "actual": "image/png",
+                "bytes": 4455,
+                "corner": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "requested": "image/jpeg",
+                "actual": "image/jpeg",
+                "bytes": 4183,
+                "corner": [
+                  255,
+                  255,
+                  255,
+                  255
+                ]
+              },
+              {
+                "requested": "image/webp",
+                "actual": "image/png",
+                "bytes": 4455,
+                "corner": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ],
+            "allocation": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "scratchPixels": 15937500
+          }
+        },
+        "quality": [
+          {
+            "spec": {
+              "name": "garden-full",
+              "source": "garden-5120.jpg"
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-full-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-full-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-full-progressive.png",
+              "production": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-full-production.png",
+              "old": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-full-old.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "productionDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 4.698477564102563,
+                "psnr": 31.011040433499776
+              },
+              "single": {
+                "mae": 10.031272893772893,
+                "psnr": 24.206224187357925
+              },
+              "progressive": {
+                "mae": 4.698477564102563,
+                "psnr": 31.011040433499776
+              },
+              "production": {
+                "mae": 4.698477564102563,
+                "psnr": 31.011040433499776
+              },
+              "old": {
+                "mae": 10.031272893772893,
+                "psnr": 24.206224187357925
+              }
+            },
+            "plainLanczos": {
+              "hybrid": {
+                "mae": 4.5293898809523805,
+                "psnr": 31.31467003619987
+              },
+              "single": {
+                "mae": 10.043801510989011,
+                "psnr": 24.180907376971707
+              },
+              "progressive": {
+                "mae": 4.5293898809523805,
+                "psnr": 31.31467003619987
+              },
+              "production": {
+                "mae": 4.5293898809523805,
+                "psnr": 31.31467003619987
+              },
+              "old": {
+                "mae": 10.043801510989011,
+                "psnr": 24.180907376971707
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-full",
+              "source": "photo-48mp.jpg"
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 240,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-full-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-full-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-full-progressive.png",
+              "production": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-full-production.png",
+              "old": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-full-old.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "productionDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 3.5359635416666664,
+                "psnr": 33.741698287255886
+              },
+              "single": {
+                "mae": 11.932269965277778,
+                "psnr": 22.780578202232093
+              },
+              "progressive": {
+                "mae": 3.5359635416666664,
+                "psnr": 33.741698287255886
+              },
+              "production": {
+                "mae": 3.5359635416666664,
+                "psnr": 33.741698287255886
+              },
+              "old": {
+                "mae": 11.932269965277778,
+                "psnr": 22.780578202232093
+              }
+            },
+            "plainLanczos": {
+              "hybrid": {
+                "mae": 3.5222916666666664,
+                "psnr": 33.768047690857905
+              },
+              "single": {
+                "mae": 11.926254340277778,
+                "psnr": 22.784107208217637
+              },
+              "progressive": {
+                "mae": 3.5222916666666664,
+                "psnr": 33.768047690857905
+              },
+              "production": {
+                "mae": 3.5222916666666664,
+                "psnr": 33.768047690857905
+              },
+              "old": {
+                "mae": 11.926254340277778,
+                "psnr": 22.784107208217637
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "garden-angle37",
+              "source": "garden-5120.jpg",
+              "angle": 37.25
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                0.796002002534622,
+                0.6052939880428944,
+                -0.6052939880428944,
+                0.796002002534622,
+                1404.4508610838861,
+                -1252.2255280840213
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-angle37-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-angle37-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-angle37-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 4.292582417582418e-06,
+              "rmseRGBA": 0.0020718548254118623,
+              "premultipliedRMSE": 0.0020718548254118623,
+              "max": 1,
+              "changed": 1
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 5.2507612179487175,
+                "psnr": 29.104279149806878
+              },
+              "single": {
+                "mae": 8.671972298534799,
+                "psnr": 24.157417313200334
+              },
+              "progressive": {
+                "mae": 5.2507440476190474,
+                "psnr": 29.104324870085165
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-angle-flip-circle",
+              "source": "photo-48mp.jpg",
+              "angle": -28.75,
+              "flip": true,
+              "circle": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                -0.8767267557075077,
+                0.48098876891938763,
+                0.48098876891938763,
+                0.8767267557075077,
+                6063.940716071867,
+                -1554.1353428000739
+              ],
+              "mask": "circle"
+            },
+            "width": 320,
+            "height": 240,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-angle-flip-circle-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-angle-flip-circle-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-angle-flip-circle-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 3.2552083333333335e-06,
+              "rmseRGBA": 0.0018042195912175807,
+              "premultipliedRMSE": 0.0018042195912175807,
+              "max": 1,
+              "changed": 1
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  240
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 3.114435763888889,
+                "psnr": 33.83896743524034
+              },
+              "single": {
+                "mae": 9.542847222222221,
+                "psnr": 23.618617555480004
+              },
+              "progressive": {
+                "mae": 3.114422743055556,
+                "psnr": 33.83906777181563
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "48mp-fractional-letterbox",
+              "source": "photo-48mp.jpg",
+              "angle": 123.4,
+              "flip": true,
+              "fractional": true,
+              "letterbox": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 8000,
+                "height": 6000
+              },
+              "stage": {
+                "width": 8000,
+                "height": 6000
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 8000,
+                "height": 6000
+              },
+              "transform": [
+                0.5504807400849956,
+                -0.8348478632634065,
+                -0.8348478632634065,
+                -0.5504807400849956,
+                4302.620629450237,
+                7990.833673308613
+              ]
+            },
+            "width": 320,
+            "height": 320,
+            "options": {
+              "width": 320,
+              "height": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-fractional-letterbox-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-fractional-letterbox-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-48mp-fractional-letterbox-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 4.8828125e-06,
+              "rmseRGBA": 0.002209708691207961,
+              "premultipliedRMSE": 0.002209708691207961,
+              "max": 1,
+              "changed": 2
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "target": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "canvas": [
+                  4000,
+                  3000
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  4000,
+                  3000
+                ],
+                "target": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "canvas": [
+                  2000,
+                  1500
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2000,
+                  1500
+                ],
+                "target": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "canvas": [
+                  1000,
+                  750
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1000,
+                  750
+                ],
+                "target": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "canvas": [
+                  500,
+                  375
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  500,
+                  375
+                ],
+                "target": [
+                  0,
+                  0,
+                  8000,
+                  6000
+                ],
+                "canvas": [
+                  320,
+                  320
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 2.4707519531249997,
+                "psnr": 34.74180458294399
+              },
+              "single": {
+                "mae": 7.431048177083333,
+                "psnr": 24.705664918911307
+              },
+              "progressive": {
+                "mae": 2.4707519531249997,
+                "psnr": 34.74176960009237
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "garden-region",
+              "source": "garden-5120.jpg",
+              "region": true,
+              "angle": 19.3,
+              "fractional": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 1024,
+                "height": 583
+              },
+              "transform": [
+                0.9438009515832294,
+                0.330514392713223,
+                -0.330514392713223,
+                0.9438009515832294,
+                -1422.4057086735447,
+                -1930.2067322784078
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-region-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-region-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-garden-region-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0.7307220123626373,
+              "rmseRGBA": 1.5420933908485897,
+              "premultipliedRMSE": 1.5420933908485897,
+              "max": 30,
+              "changed": 96201
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  1978,
+                  972,
+                  1186,
+                  916
+                ],
+                "target": [
+                  0,
+                  0,
+                  593,
+                  458
+                ],
+                "canvas": [
+                  593,
+                  458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  593,
+                  458
+                ],
+                "target": [
+                  1978,
+                  972,
+                  1186,
+                  916
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 3.7262648809523804,
+                "psnr": 33.2273970851068
+              },
+              "single": {
+                "mae": 4.040464743589744,
+                "psnr": 32.36776593882205
+              },
+              "progressive": {
+                "mae": 3.8156250000000003,
+                "psnr": 32.89894645687176
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "transparent-circle",
+              "source": "art.png",
+              "angle": 37.25,
+              "flip": true,
+              "circle": true,
+              "letterbox": true,
+              "fractional": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 1024,
+                "height": 768
+              },
+              "stage": {
+                "width": 1024,
+                "height": 768
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 19.375,
+                "y": -21.625,
+                "width": 1024,
+                "height": 768
+              },
+              "transform": [
+                -0.796002002534622,
+                -0.6052939880428944,
+                -0.6052939880428944,
+                0.796002002534622,
+                1151.985916706198,
+                388.24575290466703
+              ],
+              "mask": "circle"
+            },
+            "width": 320,
+            "height": 320,
+            "options": {
+              "width": 320,
+              "height": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-transparent-circle-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-transparent-circle-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-transparent-circle-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  1024,
+                  768
+                ],
+                "target": [
+                  0,
+                  0,
+                  512,
+                  384
+                ],
+                "canvas": [
+                  512,
+                  384
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  512,
+                  384
+                ],
+                "target": [
+                  0,
+                  0,
+                  1024,
+                  768
+                ],
+                "canvas": [
+                  320,
+                  320
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 0.5250390625,
+                "psnr": 40.748718580527886
+              },
+              "single": {
+                "mae": 0.8696516927083334,
+                "psnr": 34.680290012710856
+              },
+              "progressive": {
+                "mae": 0.5250390625,
+                "psnr": 40.748718580527886
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "shear-limit",
+              "source": "garden-5120.jpg",
+              "shear": true,
+              "angle": 17.5
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 2915
+              },
+              "transform": [
+                0.9537169507482269,
+                0.3007057995042731,
+                2.3196099872275955,
+                1.779899344785266,
+                -3262.3469502996813,
+                -1906.5101417554642
+              ]
+            },
+            "width": 320,
+            "height": 182,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-shear-limit-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-shear-limit-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-shear-limit-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0.00018458104395604395,
+              "rmseRGBA": 0.01358606064891674,
+              "premultipliedRMSE": 0.01358606064891674,
+              "max": 1,
+              "changed": 43
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  182
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 6.7347413003662995,
+                "psnr": 25.507007770961664
+              },
+              "single": {
+                "mae": 8.436389652014652,
+                "psnr": 23.373802766703587
+              },
+              "progressive": {
+                "mae": 6.734781364468865,
+                "psnr": 25.506979378243404
+              }
+            }
+          },
+          {
+            "spec": {
+              "name": "anisotropic-limit",
+              "source": "garden-5120.jpg",
+              "anisotropic": true
+            },
+            "state": {
+              "version": 1,
+              "image": {
+                "width": 5120,
+                "height": 2915
+              },
+              "stage": {
+                "width": 5120,
+                "height": 2915
+              },
+              "aspect": null,
+              "viewport": {
+                "x": 0,
+                "y": 0,
+                "width": 5120,
+                "height": 233.20000000000002
+              },
+              "transform": [
+                1,
+                0,
+                0,
+                0.08,
+                0,
+                0
+              ]
+            },
+            "width": 320,
+            "height": 15,
+            "options": {
+              "width": 320
+            },
+            "outputs": {
+              "hybrid": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-anisotropic-limit-hybrid.png",
+              "single": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-anisotropic-limit-single.png",
+              "progressive": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-anisotropic-limit-progressive.png"
+            },
+            "nativeDifference": {
+              "meanRGBA": 0,
+              "rmseRGBA": 0,
+              "premultipliedRMSE": 0,
+              "max": 0,
+              "changed": 0
+            },
+            "draws": [
+              {
+                "image": true,
+                "source": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "target": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "canvas": [
+                  2560,
+                  1458
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  2560,
+                  1458
+                ],
+                "target": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "canvas": [
+                  1280,
+                  729
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  1280,
+                  729
+                ],
+                "target": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "canvas": [
+                  640,
+                  365
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  640,
+                  365
+                ],
+                "target": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "canvas": [
+                  320,
+                  183
+                ]
+              },
+              {
+                "image": false,
+                "source": [
+                  0,
+                  0,
+                  320,
+                  183
+                ],
+                "target": [
+                  0,
+                  0,
+                  5120,
+                  2915
+                ],
+                "canvas": [
+                  320,
+                  15
+                ]
+              }
+            ],
+            "quality": {
+              "hybrid": {
+                "mae": 18.97236111111111,
+                "psnr": 19.927967808408695
+              },
+              "single": {
+                "mae": 15.50875,
+                "psnr": 19.862430616025932
+              },
+              "progressive": {
+                "mae": 18.97236111111111,
+                "psnr": 19.927967808408695
+              }
+            }
+          }
+        ],
+        "exif": [
+          {
+            "orientation": 1,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-1.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          },
+          {
+            "orientation": 2,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-2.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          },
+          {
+            "orientation": 3,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-3.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          },
+          {
+            "orientation": 4,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-4.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          },
+          {
+            "orientation": 5,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-5.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          },
+          {
+            "orientation": 6,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-6.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          },
+          {
+            "orientation": 7,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-7.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          },
+          {
+            "orientation": 8,
+            "path": "/Users/matthewstingel/orca/workspaces/croppie/performance-and-size/.cache/hybrid/export/webkit-exif-8.png",
+            "metrics": {
+              "mae": 0.16798611111111114,
+              "psnr": 55.862836143831174
+            }
+          }
+        ],
+        "errors": []
+      }
+    ],
+    "acceptance": {
+      "passed": true,
+      "failures": []
+    }
+  }
+}
