@@ -1120,7 +1120,11 @@ export class Croppie {
 	 * Emits an update event
 	 */
 	private emitUpdate(): void {
-		this.emitEvent("update", this.get());
+		// Crop coordinates are only needed by update subscribers. Keep dispatch synchronous,
+		// checking the live set so listeners added by a rotate handler are included too.
+		if (this.eventHandlers.get("update")?.size) {
+			this.emitEvent("update", this.get());
+		}
 	}
 
 	/**
