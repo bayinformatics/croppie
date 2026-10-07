@@ -90,6 +90,34 @@ function describeValue(value: unknown): string {
 }
 
 /**
+ * The rotation a bind starts with: the validated `rotation` option; else the rotation an
+ * explicit `orientation` (EXIF 1-8) stands for; else 0. Mirrored or out-of-range
+ * orientations cannot be expressed as a rotation, so they are ignored with a warning.
+ *
+ * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
+ */
+function resolveBindRotation(bindOptions: BindFileOptions): Rotation {
+	if (bindOptions.rotation !== undefined) {
+		return normalizeRotation(bindOptions.rotation);
+	}
+	if (bindOptions.orientation === undefined) return 0;
+
+	const rotation = exifOrientationToRotation(bindOptions.orientation);
+	if (rotation === undefined) {
+		console.warn(
+			`[@bayinformatics/croppie] Ignoring bind({ orientation: ${bindOptions.orientation} }): only the EXIF orientations 1, 3, 6 and 8 can be expressed as a rotation`,
+		);
+		return 0;
+	}
+	return rotation;
+}
+
+/** The transform before any image is bound, and again after `destroy()`. */
+function initialTransform(): TransformState {
+	return { x: 0, y: 0, scale: 1, rotation: 0 };
+}
+
+/**
  * Modern, TypeScript-first image cropper.
  *
  * @example
@@ -119,7 +147,7 @@ export class Croppie {
 
 	// State
 	private image: HTMLImageElement | null = null;
-	private transform: TransformState = Croppie.initialTransform();
+	private transform: TransformState = initialTransform();
 	/** The rotation `bind()` started with; `reset()` returns to it. */
 	private initialRotation: Rotation = 0;
 	/** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
@@ -160,11 +188,6 @@ export class Croppie {
 	// bind win (an older bind that finishes loading later sees a newer generation and stops)
 	private destroyed = false;
 	private bindGeneration = 0;
-
-	/** The transform before any image is bound, and again after `destroy()`. */
-	private static initialTransform(): TransformState {
-		return { x: 0, y: 0, scale: 1, rotation: 0 };
-	}
 
 	constructor(element: HTMLElement, givenOptions: CroppieOptions) {
 		// Dimensions and zoom limits given as numeric strings (data attributes) are numbers
@@ -334,7 +357,7 @@ export class Croppie {
 		// points cannot throw: an array without exactly 4 entries is malformed like a NaN
 		// coordinate, and is ignored with the same warning in load(); the bind itself goes on,
 		// and like any bind it supersedes an older one
-		const rotation = this.resolveBindRotation(bindOptions);
+		const rotation = resolveBindRotation(bindOptions);
 		const points = readPoints(bindOptions.points);
 
 		await this.runBind(
@@ -342,29 +365,6 @@ export class Croppie {
 			() => bindOptions.url,
 			(image) => this.load(image, bindOptions, rotation, points),
 		);
-	}
-
-	/**
-	 * The rotation a bind starts with: the validated `rotation` option; else the rotation an
-	 * explicit `orientation` (EXIF 1-8) stands for; else 0. Mirrored or out-of-range
-	 * orientations cannot be expressed as a rotation, so they are ignored with a warning.
-	 *
-	 * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
-	 */
-	private resolveBindRotation(bindOptions: BindFileOptions): Rotation {
-		if (bindOptions.rotation !== undefined) {
-			return normalizeRotation(bindOptions.rotation);
-		}
-		if (bindOptions.orientation === undefined) return 0;
-
-		const rotation = exifOrientationToRotation(bindOptions.orientation);
-		if (rotation === undefined) {
-			console.warn(
-				`[@bayinformatics/croppie] Ignoring bind({ orientation: ${bindOptions.orientation} }): only the EXIF orientations 1, 3, 6 and 8 can be expressed as a rotation`,
-			);
-			return 0;
-		}
-		return rotation;
 	}
 
 	/**
@@ -568,7 +568,7 @@ export class Croppie {
 		}
 
 		// Validate and read the options like bind() does, before claiming a generation
-		const rotation = this.resolveBindRotation(options);
+		const rotation = resolveBindRotation(options);
 		const points = readPoints(options.points);
 
 		// Claim the generation before reading, so a bind() started while the file is
@@ -900,7 +900,7 @@ export class Croppie {
 		// EXIF orientation: that tag belonged to the image that is gone
 		this.exifOrientation = undefined;
 		this.initialRotation = 0;
-		this.transform = Croppie.initialTransform();
+		this.transform = initialTransform();
 	}
 
 	/**
