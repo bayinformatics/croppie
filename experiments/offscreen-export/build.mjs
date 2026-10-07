@@ -52,7 +52,9 @@ export async function build(outdir) {
   // Match the production command, including its sourceMappingURL comment.
   execFileSync(process.execPath, ["build", "src/index.ts", `--outdir=${outdir}`,
     "--entry-naming=croppie.[ext]", "--minify", "--sourcemap"], { cwd: root, stdio: "pipe" });
-  await writeFile(join(outdir, "croppie.css"), await readFile(join(root, "src/croppie.css")));
+  // The integrated production build minifies CSS (the worker's original snapshot did not).
+  execFileSync(process.execPath, ["build", "src/croppie.css", `--outdir=${outdir}`,
+    "--minify"], { cwd: root, stdio: "pipe" });
   await writeFile(join(outdir, "adapted-draw.ts"), adapted);
   const assets = ["native.js", "loader.js", "worker.js", "harness.js", "croppie.js", "croppie.css"];
   // Use Node's zlib, as in the parent measurement (Bun's compressor differs).

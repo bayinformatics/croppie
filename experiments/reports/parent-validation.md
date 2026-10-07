@@ -24,7 +24,7 @@ Measurements use Bun **1.4.2**, Node **24.16.0**, and gzip level 9. Each served 
 2. **Browser correctness:** Chromium 153.0.8010.12, Firefox 155.0, and Playwright WebKit 26.6 pass all eight EXIF orientations, mirrored images, rotation/state round-trips, circle transparency, proxy method calls, superseded/destroyed binds, and 20 replacements with correct object-URL cleanup. Fourteen output hashes per engine match baseline, including 12MP/48MP JPEG and transparent PNG exports at 256 and 2048 pixels.
 3. **Additional output checks:** the parent independently reran the focused runtime helper. Sixteen rotated/circular/fractional/letterboxed RGBA hashes, decoded encoded-output hashes, encoded lengths, and draw sequences match baseline within each engine.
 4. **Prototype checks:** an independent build reproduces the 4,627-byte widget subtotal and 8,099-byte complete demo. Strict types, 4,969 model assertions, 40 browser scenarios, and 63 pixel comparisons pass. These establish the documented geometry/lifecycle behavior and bounded edge-interpolation agreement, not production quality parity. The parent also reran the photo-quality comparison and visually inspected the resulting aliasing.
-5. **Lifecycle accounting:** each Orca task has an explicit outcome, committed artifacts, and a terminal ownership decision. The original three workers were released after their reports were accepted; their branches and reports remain available. A conditional follow-up examines worker export because the parent found substantial blocking on large photos.
+5. **Lifecycle accounting:** all four Orca dispatches have explicit outcomes, committed artifacts, and released worker terminals. The original three tasks cover size, runtime, and redesign; the conditional follow-up tests worker export because the parent found substantial blocking on large photos. Their branches and reports remain available.
 
 ### Runtime results: less work, no established photo-export speedup
 
@@ -45,6 +45,24 @@ Within-engine frame/export changes are generally within baseline batch variation
 The parent separately reran the focused synchronous workload, baseline/candidate/candidate/baseline, with 1,000 warmup operations and seven samples of 3,000 operations per page. Without subscribers, small `setZoom()` calls measured **5.0→2.9 ms** in Chromium, **9→5 ms** in Firefox, and **5→3 ms** in WebKit. These are tight-loop processing measurements, not user interaction latency. More directly, 1,000 small changes produce **0 unused `get()` calls and 0 unchanged `aria-valuetext` writes**, versus 1,000 of each at baseline. Subscribed events still receive their required snapshots.
 
 No workers were running CPU-heavy checks during the parent timing runs. This does not make the workstation a controlled laboratory: OS activity, graphics caches, garbage collection, and timer quantization remain. Physical iPhone/Android behavior and native/GPU memory were not measured.
+
+### Conditional worker-export follow-up
+
+The [OffscreenCanvas experiment](offscreen-export.md) reuses the complete production drawing algorithm, with guarded substitutions for canvas creation and ImageBitmap dimensions. It compares native export, bitmap transfer from an already decoded image, and Blob decoding inside a worker. It preserves progressive downsampling. The parent independently reran the complete strict correctness matrix:
+
+| Engine | Exact native/worker comparisons | Failed comparisons |
+| --- | ---: | ---: |
+| Chromium | 44 / 144 | 100 |
+| Firefox | 144 / 144 | 0 |
+| WebKit | 64 / 144 | 80 |
+
+All independent EXIF orientation/dimension checks pass; the mismatch is not treated as an orientation workaround. Fractional, circular, transparent and rotated cases expose rendering differences. The experiment's expected exit code is 1 because its equality gate fails. It remains outside production.
+
+A short independent Chromium timing repeat used two warmups and three samples per variant/workload (60 measured exports). For the **reused-source 48MP→256 PNG** case, native export took a median **36.5 ms** with a **34.5 ms** maximum timer gap; the reused Blob worker took **220.7 ms** with a **5.8 ms** gap. This corroborates the worker's larger run: responsiveness can improve while completion becomes slower. This isolated PNG workload differs from the earlier JPEG/gesture/lifecycle profile; their absolute times are not before/after comparisons.
+
+The worker and loader add **1,936 gzip bytes**. With the parent's minified CSS and accepted native build, the measured combined assets total **10,956 bytes** (9,020 + 1,936), before any unimplemented production lifecycle/fallback integration. The parent aligned the experiment's CSS accounting with the integrated build; the worker's historical 11,528-byte snapshot used its own unminified-CSS worktree. Raw recorded history was preserved.
+
+The reused workers retain their realm, not a decoded image. Worker-side source retention, cancellation and production fallback policies were not built or sized. These results reject the tested transparent replacement; they do not establish that every possible worker architecture is slower or unsuitable.
 
 ## Assumptions the experiments rejected
 

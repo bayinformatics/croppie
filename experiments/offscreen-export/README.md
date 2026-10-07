@@ -34,3 +34,7 @@ is an experiment maintenance seam: review production changes before reusing it.
 
 Read [the report](../reports/offscreen-export.md) for the strict pixel failures,
 responsiveness/latency tradeoffs, full byte accounting, commands and limitations.
+
+The checked-in worker evidence predates integration of CSS minification. Rerunning the
+build now minifies CSS to match the current package; the added worker/loader payload is
+unchanged. Keep fresh results separate with `OFFSCREEN_OUTPUT` when comparing snapshots.
