@@ -90,6 +90,34 @@ function describeValue(value: unknown): string {
 }
 
 /**
+ * The rotation a bind starts with: the validated `rotation` option; else the rotation an
+ * explicit `orientation` (EXIF 1-8) stands for; else 0. Mirrored or out-of-range
+ * orientations cannot be expressed as a rotation, so they are ignored with a warning.
+ *
+ * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
+ */
+function resolveBindRotation(bindOptions: BindFileOptions): Rotation {
+	if (bindOptions.rotation !== undefined) {
+		return normalizeRotation(bindOptions.rotation);
+	}
+	if (bindOptions.orientation === undefined) return 0;
+
+	const rotation = exifOrientationToRotation(bindOptions.orientation);
+	if (rotation === undefined) {
+		console.warn(
+			`[@bayinformatics/croppie] Ignoring bind({ orientation: ${bindOptions.orientation} }): only the EXIF orientations 1, 3, 6 and 8 can be expressed as a rotation`,
+		);
+		return 0;
+	}
+	return rotation;
+}
+
+/** The transform before any image is bound, and again after `destroy()`. */
+function initialTransform(): TransformState {
+	return { x: 0, y: 0, scale: 1, rotation: 0 };
+}
+
+/**
  * Modern, TypeScript-first image cropper.
  *
  * @example
@@ -103,7 +131,6 @@ function describeValue(value: unknown): string {
  * ```
  */
 export class Croppie {
-	private readonly element: HTMLElement;
 	private readonly options: Required<
 		Pick<
 			CroppieOptions,
@@ -115,14 +142,12 @@ export class Croppie {
 	// DOM elements
 	private container: HTMLDivElement | null = null;
 	private boundaryEl: HTMLDivElement | null = null;
-	private viewportEl: HTMLDivElement | null = null;
-	private overlayEl: HTMLDivElement | null = null;
 	private previewEl: HTMLImageElement | null = null;
 	private sliderEl: HTMLInputElement | null = null;
 
 	// State
 	private image: HTMLImageElement | null = null;
-	private transform: TransformState = Croppie.initialTransform();
+	private transform: TransformState = initialTransform();
 	/** The rotation `bind()` started with; `reset()` returns to it. */
 	private initialRotation: Rotation = 0;
 	/** The EXIF Orientation tag of the bound image (only read with `enableExif`); informational. */
@@ -164,16 +189,10 @@ export class Croppie {
 	private destroyed = false;
 	private bindGeneration = 0;
 
-	/** The transform before any image is bound, and again after `destroy()`. */
-	private static initialTransform(): TransformState {
-		return { x: 0, y: 0, scale: 1, rotation: 0 };
-	}
-
 	constructor(element: HTMLElement, givenOptions: CroppieOptions) {
 		// Dimensions and zoom limits given as numeric strings (data attributes) are numbers
 		// from here on, so no string reaches the arithmetic
 		const options = validateOptions(givenOptions);
-		this.element = element;
 
 		// Calculate default boundary (viewport + 100px padding)
 		const defaultBoundary: Boundary = {
@@ -210,18 +229,18 @@ export class Croppie {
 			this.zoomConfig.max,
 		);
 
-		this.createElements();
+		this.createElements(element);
 		this.attachEventHandlers();
 	}
 
 	/**
 	 * Creates all DOM elements
 	 */
-	private createElements(): void {
+	private createElements(element: HTMLElement): void {
 		this.container = createContainer(this.options.customClass);
 		this.boundaryEl = createBoundary(this.options.boundary);
-		this.viewportEl = createViewport(this.options.viewport);
-		this.overlayEl = createOverlay(
+		const viewportEl = createViewport(this.options.viewport);
+		const overlayEl = createOverlay(
 			this.options.boundary,
 			this.options.viewport,
 		);
@@ -229,8 +248,8 @@ export class Croppie {
 
 		// Assemble the DOM tree
 		this.boundaryEl.appendChild(this.previewEl);
-		this.boundaryEl.appendChild(this.overlayEl);
-		this.boundaryEl.appendChild(this.viewportEl);
+		this.boundaryEl.appendChild(overlayEl);
+		this.boundaryEl.appendChild(viewportEl);
 		this.container.appendChild(this.boundaryEl);
 
 		// Add zoom slider if enabled
@@ -256,7 +275,7 @@ export class Croppie {
 			});
 		}
 
-		this.element.appendChild(this.container);
+		element.appendChild(this.container);
 	}
 
 	/**
@@ -338,7 +357,7 @@ export class Croppie {
 		// points cannot throw: an array without exactly 4 entries is malformed like a NaN
 		// coordinate, and is ignored with the same warning in load(); the bind itself goes on,
 		// and like any bind it supersedes an older one
-		const rotation = this.resolveBindRotation(bindOptions);
+		const rotation = resolveBindRotation(bindOptions);
 		const points = readPoints(bindOptions.points);
 
 		await this.runBind(
@@ -346,29 +365,6 @@ export class Croppie {
 			() => bindOptions.url,
 			(image) => this.load(image, bindOptions, rotation, points),
 		);
-	}
-
-	/**
-	 * The rotation a bind starts with: the validated `rotation` option; else the rotation an
-	 * explicit `orientation` (EXIF 1-8) stands for; else 0. Mirrored or out-of-range
-	 * orientations cannot be expressed as a rotation, so they are ignored with a warning.
-	 *
-	 * @throws RangeError if `bindOptions.rotation` is not a multiple of 90
-	 */
-	private resolveBindRotation(bindOptions: BindFileOptions): Rotation {
-		if (bindOptions.rotation !== undefined) {
-			return normalizeRotation(bindOptions.rotation);
-		}
-		if (bindOptions.orientation === undefined) return 0;
-
-		const rotation = exifOrientationToRotation(bindOptions.orientation);
-		if (rotation === undefined) {
-			console.warn(
-				`[@bayinformatics/croppie] Ignoring bind({ orientation: ${bindOptions.orientation} }): only the EXIF orientations 1, 3, 6 and 8 can be expressed as a rotation`,
-			);
-			return 0;
-		}
-		return rotation;
 	}
 
 	/**
@@ -572,7 +568,7 @@ export class Croppie {
 		}
 
 		// Validate and read the options like bind() does, before claiming a generation
-		const rotation = this.resolveBindRotation(options);
+		const rotation = resolveBindRotation(options);
 		const points = readPoints(options.points);
 
 		// Claim the generation before reading, so a bind() started while the file is
@@ -897,8 +893,6 @@ export class Croppie {
 
 		this.container = null;
 		this.boundaryEl = null;
-		this.viewportEl = null;
-		this.overlayEl = null;
 		this.previewEl = null;
 		this.sliderEl = null;
 		this.image = null;
@@ -906,7 +900,7 @@ export class Croppie {
 		// EXIF orientation: that tag belonged to the image that is gone
 		this.exifOrientation = undefined;
 		this.initialRotation = 0;
-		this.transform = Croppie.initialTransform();
+		this.transform = initialTransform();
 	}
 
 	/**
@@ -1048,11 +1042,14 @@ export class Croppie {
 	 */
 	private updateSlider(): void {
 		if (this.sliderEl) {
-			this.sliderEl.value = String(this.transform.scale);
-			this.sliderEl.setAttribute(
-				"aria-valuetext",
-				`${Math.round(this.transform.scale * 100)}%`,
-			);
+			const value = String(this.transform.scale);
+			if (this.sliderEl.value !== value) this.sliderEl.value = value;
+			const spokenValue = `${Math.round(this.transform.scale * 100)}%`;
+			// Small wheel/pinch changes often leave the spoken percentage unchanged. Read the
+			// DOM rather than caching it so a clamped input still repairs an altered slider.
+			if (this.sliderEl.getAttribute("aria-valuetext") !== spokenValue) {
+				this.sliderEl.setAttribute("aria-valuetext", spokenValue);
+			}
 		}
 	}
 
@@ -1126,7 +1123,11 @@ export class Croppie {
 	 * Emits an update event
 	 */
 	private emitUpdate(): void {
-		this.emitEvent("update", this.get());
+		// Crop coordinates are only needed by update subscribers. Keep dispatch synchronous,
+		// checking the live set so listeners added by a rotate handler are included too.
+		if (this.eventHandlers.get("update")?.size) {
+			this.emitEvent("update", this.get());
+		}
 	}
 
 	/**
